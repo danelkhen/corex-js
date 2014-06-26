@@ -5,6 +5,7 @@
     <link href="index.css" rel="stylesheet" />
     <script src="../js/corex.js"></script>
     <script src="../lib/jquery/jquery-2.0.3.js"></script>
+    <script src="../res/databind.js"></script>
     <script src="index.js"></script>
     <script>$(main);</script>
 </head>
@@ -12,9 +13,12 @@
     <div>
     <button onclick="$(document).databind();">databind</button>
     <button onclick="$(document).databindback();">databindback</button>
-    <button onclick="$(document).data('context').push({name:'New', isCool:false});$(document).databind();">New Item</button>
+    <button onclick="$(document).data('context').contacts.push({name:'New', isCool:false});$(document).databind();">New Item</button>
     </div>
-    <textarea id="preJson" cols="80" rows="10" data-onbind="this.value=JSON.stringify(context);" onchange="$(this).databindback();$(document).databind();" data-onbindback="$(document).data('context', JSON.parse(this.value));"></textarea>
+    <textarea id="preJson" cols="80" rows="10" 
+              data-onbind="this.value=JSON.stringify(context);" 
+              onchange="$(this).databindback();$(document).databind();" 
+              data-onbindback="$(document).data('context', JSON.parse(this.value));"></textarea>
     <div class="Repeater" data-bindings="contacts:children;">
         <div class="Contact Template">
             <input data-bindings="name"                    onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();" />

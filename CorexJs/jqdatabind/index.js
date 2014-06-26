@@ -10,7 +10,7 @@
 
 
 
-
+/*
 function DataBindingPlugin() {
     init();
     function init() {
@@ -199,3 +199,4 @@ function DataBindingPlugin() {
 };
 DataBindingPlugin();
 
+*/
