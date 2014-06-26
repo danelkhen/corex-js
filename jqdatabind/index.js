@@ -1,6 +1,11 @@
 ﻿function main() {
-    $(document.body).data("context", [{ name: "Shooki", isCool: true }, { name: "Booki", isCool: false }]);
-    $(document.body).databind();
+    var list = [{ name: "Shooki", isCool: true }, { name: "Booki", isCool: false }];
+    $(document).data("context", list);
+    $(document).databind();
+    //window.setTimeout(function(){
+    //    list.push({name:"New", isCool:false});
+    //    $(document.body).databind();
+    //}, 1000);
 }
 
 function bindArrayToChildren(el, template, list){
@@ -11,25 +16,29 @@ function bindArrayToChildren(el, template, list){
         return $(template).clone(true).removeClass('Template').data('context', t);
     }
     var index = 0;
-    children.forEach(function(ch){
-        var ch2 = $(ch);
+    var index2 = 0;
+    while(index2<children.length) {
+        var ch2 = $(children[index2]);
         var dc2 = ch2.data("context");
         if(dc2==null)
-            return;
+            continue;
         var dc = list[index];
         if(dc!=dc2){
             if(dc==null){
                 ch2.remove();
-                return;
+                index2++;
+                continue;
             }
-            var ch3 = createTemplate(dc);
-            ch3.insertBefore(ch2);
+            else{
+                var ch3 = createTemplate(dc);
+                ch3.insertBefore(ch2);
+                index++;
+                continue;
+            }
         }
-        else{
-
-        }
+        index2++;
         index++;
-    });
+    }
     while(index<list.length){
         el2.append(createTemplate(list[index]));
         index++;
@@ -48,7 +57,7 @@ function DataBindingPlugin(){
     
 
     function document_databind(e) {
-        console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify($(e.target).data("context")));
+        //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify($(e.target).data("context")));
         if (e.isDefaultPrevented())
             return;
 
@@ -77,8 +86,10 @@ function DataBindingPlugin(){
 
         children.toArray().forEach(function(t){
             var t2 = $(t);
-            if(t2.data("context")==null){
+            var ctx = t2.data("context");
+            if(ctx==null || t2.data("inherited-context")==ctx){
                 t2.data("context", childDataContext);
+                t2.data("inherited-context", childDataContext);
             }
             else{
                 console.log();
@@ -157,6 +168,9 @@ function DataBindingPlugin(){
         return obj;
     }
     
+    $.databind = function(){
+        $(document).databind();
+    }
     $.fn.databind = function () {
         this.trigger("databind");
         return this;

@@ -9,14 +9,18 @@
     <script>$(main);</script>
 </head>
 <body>
+    <div>
+    <button onclick="$(document).databind();">databind</button>
+    <button onclick="$(document).databindback();">databindback</button>
+    <button onclick="$(document).data('context').push({name:'New', isCool:false});$(document).databind();">New Item</button>
+    </div>
+    <textarea data-onbind="this.value=JSON.stringify(context);" onchange="$(this).databindback();debugger;$(document).databind()" data-onbindback="debugger;$(document).data('context', JSON.parse(this.value));"></textarea>
     <div class="Repeater" data-onbind="bindArrayToChildren(this, '.Contact.Template', context);">
         <div class="Contact Template">
             <input data-bindings="name" onchange="$(this).databindback(); $(this).closest('div').find('pre').databind()" />
             <input type="checkbox" data-bindings="isCool" />
-            <pre data-onbind="this.textContent = JSON.stringify(context)"></pre>
+            <pre data-onbind="this.textContent=JSON.stringify(context);"></pre>
         </div>
     </div>
-    <button onclick="$(document).databind();">databind</button>
-    <button onclick="$(document).databindback();">databindback</button>
 </body>
 </html>
