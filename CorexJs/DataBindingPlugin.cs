@@ -4,7 +4,7 @@ using SharpKit.jQuery;
 
 namespace CorexJs
 {
-    [JsType(JsMode.Global, PreCode ="(function(){", PostCode ="})();", Filename="res/databind.js")]
+    [JsType(JsMode.Global, PreCode = "(function(){", PostCode = "})();", Filename = "res/databind.js")]
     public class DataBindingPlugin : jQueryContext
     {
 
@@ -12,13 +12,13 @@ namespace CorexJs
         {
             init();
         }
-        public static void init()
+        static void init()
         {
             J(document).on("databind", document_databind);
             J(document).on("databindback", document_databindback);
         }
 
-        public static void document_databind(Event e)
+        static void document_databind(Event e)
         {
             //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(J(e.target).data("context")));
             if (e.isDefaultPrevented())
@@ -38,7 +38,7 @@ namespace CorexJs
                     return;
                 }
             }
-            var bindings = parseBindings(J(e.target).data("bindings").As<JsString>(), getDefaultBindingTarget(e.target));
+            var bindings = parseBindings2(J(e.target).data("bindings").As<JsString>(), getDefaultBindingTarget(e.target));
             if (bindings != null)
             {
                 databind_bind(dataContext, e.target, bindings);
@@ -67,38 +67,38 @@ namespace CorexJs
             children.databind();
         }
 
-        public static void databind_bind(object source, object target, JsObject<JsString> bindings)
+        static void databind_bind(object source, object target, JsArray<Binding> bindings)
         {
             if (bindings == null || target == null || source == null)
                 return;
-            JsObjectExt.forEach(bindings, (sourcePath, targetPath) =>
+            bindings.forEach(t =>
             {
-                if (targetPath == "children")
+                if (t.TargetPath == "children")
                 {
-                    bindArrayToChildren(target, null, JsObjectExt.tryGet(source, sourcePath));
+                    bindArrayToChildren(target, null, JsObjectExt.tryGet(source, t.SourcePath));
                 }
                 else
                 {
-                    databind_tryCopy(source, sourcePath, target, targetPath);
+                    databind_tryCopy(source, t.SourcePath, target, t.TargetPath);
                 }
             });
         }
 
-        public static void databind_bindBack(object source, object target, JsObject<JsString> bindings)
+        static void databind_bindBack(object source, object target, JsArray<Binding> bindings)
         {
-            JsObjectExt.forEach(bindings, (sourcePath, targetPath) =>
+            bindings.forEach(t=>
             {
-                databind_tryCopy(target, targetPath, source, sourcePath);
+                databind_tryCopy(target, t.TargetPath, source, t.SourcePath);
             });
         }
 
-        public static void databind_tryCopy(object source, JsString sourcePath, object target, JsString targetPath)
+        static void databind_tryCopy(object source, JsString sourcePath, object target, JsString targetPath)
         {
             var value = JsObjectExt.tryGet(source, sourcePath);
             JsObjectExt.trySet(target, targetPath, value);
         }
 
-        public static void document_databindback(Event e)
+        static void document_databindback(Event e)
         {
             //console.log(e.type, e.target.nodeName, e.target.className);
             if (e.isDefaultPrevented())
@@ -119,7 +119,7 @@ namespace CorexJs
                     return;
                 }
             }
-            var bindings = parseBindings(J(e.target).data("bindings").As<JsString>(), getDefaultBindingTarget(e.target));
+            var bindings = parseBindings2(J(e.target).data("bindings").As<JsString>(), getDefaultBindingTarget(e.target));
             if (bindings != null)
             {
                 databind_bindBack(dataContext, e.target, bindings);
@@ -128,7 +128,7 @@ namespace CorexJs
             target.children(":not(.Template)").databindback();
         }
 
-        public static void bindArrayToChildren(object el, object template, object context)
+        static void bindArrayToChildren(object el, object template, object context)
         {
             var list = context.As<JsArray<object>>();
             var el2 = J(el);
@@ -143,10 +143,13 @@ namespace CorexJs
                 return;
             var children = el2.children(":not(.Template)").toArray();
 
-            JsFunc<object, jQuery> createTemplate = t =>
-            {
-                return template2.clone(true).removeClass("Template").data("context", t);
-            };
+            JsFunc<object, jQuery> createTemplate = t => template2.clone(true).removeClass("Template").data("context", t);
+
+            bindArrayToChildrenInternal(list, el2, children, createTemplate);
+        }
+
+        static void bindArrayToChildrenInternal(JsArray<object> source, jQuery target, JsArray<HtmlElement> children, JsFunc<object, jQuery> creator)
+        {
             var index = 0;
             var index2 = 0;
             while (index2 < children.length)
@@ -155,7 +158,7 @@ namespace CorexJs
                 var dc2 = ch2.data("context");
                 if (dc2 == null)
                     continue;
-                var dc = list[index];
+                var dc = source[index];
                 if (dc != dc2)
                 {
                     if (dc == null)
@@ -166,7 +169,7 @@ namespace CorexJs
                     }
                     else
                     {
-                        var ch3 = createTemplate(dc);
+                        var ch3 = creator(dc);
                         ch3.insertBefore(ch2);
                         index++;
                         continue;
@@ -175,14 +178,14 @@ namespace CorexJs
                 index2++;
                 index++;
             }
-            while (index < list.length)
+            while (index < source.length)
             {
-                el2.append(createTemplate(list[index]));
+                target.append(creator(source[index]));
                 index++;
             }
         }
 
-        public static JsString getDefaultBindingTarget(HtmlElement el)
+        static JsString getDefaultBindingTarget(HtmlElement el)
         {
             if (el.nodeName == "INPUT")
             {
@@ -193,24 +196,28 @@ namespace CorexJs
         }
 
 
-        public static JsObject<JsString> parseBindings(JsString s, JsString defaultTarget)
+        static JsArray<Binding> parseBindings2(JsString s, JsString defaultTarget)
         {
             if (s == null || s == "")
                 return null;
             var pairs = s.split(';');
-            var obj = new JsObject<JsString>();
+            var list = new JsArray<Binding>();
             pairs.forEach(pair =>
             {
                 if (pair == "")
                     return;
                 var pair2 = pair.split(":");
-                obj[pair2[0]] = pair2[1] ?? defaultTarget;
+                var b = new Binding
+                {
+                    SourcePath = pair2[0],
+                    TargetPath = pair2[1] ?? defaultTarget
+                };
+                list.Add(b);
             });
-            return obj;
+            return list;
         }
 
-
-        [JsType(JsMode.Prototype, Name = "$", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "res/databind.js", PrototypeName ="fn")]
+        [JsType(JsMode.Prototype, Name = "$", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "res/databind.js", PrototypeName = "fn")]
         class Plugin : jQuery
         {
             public jQuery databind()
@@ -229,7 +236,16 @@ namespace CorexJs
 
     }
 
-    [JsType(JsMode.Prototype, Export =false)]
+    [JsType(JsMode.Json)]
+    class Binding
+    {
+        //public object Source { get; set; }
+        public JsString SourcePath { get; set; }
+        //public HtmlElement Target { get; set; }
+        public JsString TargetPath { get; set; }
+    }
+
+    [JsType(JsMode.Prototype, Export = false)]
     static class jQueryDataBindingPluginExtension
     {
         [JsMethod(ExtensionImplementedInInstance = true)]

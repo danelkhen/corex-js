@@ -21,7 +21,7 @@ function document_databind(e){
             return;
         }
     }
-    var bindings = parseBindings($(e.target).data("bindings"), getDefaultBindingTarget(e.target));
+    var bindings = parseBindings2($(e.target).data("bindings"), getDefaultBindingTarget(e.target));
     if (bindings != null){
         databind_bind(dataContext, e.target, bindings);
     }
@@ -45,18 +45,18 @@ function document_databind(e){
 function databind_bind(source, target, bindings){
     if (bindings == null || target == null || source == null)
         return;
-    Object.forEach(bindings, function (sourcePath, targetPath){
-        if (targetPath == "children"){
-            bindArrayToChildren(target, null, Object.tryGet(source, sourcePath));
+    bindings.forEach(function (t){
+        if (t.TargetPath == "children"){
+            bindArrayToChildren(target, null, Object.tryGet(source, t.SourcePath));
         }
         else {
-            databind_tryCopy(source, sourcePath, target, targetPath);
+            databind_tryCopy(source, t.SourcePath, target, t.TargetPath);
         }
     });
 };
 function databind_bindBack(source, target, bindings){
-    Object.forEach(bindings, function (sourcePath, targetPath){
-        databind_tryCopy(target, targetPath, source, sourcePath);
+    bindings.forEach(function (t){
+        databind_tryCopy(target, t.TargetPath, source, t.SourcePath);
     });
 };
 function databind_tryCopy(source, sourcePath, target, targetPath){
@@ -78,7 +78,7 @@ function document_databindback(e){
             return;
         }
     }
-    var bindings = parseBindings($(e.target).data("bindings"), getDefaultBindingTarget(e.target));
+    var bindings = parseBindings2($(e.target).data("bindings"), getDefaultBindingTarget(e.target));
     if (bindings != null){
         databind_bindBack(dataContext, e.target, bindings);
     }
@@ -100,6 +100,9 @@ function bindArrayToChildren(el, template, context){
     var createTemplate = function (t){
         return template2.clone(true).removeClass("Template").data("context", t);
     };
+    bindArrayToChildrenInternal(list, el2, children, createTemplate);
+};
+function bindArrayToChildrenInternal(source, target, children, creator){
     var index = 0;
     var index2 = 0;
     while (index2 < children.length){
@@ -107,7 +110,7 @@ function bindArrayToChildren(el, template, context){
         var dc2 = ch2.data("context");
         if (dc2 == null)
             continue;
-        var dc = list[index];
+        var dc = source[index];
         if (dc != dc2){
             if (dc == null){
                 ch2.remove();
@@ -115,7 +118,7 @@ function bindArrayToChildren(el, template, context){
                 continue;
             }
             else {
-                var ch3 = createTemplate(dc);
+                var ch3 = creator(dc);
                 ch3.insertBefore(ch2);
                 index++;
                 continue;
@@ -124,8 +127,8 @@ function bindArrayToChildren(el, template, context){
         index2++;
         index++;
     }
-    while (index < list.length){
-        el2.append(createTemplate(list[index]));
+    while (index < source.length){
+        target.append(creator(source[index]));
         index++;
     }
 };
@@ -136,18 +139,22 @@ function getDefaultBindingTarget(el){
     }
     return "value";
 };
-function parseBindings(s, defaultTarget){
+function parseBindings2(s, defaultTarget){
     if (s == null || s == "")
         return null;
     var pairs = s.split(";");
-    var obj = new Object();
+    var list =  [];
     pairs.forEach(function (pair){
         if (pair == "")
             return;
         var pair2 = pair.split(":");
-        obj[pair2[0]] = (pair2[1] != null ? pair2[1] : defaultTarget);
+        var b = {
+            SourcePath: pair2[0],
+            TargetPath: (pair2[1] != null ? pair2[1] : defaultTarget)
+        };
+        list.push(b);
     });
-    return obj;
+    return list;
 };
 })();
 $.fn.databind = function (){

@@ -11,18 +11,17 @@
 </head>
 <body>
     <div>
-    <button onclick="$(document).databind();">databind</button>
-    <button onclick="$(document).databindback();">databindback</button>
-    <button onclick="$(document).data('context').contacts.push({name:'New', isCool:false});$(document).databind();">New Item</button>
+        <button onclick="$(document).databind();">databind</button>
+        <button onclick="$(document).databindback();">databindback</button>
+        <button onclick="$(document).data('context').contacts.push({name:'New', isCool:false});$(document).databind();">New Item</button>
     </div>
     <textarea id="preJson" cols="80" rows="10" 
               data-onbind="this.value=JSON.stringify(context);" 
-              onchange="$(this).databindback();$(document).databind();" 
-              data-onbindback="$(document).data('context', JSON.parse(this.value));"></textarea>
+              onchange="$(document).data('context', JSON.parse(this.value));$(document).databind();"></textarea>
     <div class="Repeater" data-bindings="contacts:children;">
         <div class="Contact Template">
-            <input data-bindings="name"                    onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();" />
-            <input type="checkbox" data-bindings="isCool"  onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();"/>
+            <input                 data-bindings="name"   onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();" />
+            <input type="checkbox" data-bindings="isCool" onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();"/>
             <pre data-onbind="this.textContent=JSON.stringify(context);"></pre>
         </div>
     </div>
