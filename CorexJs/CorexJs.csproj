@@ -55,12 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\jquery\jquery-2.0.3.min.map" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="jqdatabind\index.css" />
