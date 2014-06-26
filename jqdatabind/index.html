@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="index.css" rel="stylesheet" />
+    <script src="../js/corex.js"></script>
+    <script src="../lib/jquery/jquery-2.0.3.js"></script>
+    <script src="index.js"></script>
+    <script>$(main);</script>
+</head>
+<body>
+    <div class="Repeater" data-onbind="bindArrayToChildren(this, '.Contact.Template', context);">
+        <div class="Contact Template">
+            <input data-bindings="name" onchange="$(this).databindback(); $(this).closest('div').find('pre').databind()" />
+            <input type="checkbox" data-bindings="isCool" />
+            <pre data-onbind="this.textContent = JSON.stringify(context)"></pre>
+        </div>
+    </div>
+    <button onclick="$(document).databind();">databind</button>
+    <button onclick="$(document).databindback();">databindback</button>
+</body>
+</html>
