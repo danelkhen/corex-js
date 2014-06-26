@@ -1,4 +1,5 @@
 *.ide
 *.suo
+*.user
 bin
 obj

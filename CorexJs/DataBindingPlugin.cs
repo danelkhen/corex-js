@@ -12,6 +12,7 @@ namespace CorexJs
         {
             init();
         }
+
         static void init()
         {
             J(document).on("databind", document_databind);
@@ -62,27 +63,29 @@ namespace CorexJs
             bindings.forEach(t =>
             {
                 if (t.TargetPath == "children")
-                {
-                    bindArrayToChildren(target, null, source.tryGet(t.SourcePath));
-                }
+                    bindArrayToChildren(target, null, source.tryGetByPath(t.SourcePath));
                 else
-                {
                     databind_tryCopy(source, t.SourcePath, target, t.TargetPath);
-                }
             });
         }
 
         static void databind_bindBack(object source, object target, JsArray<Binding> bindings)
         {
-            bindings.forEach(t=>
+            bindings.forEach(t =>
             {
-                databind_tryCopy(target, t.TargetPath, source, t.SourcePath);
+                if (t.TargetPath == "children")
+                {
+                }
+                else
+                {
+                    databind_tryCopy(target, t.TargetPath, source, t.SourcePath);
+                }
             });
         }
 
         static void databind_tryCopy(object source, JsString sourcePath, object target, JsString targetPath)
         {
-            var value = JsObjectExt.tryGet(source, sourcePath);
+            var value = source.tryGetByPath(sourcePath);
             JsObjectExt.trySet(target, targetPath, value);
         }
 
@@ -113,6 +116,7 @@ namespace CorexJs
             var bindings = parseBindings(J(el).data("bindings").As<JsString>(), getDefaultBindingTarget(el));
             return bindings;
         }
+
         static void triggerAttributeEvent(Event e, JsString name, object source, JsString member)
         {
             var att = J(e.target).data(name).As<JsString>();
@@ -124,10 +128,10 @@ namespace CorexJs
                 e.preventDefault();
         }
 
-        static void bindArrayToChildren(object el, object template, object context)
+        static void bindArrayToChildren(object target, object template, object source)
         {
-            var list = context.As<JsArray<object>>();
-            var el2 = J(el);
+            var list = source.As<JsArray<object>>();
+            var el2 = J(target);
             var template2 = J(template);
             if (template2.length == 0)
                 template2 = el2.find(".Template:first");
@@ -153,7 +157,10 @@ namespace CorexJs
                 var ch2 = J(children[index2]);
                 var dc2 = ch2.data("source");
                 if (dc2 == null)
+                {
+                    index2++;
                     continue;
+                }
                 var dc = source[index];
                 if (dc != dc2)
                 {
@@ -243,6 +250,18 @@ namespace CorexJs
         public JsString TargetPath { get; set; }
     }
 
+
+    [JsType(JsMode.Prototype, Name = "BindingExt", Filename = "res/databind.js")]
+    static class BindingExtensions
+    {
+        public static object tryGetByPath(this object obj, JsString path)
+        {
+            if (path == null || path == "")
+                return obj;
+            return obj.tryGet(path);
+        }
+
+    }
     [JsType(JsMode.Prototype, Export = false)]
     static class jQueryDataBindingPluginExtension
     {

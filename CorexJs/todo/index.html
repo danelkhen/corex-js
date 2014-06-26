@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>TODO Demo</title>
+    <link href="index.css" rel="stylesheet" />
+    <script src="../js/corex.js"></script>
+    <script src="../lib/jquery/jquery-2.0.3.js"></script>
+    <script src="../res/databind.js"></script>
+    <script src="index.js"></script>
+    <script>$(main);</script>
+</head>
+<body>
+    <h1>TODO Lists</h1>
+    <div>
+        <button onclick="save();">Save</button>
+        <button onclick="load();">Load</button>
+    </div>
+    <div data-bindings=":children;">
+        <div class="TodoList Template">
+            <input class="Name" data-bindings="name:value;" onchange="$(this).databindback();" />
+            <div class="Items">
+                <div data-bindings="items:children;">
+                    <div class="TodoItem Template" data-onbind="$(this).toggleClass('Done', source.done);">
+                        <input type="checkbox" data-bindings="done:checked;" onchange="$(this).databindback().closest('.TodoItem').databind();" />
+                        <input data-bindings="title:value;" onchange="$(this).databindback();" onfocus="window.setTimeout(this.select.bind(this), 0);" />
+                    </div>
+                </div>
+                <div>
+                    <button onclick="$(this).closest('.TodoList').data('source').items.push({title:'Task', done:false});$(document).databind();">New Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="float:left">
+        <button onclick="$(document).data('source').push({name:'List', items:[]});$(document).databind();">New List</button>
+    </div>
+</body>
+</html>

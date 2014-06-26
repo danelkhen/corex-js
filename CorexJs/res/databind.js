@@ -36,21 +36,23 @@ function databind_bind(source, target, bindings){
     if (bindings == null || target == null || source == null)
         return;
     bindings.forEach(function (t){
-        if (t.TargetPath == "children"){
-            bindArrayToChildren(target, null, Object.tryGet(source, t.SourcePath));
-        }
-        else {
+        if (t.TargetPath == "children")
+            bindArrayToChildren(target, null, BindingExt.tryGetByPath(source, t.SourcePath));
+        else
             databind_tryCopy(source, t.SourcePath, target, t.TargetPath);
-        }
     });
 };
 function databind_bindBack(source, target, bindings){
     bindings.forEach(function (t){
-        databind_tryCopy(target, t.TargetPath, source, t.SourcePath);
+        if (t.TargetPath == "children"){
+        }
+        else {
+            databind_tryCopy(target, t.TargetPath, source, t.SourcePath);
+        }
     });
 };
 function databind_tryCopy(source, sourcePath, target, targetPath){
-    var value = Object.tryGet(source, sourcePath);
+    var value = BindingExt.tryGetByPath(source, sourcePath);
     Object.trySet(target, targetPath, value);
 };
 function document_databindback(e){
@@ -81,9 +83,9 @@ function triggerAttributeEvent(e, name, source, member){
     if (!e.isDefaultPrevented() && returnValue === false)
         e.preventDefault();
 };
-function bindArrayToChildren(el, template, context){
-    var list = context;
-    var el2 = $(el);
+function bindArrayToChildren(target, template, source){
+    var list = source;
+    var el2 = $(target);
     var template2 = $(template);
     if (template2.length == 0)
         template2 = el2.find(".Template:first");
@@ -105,8 +107,10 @@ function bindArrayToChildrenInternal(source, target, children, creator){
     while (index2 < children.length){
         var ch2 = $(children[index2]);
         var dc2 = ch2.data("source");
-        if (dc2 == null)
+        if (dc2 == null){
+            index2++;
             continue;
+        }
         var dc = source[index];
         if (dc != dc2){
             if (dc == null){
@@ -161,5 +165,12 @@ $.fn.databind = function (){
 $.fn.databindback = function (){
     this.trigger("databindback");
     return this;
+};
+var BindingExt = function (){
+};
+BindingExt.tryGetByPath = function (obj, path){
+    if (path == null || path == "")
+        return obj;
+    return Object.tryGet(obj, path);
 };
 

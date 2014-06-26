@@ -20,9 +20,9 @@
               onchange="$(document).data('source', JSON.parse(this.value));$(document).databind();"></textarea>
     <div class="Repeater" data-bindings="contacts:children;">
         <div class="Contact Template">
-            <input                 data-bindings="name"       onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();" />
-            <input                 data-bindings="age:value" data-onbindback="source.age = parseInt(this.value);return false;"  onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();" />
-            <input type="checkbox" data-bindings="isCool"     onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();"/>
+            <input                 data-bindings="name:value;"      onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();" />
+            <input                 data-bindings="age:value;"       data-onbindback="source.age = parseInt(this.value);return false;"  onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();" />
+            <input type="checkbox" data-bindings="isCool:checked;"  onchange="$(this).databindback(); $(this).closest('div').find('pre').databind(); $('#preJson').databind();"/>
             <pre data-onbind="this.textContent=JSON.stringify(source);"></pre>
         </div>
     </div>
