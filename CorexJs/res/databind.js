@@ -10,34 +10,24 @@ function document_databind(e){
     if (e.isDefaultPrevented())
         return;
     var target = $(e.target);
-    var dataContext = target.data("context");
-    var dataMember = target.data("member");
-    var att = $(e.target).data("onbind");
-    if (att != null){
-        var func = new Function("event", "context", "member", att);
-        var returnValue = func.call(e.target, e, dataContext, dataMember);
-        if (!e.isDefaultPrevented() && returnValue === false){
-            e.preventDefault();
-            return;
-        }
-    }
-    var bindings = parseBindings2($(e.target).data("bindings"), getDefaultBindingTarget(e.target));
-    if (bindings != null){
-        databind_bind(dataContext, e.target, bindings);
-    }
+    var source = target.data("source");
+    var member = target.data("member");
+    triggerAttributeEvent(e, "onbind", source, member);
+    if (e.isDefaultPrevented())
+        return;
+    var bindings = getBindings(e.target);
+    if (bindings != null)
+        databind_bind(source, e.target, bindings);
     var children = target.children(":not(.Template)");
-    var childDataContext = dataContext;
-    if (childDataContext != null && dataMember != null)
-        childDataContext = childDataContext[dataMember];
+    var childSource = source;
+    if (childSource != null && member != null)
+        childSource = childSource[member];
     children.toArray().forEach(function (t){
         var t2 = $(t);
-        var ctx = t2.data("context");
-        if (ctx == null || t2.data("inherited-context") == ctx){
-            t2.data("context", childDataContext);
-            t2.data("inherited-context", childDataContext);
-        }
-        else {
-            console.log();
+        var ctx = t2.data("source");
+        if (ctx == null || t2.data("inherited-source") == ctx){
+            t2.data("source", childSource);
+            t2.data("inherited-source", childSource);
         }
     });
     children.databind();
@@ -67,22 +57,29 @@ function document_databindback(e){
     if (e.isDefaultPrevented())
         return;
     var target = $(e.target);
-    var dataContext = target.data("context");
+    var dataContext = target.data("source");
     var dataMember = target.data("member");
     var att = $(e.target).data("onbindback");
-    if (att != null){
-        var func = new Function("event", "context", "member", att);
-        var returnValue = func.call(e.target, e, dataContext, dataMember);
-        if (!e.isDefaultPrevented() && returnValue === false){
-            e.preventDefault();
-            return;
-        }
-    }
-    var bindings = parseBindings2($(e.target).data("bindings"), getDefaultBindingTarget(e.target));
-    if (bindings != null){
+    triggerAttributeEvent(e, "onbindback", dataContext, dataMember);
+    if (e.isDefaultPrevented())
+        return;
+    var bindings = getBindings(e.target);
+    if (bindings != null)
         databind_bindBack(dataContext, e.target, bindings);
-    }
     target.children(":not(.Template)").databindback();
+};
+function getBindings(el){
+    var bindings = parseBindings($(el).data("bindings"), getDefaultBindingTarget(el));
+    return bindings;
+};
+function triggerAttributeEvent(e, name, source, member){
+    var att = $(e.target).data(name);
+    if (att == null)
+        return;
+    var func = new Function("event", "source", "member", "target", att);
+    var returnValue = func.call(e.target, e, source, member, e.target);
+    if (!e.isDefaultPrevented() && returnValue === false)
+        e.preventDefault();
 };
 function bindArrayToChildren(el, template, context){
     var list = context;
@@ -93,12 +90,12 @@ function bindArrayToChildren(el, template, context){
     if (template2.length == 0)
         return;
     if (list == null)
-        list = el2.data("context");
+        list = el2.data("source");
     if (!(list instanceof Array))
         return;
     var children = el2.children(":not(.Template)").toArray();
     var createTemplate = function (t){
-        return template2.clone(true).removeClass("Template").data("context", t);
+        return template2.clone(true).removeClass("Template").data("source", t);
     };
     bindArrayToChildrenInternal(list, el2, children, createTemplate);
 };
@@ -107,7 +104,7 @@ function bindArrayToChildrenInternal(source, target, children, creator){
     var index2 = 0;
     while (index2 < children.length){
         var ch2 = $(children[index2]);
-        var dc2 = ch2.data("context");
+        var dc2 = ch2.data("source");
         if (dc2 == null)
             continue;
         var dc = source[index];
@@ -139,7 +136,7 @@ function getDefaultBindingTarget(el){
     }
     return "value";
 };
-function parseBindings2(s, defaultTarget){
+function parseBindings(s, defaultTarget){
     if (s == null || s == "")
         return null;
     var pairs = s.split(";");

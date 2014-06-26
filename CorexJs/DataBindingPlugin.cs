@@ -20,48 +20,36 @@ namespace CorexJs
 
         static void document_databind(Event e)
         {
-            //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(J(e.target).data("context")));
+            //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(J(e.target).data("source")));
             if (e.isDefaultPrevented())
                 return;
 
             var target = J(e.target);
-            var dataContext = target.data("context");
-            var dataMember = target.data("member").As<JsString>();
-            var att = J(e.target).data("onbind").As<JsString>();
-            if (att != null)
-            {
-                var func = new JsFunction("event", "context", "member", att);
-                var returnValue = func.call(e.target, e, dataContext, dataMember);
-                if (!e.isDefaultPrevented() && returnValue.ExactEquals(false))
-                {
-                    e.preventDefault();
-                    return;
-                }
-            }
-            var bindings = parseBindings2(J(e.target).data("bindings").As<JsString>(), getDefaultBindingTarget(e.target));
+            var source = target.data("source");
+            var member = target.data("member").As<JsString>();
+
+            triggerAttributeEvent(e, "onbind", source, member);
+            if (e.isDefaultPrevented())
+                return;
+
+            var bindings = getBindings(e.target);
             if (bindings != null)
-            {
-                databind_bind(dataContext, e.target, bindings);
-            }
+                databind_bind(source, e.target, bindings);
 
             var children = target.children(":not(.Template)");
 
-            var childDataContext = dataContext;
-            if (childDataContext != null && dataMember != null)
-                childDataContext = childDataContext.As<JsObject>()[dataMember];
+            var childSource = source;
+            if (childSource != null && member != null)
+                childSource = childSource.As<JsObject>()[member];
 
             children.toArray().forEach(t =>
             {
                 var t2 = J(t);
-                var ctx = t2.data("context");
-                if (ctx == null || t2.data("inherited-context") == ctx)
+                var ctx = t2.data("source");
+                if (ctx == null || t2.data("inherited-source") == ctx)
                 {
-                    t2.data("context", childDataContext);
-                    t2.data("inherited-context", childDataContext);
-                }
-                else
-                {
-                    console.log();
+                    t2.data("source", childSource);
+                    t2.data("inherited-source", childSource);
                 }
             });
             children.databind();
@@ -75,7 +63,7 @@ namespace CorexJs
             {
                 if (t.TargetPath == "children")
                 {
-                    bindArrayToChildren(target, null, JsObjectExt.tryGet(source, t.SourcePath));
+                    bindArrayToChildren(target, null, source.tryGet(t.SourcePath));
                 }
                 else
                 {
@@ -105,27 +93,35 @@ namespace CorexJs
                 return;
 
             var target = J(e.target);
-            var dataContext = target.data("context");
-            var dataMember = target.data("member");
+            var dataContext = target.data("source");
+            var dataMember = target.data("member").As<JsString>();
             var att = J(e.target).data("onbindback").As<JsString>();
 
-            if (att != null)
-            {
-                var func = new JsFunction("event", "context", "member", att);
-                var returnValue = func.call(e.target, e, dataContext, dataMember);
-                if (!e.isDefaultPrevented() && returnValue.ExactEquals(false))
-                {
-                    e.preventDefault();
-                    return;
-                }
-            }
-            var bindings = parseBindings2(J(e.target).data("bindings").As<JsString>(), getDefaultBindingTarget(e.target));
+            triggerAttributeEvent(e, "onbindback", dataContext, dataMember);
+            if (e.isDefaultPrevented())
+                return;
+
+            var bindings = getBindings(e.target);
             if (bindings != null)
-            {
                 databind_bindBack(dataContext, e.target, bindings);
-            }
 
             target.children(":not(.Template)").databindback();
+        }
+
+        static JsArray<Binding> getBindings(HtmlElement el)
+        {
+            var bindings = parseBindings(J(el).data("bindings").As<JsString>(), getDefaultBindingTarget(el));
+            return bindings;
+        }
+        static void triggerAttributeEvent(Event e, JsString name, object source, JsString member)
+        {
+            var att = J(e.target).data(name).As<JsString>();
+            if (att == null)
+                return;
+            var func = new JsFunction("event", "source", "member", "target", att);
+            var returnValue = func.call(e.target, e, source, member, e.target);
+            if (!e.isDefaultPrevented() && returnValue.ExactEquals(false))
+                e.preventDefault();
         }
 
         static void bindArrayToChildren(object el, object template, object context)
@@ -138,12 +134,12 @@ namespace CorexJs
             if (template2.length == 0)
                 return;
             if (list == null)
-                list = el2.data("context").As<JsArray<object>>();
+                list = el2.data("source").As<JsArray<object>>();
             if (!(list is JsArray<object>))
                 return;
             var children = el2.children(":not(.Template)").toArray();
 
-            JsFunc<object, jQuery> createTemplate = t => template2.clone(true).removeClass("Template").data("context", t);
+            JsFunc<object, jQuery> createTemplate = t => template2.clone(true).removeClass("Template").data("source", t);
 
             bindArrayToChildrenInternal(list, el2, children, createTemplate);
         }
@@ -155,7 +151,7 @@ namespace CorexJs
             while (index2 < children.length)
             {
                 var ch2 = J(children[index2]);
-                var dc2 = ch2.data("context");
+                var dc2 = ch2.data("source");
                 if (dc2 == null)
                     continue;
                 var dc = source[index];
@@ -196,7 +192,7 @@ namespace CorexJs
         }
 
 
-        static JsArray<Binding> parseBindings2(JsString s, JsString defaultTarget)
+        static JsArray<Binding> parseBindings(JsString s, JsString defaultTarget)
         {
             if (s == null || s == "")
                 return null;
@@ -217,24 +213,26 @@ namespace CorexJs
             return list;
         }
 
-        [JsType(JsMode.Prototype, Name = "$", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "res/databind.js", PrototypeName = "fn")]
-        class Plugin : jQuery
-        {
-            public jQuery databind()
-            {
-                this.trigger("databind");
-                return this;
-            }
-
-            public jQuery databindback()
-            {
-                this.trigger("databindback");
-                return this;
-            }
-        }
 
 
     }
+
+    [JsType(JsMode.Prototype, Name = "$", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "res/databind.js", PrototypeName = "fn")]
+    class Plugin : jQuery
+    {
+        public jQuery databind()
+        {
+            this.trigger("databind");
+            return this;
+        }
+
+        public jQuery databindback()
+        {
+            this.trigger("databindback");
+            return this;
+        }
+    }
+
 
     [JsType(JsMode.Json)]
     class Binding

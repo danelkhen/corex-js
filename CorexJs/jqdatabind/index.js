@@ -1,6 +1,6 @@
 ﻿function main() {
-    var dataContext = { contacts: [{ name: "Shooki", isCool: true }, { name: "Booki", isCool: false }] };
-    $(document).data("context", dataContext);
+    var dataContext = { contacts: [{ name: "Shooki", isCool: true, age:7 }, { name: "Booki", isCool: false,age:8 }] };
+    $(document).data("source", dataContext);
     $(document).databind();
     //window.setTimeout(function(){
     //    list.push({name:"New", isCool:false});
