@@ -71,7 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Corex.cs" />
-    <Compile Include="DataBinding\DataBindingPlugin.cs" />
+    <Compile Include="DataBinding\Binder.cs" />
+    <Compile Include="DataBinding\Plugin.cs" />
+    <Compile Include="DataBinding\jQueryPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <PropertyGroup>
