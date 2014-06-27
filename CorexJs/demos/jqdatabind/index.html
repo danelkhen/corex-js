@@ -10,6 +10,19 @@
     <script>$(main);</script>
 </head>
 <body>
+    <input data-onbind="this.value = $(this).data('source');" data-onbindback="$(this).data('source') = this.value;" onchange="$(this).databindback();" />
+    <input data-bindings="name:value triggers(onkeyup onkeypress onchange);" />
+    <script>
+        $(document).databind();
+    </script>
+
+
+
+
+
+
+
+
     <div>
         <button onclick="$(document).databind();">databind</button>
         <button onclick="$(document).databindback();">databindback</button>

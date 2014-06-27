@@ -267,25 +267,28 @@ CorexJs.DataBinding.Plugin.parseStyleAttr = function (s){
 CorexJs.DataBinding.Plugin.triggerDataBindingEvent = function (q, type, attrName, defaultBehavior){
     q.each(function (i, el){
         var ev = new jQuery.Event(type);
-        var target = $(el);
-        CorexJs.DataBinding.Plugin.triggerDataBindingAttrEvent(ev, attrName, target);
+        CorexJs.DataBinding.Plugin.triggerDataBindingAttrEvent(ev, attrName, el);
         if (ev.isDefaultPrevented())
             return;
+        var target = $(el);
         target.triggerHandler(ev);
         if (ev.isDefaultPrevented())
             return;
         defaultBehavior(ev);
     });
 };
-CorexJs.DataBinding.Plugin.triggerDataBindingAttrEvent = function (e, attrName, target){
+CorexJs.DataBinding.Plugin.triggerDataBindingAttrEvent = function (e, attrName, el){
+    var target = $(el);
     var context = {
         source: target.data("source"),
         member: target.data("member")
     };
+    e.target = el;
     CorexJs.DataBinding.Plugin.triggerAttributeEvent(e, attrName, context);
 };
 CorexJs.DataBinding.Plugin.triggerAttributeEvent = function (e, attrName, globalContext){
-    var att = $(e.target).data(attrName);
+    var target = $(e.target);
+    var att = target.data(attrName);
     if (att == null)
         return;
     var func = new Function("event", "context", "with(context){" + att + "}");

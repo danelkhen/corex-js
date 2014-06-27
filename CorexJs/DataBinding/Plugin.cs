@@ -181,10 +181,10 @@ namespace CorexJs.DataBinding
             q.each((i, el) =>
             {
                 var ev = new Event(type);
-                var target = new jQuery(el);
-                triggerDataBindingAttrEvent(ev, attrName, target);
+                triggerDataBindingAttrEvent(ev, attrName, el);
                 if (ev.isDefaultPrevented())
                     return;
+                var target = new jQuery(el);
                 target.triggerHandler(ev);
                 if (ev.isDefaultPrevented())
                     return;
@@ -192,19 +192,22 @@ namespace CorexJs.DataBinding
             });
         }
 
-        static void triggerDataBindingAttrEvent(Event e, JsString attrName, jQuery target)
+        static void triggerDataBindingAttrEvent(Event e, JsString attrName, HtmlElement el)
         {
+            var target = new jQuery(el);
             var context = new
             {
                 source = target.data("source"),
                 member = target.data("member").As<JsString>(),
             };
+            e.target = el;
             triggerAttributeEvent(e, attrName, context);
         }
 
         static void triggerAttributeEvent(Event e, JsString attrName, object globalContext)
         {
-            var att = new jQuery(e.target).data(attrName).As<JsString>();
+            var target = new jQuery(e.target);
+            var att = target.data(attrName).As<JsString>();
             if (att == null)
                 return;
             var func = new JsFunction("event", "context", "with(context){"+att+"}");
