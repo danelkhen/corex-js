@@ -8,7 +8,7 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
+    [JsType(JsMode.Prototype, Name="Binder", Filename = "~/res/databind.js")]
     class Binder
     {
         public Binder(BinderOptions options)
@@ -17,14 +17,18 @@ namespace CorexJs.DataBinding
         }
         BinderOptions Options;
 
+        //public static Binder OnChange(JsString sourcePath)
+        //{
+        //    return new Binder(new BinderOptions { SourcePath = sourcePath, BindBackOn = "change" });
+        //}
         public virtual void init(Event e)
         {
-            if (Options.TargetPath == null)
-                Options.TargetPath = getDefaultTargetPath(e.target);
-            if (Options.BindBackOn != null && Options.BindBackOn.length > 0)
+            if (Options.targetPath == null)
+                Options.targetPath = getDefaultTargetPath(e.target);
+            if (Options.triggers != null && Options.triggers.length > 0)
             {
                 var target = new jQuery(e.target);
-                target.on(Options.BindBackOn, databindback);
+                target.on(Options.triggers, databindback);
             }
 
         }
@@ -33,29 +37,29 @@ namespace CorexJs.DataBinding
         {
             var target = new jQuery(e.target);
             var source = target.data("source");
-            if (Options.TargetPath == "children")
-                bindArrayToChildren(target, null, source.tryGetByPath(Options.SourcePath));
+            if (Options.targetPath == "children")
+                bindArrayToChildren(target, null, source.tryGetByPath(Options.sourcePath));
             else
-                databind_tryCopy(source, Options.SourcePath, e.target, Options.TargetPath);
+                databind_tryCopy(source, Options.sourcePath, e.target, Options.targetPath);
         }
 
         public virtual void databindback(Event e)
         {
-            if (Options.OneWay)
+            if (Options.oneWay)
                 return;
-            if (Options.TargetPath == "children")
+            if (Options.targetPath == "children")
                 return;
             var target = new jQuery(e.target);
             var source = target.data("source");
-            databind_tryCopy(e.target, Options.TargetPath, source, Options.SourcePath);
+            databind_tryCopy(e.target, Options.targetPath, source, Options.sourcePath);
         }
 
         public virtual void destroy(Event e)
         {
-            if (Options.BindBackOn != null && Options.BindBackOn.length > 0)
+            if (Options.triggers != null && Options.triggers.length > 0)
             {
                 var target = new jQuery(e.target);
-                target.off(Options.BindBackOn, databindback);
+                target.off(Options.triggers, databindback);
             }
         }
 

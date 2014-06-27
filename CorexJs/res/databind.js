@@ -29,50 +29,46 @@ if (typeof($CreateDelegate)=='undefined'){
 }
 
 
-if (typeof(CorexJs) == "undefined")
-    var CorexJs = {};
-if (typeof(CorexJs.DataBinding) == "undefined")
-    CorexJs.DataBinding = {};
-CorexJs.DataBinding.Binder = function (options){
+var Binder = function (options){
     this.Options = null;
     this.Options = options;
 };
-CorexJs.DataBinding.Binder.prototype.init = function (e){
-    if (this.Options.TargetPath == null)
-        this.Options.TargetPath = CorexJs.DataBinding.Binder.getDefaultTargetPath(e.target);
-    if (this.Options.BindBackOn != null && this.Options.BindBackOn.length > 0){
+Binder.prototype.init = function (e){
+    if (this.Options.targetPath == null)
+        this.Options.targetPath = Binder.getDefaultTargetPath(e.target);
+    if (this.Options.triggers != null && this.Options.triggers.length > 0){
         var target = $(e.target);
-        target.on(this.Options.BindBackOn, $CreateDelegate(this, this.databindback));
+        target.on(this.Options.triggers, $CreateDelegate(this, this.databindback));
     }
 };
-CorexJs.DataBinding.Binder.prototype.databind = function (e){
+Binder.prototype.databind = function (e){
     var target = $(e.target);
     var source = target.data("source");
-    if (this.Options.TargetPath == "children")
-        CorexJs.DataBinding.Binder.bindArrayToChildren(target, null, BindingExt.tryGetByPath(source, this.Options.SourcePath));
+    if (this.Options.targetPath == "children")
+        Binder.bindArrayToChildren(target, null, BindingExt.tryGetByPath(source, this.Options.sourcePath));
     else
-        CorexJs.DataBinding.Binder.databind_tryCopy(source, this.Options.SourcePath, e.target, this.Options.TargetPath);
+        Binder.databind_tryCopy(source, this.Options.sourcePath, e.target, this.Options.targetPath);
 };
-CorexJs.DataBinding.Binder.prototype.databindback = function (e){
-    if (this.Options.OneWay)
+Binder.prototype.databindback = function (e){
+    if (this.Options.oneWay)
         return;
-    if (this.Options.TargetPath == "children")
+    if (this.Options.targetPath == "children")
         return;
     var target = $(e.target);
     var source = target.data("source");
-    CorexJs.DataBinding.Binder.databind_tryCopy(e.target, this.Options.TargetPath, source, this.Options.SourcePath);
+    Binder.databind_tryCopy(e.target, this.Options.targetPath, source, this.Options.sourcePath);
 };
-CorexJs.DataBinding.Binder.prototype.destroy = function (e){
-    if (this.Options.BindBackOn != null && this.Options.BindBackOn.length > 0){
+Binder.prototype.destroy = function (e){
+    if (this.Options.triggers != null && this.Options.triggers.length > 0){
         var target = $(e.target);
-        target.off(this.Options.BindBackOn, $CreateDelegate(this, this.databindback));
+        target.off(this.Options.triggers, $CreateDelegate(this, this.databindback));
     }
 };
-CorexJs.DataBinding.Binder.databind_tryCopy = function (source, sourcePath, target, targetPath){
+Binder.databind_tryCopy = function (source, sourcePath, target, targetPath){
     var value = BindingExt.tryGetByPath(source, sourcePath);
     Object.trySet(target, targetPath, value);
 };
-CorexJs.DataBinding.Binder.bindArrayToChildren = function (target, template, source){
+Binder.bindArrayToChildren = function (target, template, source){
     var list = source;
     var el2 = $(target);
     var template2 = $(template);
@@ -88,9 +84,9 @@ CorexJs.DataBinding.Binder.bindArrayToChildren = function (target, template, sou
     var createTemplate = function (t){
         return template2.clone(true).removeClass("Template").data("source", t);
     };
-    CorexJs.DataBinding.Binder.bindArrayToChildrenInternal(list, el2, children, createTemplate);
+    Binder.bindArrayToChildrenInternal(list, el2, children, createTemplate);
 };
-CorexJs.DataBinding.Binder.bindArrayToChildrenInternal = function (source, target, children, creator){
+Binder.bindArrayToChildrenInternal = function (source, target, children, creator){
     var index = 0;
     var index2 = 0;
     while (index2 < children.length){
@@ -122,13 +118,17 @@ CorexJs.DataBinding.Binder.bindArrayToChildrenInternal = function (source, targe
         index++;
     }
 };
-CorexJs.DataBinding.Binder.getDefaultTargetPath = function (el){
+Binder.getDefaultTargetPath = function (el){
     if (el.nodeName == "INPUT"){
         if (["radio", "checkbox"].contains(el.type))
             return "checked";
     }
     return "value";
 };
+if (typeof(CorexJs) == "undefined")
+    var CorexJs = {};
+if (typeof(CorexJs.DataBinding) == "undefined")
+    CorexJs.DataBinding = {};
 CorexJs.DataBinding.Plugin = function (){
 };
 CorexJs.DataBinding.Plugin.databind = function (q){
@@ -150,28 +150,25 @@ CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute = function (q, name, proce
     }
     return x;
 };
+CorexJs.DataBinding.Plugin.evalBinders = function (code){
+    var func = new Function(code);
+    return func.call();
+};
 CorexJs.DataBinding.Plugin.element_setup_default = function (e){
     var target = $(e.target);
-    var bindings = CorexJs.DataBinding.Plugin.getBindings(e.target);
-    var binders = CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute(target, "binders", function (s){
-        return new Function(s).call();
-    });
-    if (bindings != null){
-        var binders2 = bindings.map(function (t){
-            return new CorexJs.DataBinding.Binder({
-                SourcePath: t.SourcePath,
-                TargetPath: t.TargetPath
-            });
-        });
+    var binders2 = CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute(target, "bindings", CorexJs.DataBinding.Plugin.parseBindings);
+    var binders = CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute(target, "binders", CorexJs.DataBinding.Plugin.evalBinders);
+    if (binders2 != null){
         if (binders == null){
             binders =  [];
             target.data("binders", binders);
         }
         binders.addRange(binders2);
+    }
+    if (binders != null)
         binders.forEach(function (t){
             t.init(e);
         });
-    }
 };
 CorexJs.DataBinding.Plugin.element_teardown_default = function (e){
     var target = $(e.target);
@@ -226,25 +223,31 @@ CorexJs.DataBinding.Plugin.element_databindback_default = function (e){
         });
     target.children(":not(.Template)").databindback();
 };
-CorexJs.DataBinding.Plugin.getBindings = function (el){
-    return CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute($(el), "bindings", CorexJs.DataBinding.Plugin.parseStyleAttr);
+CorexJs.DataBinding.Plugin.parseBindings = function (s){
+    var obj = CorexJs.DataBinding.Plugin.parseStyleAttr(s);
+    if (obj == null)
+        return null;
+    var list =  [];
+    Object.forEach(obj, function (k, v){
+        list.push(new Binder({
+            sourcePath: k,
+            targetPath: v
+        }));
+    });
+    return list;
 };
 CorexJs.DataBinding.Plugin.parseStyleAttr = function (s){
     if (s == null || s == "")
         return null;
     var pairs = s.split(";");
-    var list =  [];
+    var obj = new Object();
     pairs.forEach(function (pair){
         if (pair == "")
             return;
         var pair2 = pair.split(":");
-        var b = {
-            SourcePath: pair2[0],
-            TargetPath: pair2[1]
-        };
-        list.push(b);
+        obj[pair2[0]] = pair2[1];
     });
-    return list;
+    return obj;
 };
 CorexJs.DataBinding.Plugin.triggerDataBindingEvent = function (q, type, attrName, defaultBehavior){
     q.each(function (i, el){

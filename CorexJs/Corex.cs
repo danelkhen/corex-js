@@ -16,4 +16,16 @@ namespace CorexJs
 
         public static void trySet(this object obj, JsString path, object value) { }
     }
+
+
+
+    //[JsType(JsMode.Prototype, Name = "Object", Filename ="~/res/databind.js")]
+    //public static class JsObjectExt2
+    //{
+    //    public static void map<T, R>(this JsObject<T> obj, JsFunc<JsString, T, R> func)
+    //    {
+
+    //    }
+    //}
+
 }

@@ -34,22 +34,28 @@ namespace CorexJs.DataBinding
             }
             return x.As<T>();
         }
+
+        static JsArray<Binder> evalBinders(JsString code)
+        {
+            var func = new JsFunction(code);
+            return func.call().As<JsArray<Binder>>();
+        }
         static void element_setup_default(Event e)
         {
             var target = new jQuery(e.target);
-            var bindings = getBindings(e.target);
-            var binders = target.ProcessAndGetDataAttribute("binders", s=>new JsFunction(s).call().As<JsArray<Binder>>());
-            if (bindings != null)
+            var binders2 = target.ProcessAndGetDataAttribute("bindings", parseBindings);
+            var binders = target.ProcessAndGetDataAttribute("binders", evalBinders);
+            if (binders2 != null)
             {
-                var binders2 = bindings.map(t => new Binder(new BinderOptions { SourcePath = t.SourcePath, TargetPath = t.TargetPath }));
                 if (binders == null)
                 {
                     binders = new JsArray<Binder>();
                     target.data("binders", binders);
                 }
                 binders.addRange(binders2);
-                binders.forEach(t => t.init(e));
             }
+            if(binders!=null)
+                binders.forEach(t => t.init(e));
         }
 
         static void element_teardown_default(Event e)
@@ -122,34 +128,35 @@ namespace CorexJs.DataBinding
         }
 
 
-        static JsArray<Binding> getBindings(HtmlElement el)
+
+        static JsArray<Binder> parseBindings(JsString s)
         {
-            return new jQuery(el).ProcessAndGetDataAttribute("bindings", parseStyleAttr);
-            //var bindings = parseStyleAttr(new jQuery(el).data("bindings").As<JsString>());
-            //return bindings;
+            var obj = parseStyleAttr(s);
+            if (obj == null)
+                return null;
+            var list = new JsArray<Binder>();
+            obj.forEach((k, v) =>
+            {
+                list.push(new Binder(new BinderOptions { sourcePath = k, targetPath = v }));
+            });
+            return list;
         }
 
-        static JsArray<Binding> parseStyleAttr(JsString s)
+        static JsObject<JsString> parseStyleAttr(JsString s)
         {
             if (s == null || s == "")
                 return null;
             var pairs = s.split(';');
-            var list = new JsArray<Binding>();
+            var obj = new JsObject<JsString>();
             pairs.forEach(pair =>
             {
                 if (pair == "")
                     return;
                 var pair2 = pair.split(":");
-                var b = new Binding
-                {
-                    SourcePath = pair2[0],
-                    TargetPath = pair2[1]
-                };
-                list.Add(b);
+                obj[pair2[0]] = pair2[1];
             });
-            return list;
+            return obj;
         }
-
 
         static void triggerDataBindingEvent(jQuery q, JsString type, JsString attrName, JsAction<Event> defaultBehavior)
         {
@@ -197,18 +204,12 @@ namespace CorexJs.DataBinding
     [JsType(JsMode.Json)]
     class BinderOptions
     {
-        public bool OneWay { get; set; }
-        public JsString SourcePath { get; set; }
-        public JsString TargetPath { get; set; }
-        public JsString BindBackOn { get; set; }
+        public bool oneWay { get; set; }
+        public JsString sourcePath { get; set; }
+        public JsString targetPath { get; set; }
+        public JsString triggers { get; set; }
     }
 
-    [JsType(JsMode.Json)]
-    class Binding
-    {
-        public JsString SourcePath { get; set; }
-        public JsString TargetPath { get; set; }
-    }
 
 
     [JsType(JsMode.Prototype, Name = "BindingExt", Filename = "~/res/databind.js")]
