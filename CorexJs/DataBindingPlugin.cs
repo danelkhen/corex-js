@@ -4,7 +4,7 @@ using SharpKit.jQuery;
 
 namespace CorexJs
 {
-    [JsType(JsMode.Global, PreCode = "(function(){", PostCode = "})();", Filename = "res/databind.js")]
+    [JsType(JsMode.Global, Filename = "res/databind.js")]//PreCode = "(function(){", PostCode = "})();", 
     public class DataBindingPlugin : jQueryContext
     {
 
@@ -15,33 +15,30 @@ namespace CorexJs
 
         static void init()
         {
-            J(document).on("databind", document_databind);
-            J(document).on("databindback", document_databindback);
+            J(document).on("databind", element_databind_default);
+            J(document).on("databindback", element_databindback_default);
         }
 
-        static void document_databind(Event e)
+        public static void element_databind_default(Event e)
         {
             //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(J(e.target).data("source")));
-            if (e.isDefaultPrevented())
-                return;
-
             var target = J(e.target);
-            var source = target.data("source");
-            var member = target.data("member").As<JsString>();
+            var dataSource = target.data("source");
+            var dataMember = target.data("member").As<JsString>();
 
-            triggerAttributeEvent(e, "onbind", source, member);
-            if (e.isDefaultPrevented())
-                return;
+            //triggerAttributeEvent(e, "onbind", source, member);
+            //if (e.isDefaultPrevented())
+            //    return;
 
             var bindings = getBindings(e.target);
             if (bindings != null)
-                databind_bind(source, e.target, bindings);
+                databind_bind(dataSource, e.target, bindings);
 
             var children = target.children(":not(.Template)");
 
-            var childSource = source;
-            if (childSource != null && member != null)
-                childSource = childSource.As<JsObject>()[member];
+            var childSource = dataSource;
+            if (childSource != null && dataMember != null)
+                childSource = childSource.As<JsObject>()[dataMember];
 
             children.toArray().forEach(t =>
             {
@@ -89,24 +86,14 @@ namespace CorexJs
             JsObjectExt.trySet(target, targetPath, value);
         }
 
-        static void document_databindback(Event e)
+        public static void element_databindback_default(Event e)
         {
-            //console.log(e.type, e.target.nodeName, e.target.className);
-            if (e.isDefaultPrevented())
-                return;
-
             var target = J(e.target);
-            var dataContext = target.data("source");
-            var dataMember = target.data("member").As<JsString>();
-            var att = J(e.target).data("onbindback").As<JsString>();
-
-            triggerAttributeEvent(e, "onbindback", dataContext, dataMember);
-            if (e.isDefaultPrevented())
-                return;
+            var dataSource = target.data("source");
 
             var bindings = getBindings(e.target);
             if (bindings != null)
-                databind_bindBack(dataContext, e.target, bindings);
+                databind_bindBack(dataSource, e.target, bindings);
 
             target.children(":not(.Template)").databindback();
         }
@@ -117,9 +104,16 @@ namespace CorexJs
             return bindings;
         }
 
-        static void triggerAttributeEvent(Event e, JsString name, object source, JsString member)
+        public static void triggerDataBindingAttrEvent(Event e, JsString attrName, jQuery target)
         {
-            var att = J(e.target).data(name).As<JsString>();
+            var source = target.data("source");
+            var member = target.data("member").As<JsString>();
+            triggerAttributeEvent(e, attrName, source, member);
+        }
+
+        public static void triggerAttributeEvent(Event e, JsString attrName, object source, JsString member)
+        {
+            var att = J(e.target).data(attrName).As<JsString>();
             if (att == null)
                 return;
             var func = new JsFunction("event", "source", "member", "target", att);
@@ -220,6 +214,21 @@ namespace CorexJs
             return list;
         }
 
+        public static void triggerDataBindingEvent(jQuery q, JsString type, JsString attrName, JsAction<Event> defaultBehavior)
+        {
+            q.each((i, el) =>
+            {
+                var ev = new Event(type);
+                var target = new jQuery(el);
+                DataBindingPlugin.triggerDataBindingAttrEvent(ev, attrName, target);
+                if (ev.isDefaultPrevented())
+                    return;
+                target.triggerHandler(ev);
+                if (ev.isDefaultPrevented())
+                    return;
+                defaultBehavior(ev);
+            });
+        }
 
 
     }
@@ -229,24 +238,23 @@ namespace CorexJs
     {
         public jQuery databind()
         {
-            this.trigger("databind");
+            DataBindingPlugin.triggerDataBindingEvent(this, "databind", "onbind", DataBindingPlugin.element_databind_default);
             return this;
         }
 
         public jQuery databindback()
         {
-            this.trigger("databindback");
+            DataBindingPlugin.triggerDataBindingEvent(this, "databindback", "onbindback", DataBindingPlugin.element_databindback_default);
             return this;
         }
     }
 
 
+
     [JsType(JsMode.Json)]
     class Binding
     {
-        //public object Source { get; set; }
         public JsString SourcePath { get; set; }
-        //public HtmlElement Target { get; set; }
         public JsString TargetPath { get; set; }
     }
 
