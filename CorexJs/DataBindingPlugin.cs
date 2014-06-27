@@ -4,22 +4,23 @@ using SharpKit.jQuery;
 
 namespace CorexJs
 {
-    [JsType(JsMode.Global, Filename = "res/databind.js")]//PreCode = "(function(){", PostCode = "})();", 
+    [JsType(JsMode.Prototype, Name = "DataBindingPlugin", Filename = "res/databind.js")]//PreCode = "(function(){", PostCode = "})();", 
     public class DataBindingPlugin : jQueryContext
     {
-
-        static DataBindingPlugin()
+        public static jQuery databind(jQuery q)
         {
-            init();
+            triggerDataBindingEvent(q, "databind", "onbind", element_databind_default);
+            return q;
         }
 
-        static void init()
+        public static jQuery databindback(jQuery q)
         {
-            J(document).on("databind", element_databind_default);
-            J(document).on("databindback", element_databindback_default);
+            triggerDataBindingEvent(q, "databindback", "onbindback", element_databindback_default);
+            return q;
         }
 
-        public static void element_databind_default(Event e)
+
+        static void element_databind_default(Event e)
         {
             //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(J(e.target).data("source")));
             var target = J(e.target);
@@ -53,6 +54,18 @@ namespace CorexJs
             children.databind();
         }
 
+        static void element_databindback_default(Event e)
+        {
+            var target = J(e.target);
+            var dataSource = target.data("source");
+
+            var bindings = getBindings(e.target);
+            if (bindings != null)
+                databind_bindBack(dataSource, e.target, bindings);
+
+            target.children(":not(.Template)").databindback();
+        }
+
         static void databind_bind(object source, object target, JsArray<Binding> bindings)
         {
             if (bindings == null || target == null || source == null)
@@ -84,42 +97,6 @@ namespace CorexJs
         {
             var value = source.tryGetByPath(sourcePath);
             JsObjectExt.trySet(target, targetPath, value);
-        }
-
-        public static void element_databindback_default(Event e)
-        {
-            var target = J(e.target);
-            var dataSource = target.data("source");
-
-            var bindings = getBindings(e.target);
-            if (bindings != null)
-                databind_bindBack(dataSource, e.target, bindings);
-
-            target.children(":not(.Template)").databindback();
-        }
-
-        static JsArray<Binding> getBindings(HtmlElement el)
-        {
-            var bindings = parseBindings(J(el).data("bindings").As<JsString>(), getDefaultBindingTarget(el));
-            return bindings;
-        }
-
-        public static void triggerDataBindingAttrEvent(Event e, JsString attrName, jQuery target)
-        {
-            var source = target.data("source");
-            var member = target.data("member").As<JsString>();
-            triggerAttributeEvent(e, attrName, source, member);
-        }
-
-        public static void triggerAttributeEvent(Event e, JsString attrName, object source, JsString member)
-        {
-            var att = J(e.target).data(attrName).As<JsString>();
-            if (att == null)
-                return;
-            var func = new JsFunction("event", "source", "member", "target", att);
-            var returnValue = func.call(e.target, e, source, member, e.target);
-            if (!e.isDefaultPrevented() && returnValue.ExactEquals(false))
-                e.preventDefault();
         }
 
         static void bindArrayToChildren(object target, object template, object source)
@@ -182,16 +159,11 @@ namespace CorexJs
             }
         }
 
-        static JsString getDefaultBindingTarget(HtmlElement el)
+        static JsArray<Binding> getBindings(HtmlElement el)
         {
-            if (el.nodeName == "INPUT")
-            {
-                if (new[] { "radio", "checkbox" }.AsJsArray().contains(el.As<HtmlInputElement>().type))
-                    return "checked";
-            }
-            return "value";
+            var bindings = parseBindings(J(el).data("bindings").As<JsString>(), getDefaultBindingTarget(el));
+            return bindings;
         }
-
 
         static JsArray<Binding> parseBindings(JsString s, JsString defaultTarget)
         {
@@ -214,13 +186,23 @@ namespace CorexJs
             return list;
         }
 
-        public static void triggerDataBindingEvent(jQuery q, JsString type, JsString attrName, JsAction<Event> defaultBehavior)
+        static JsString getDefaultBindingTarget(HtmlElement el)
+        {
+            if (el.nodeName == "INPUT")
+            {
+                if (new[] { "radio", "checkbox" }.AsJsArray().contains(el.As<HtmlInputElement>().type))
+                    return "checked";
+            }
+            return "value";
+        }
+
+        static void triggerDataBindingEvent(jQuery q, JsString type, JsString attrName, JsAction<Event> defaultBehavior)
         {
             q.each((i, el) =>
             {
                 var ev = new Event(type);
                 var target = new jQuery(el);
-                DataBindingPlugin.triggerDataBindingAttrEvent(ev, attrName, target);
+                triggerDataBindingAttrEvent(ev, attrName, target);
                 if (ev.isDefaultPrevented())
                     return;
                 target.triggerHandler(ev);
@@ -230,23 +212,34 @@ namespace CorexJs
             });
         }
 
+        static void triggerDataBindingAttrEvent(Event e, JsString attrName, jQuery target)
+        {
+            var source = target.data("source");
+            var member = target.data("member").As<JsString>();
+            triggerAttributeEvent(e, attrName, source, member);
+        }
+
+        static void triggerAttributeEvent(Event e, JsString attrName, object source, JsString member)
+        {
+            var att = J(e.target).data(attrName).As<JsString>();
+            if (att == null)
+                return;
+            var func = new JsFunction("event", "source", "member", "target", att);
+            var returnValue = func.call(e.target, e, source, member, e.target);
+            if (!e.isDefaultPrevented() && returnValue.ExactEquals(false))
+                e.preventDefault();
+        }
+
+
 
     }
 
-    [JsType(JsMode.Prototype, Name = "$", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "res/databind.js", PrototypeName = "fn")]
+    [JsType(JsMode.Prototype, Name = "$", PrototypeName = "fn", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "res/databind.js")]
     class Plugin : jQuery
     {
-        public jQuery databind()
-        {
-            DataBindingPlugin.triggerDataBindingEvent(this, "databind", "onbind", DataBindingPlugin.element_databind_default);
-            return this;
-        }
+        public jQuery databind() { return DataBindingPlugin.databind(this); }
 
-        public jQuery databindback()
-        {
-            DataBindingPlugin.triggerDataBindingEvent(this, "databindback", "onbindback", DataBindingPlugin.element_databindback_default);
-            return this;
-        }
+        public jQuery databindback() { return DataBindingPlugin.databindback(this); }
     }
 
 
