@@ -17,7 +17,7 @@
     </div>
     <div data-bindings=":children;">
         <div class="TodoList Template">
-            <input class="Name" data-bindings="name:value;" onchange="$(this).databindback();" />
+            <input class="Name" data-bindings="name:value;" onchange="$(this).databindback();" data-binders="twoWay('name','value')" />
             <div class="Items">
                 <div data-bindings="items:children;">
                     <div class="TodoItem Template" data-onbind="$(this).toggleClass('Done', source.done);">
