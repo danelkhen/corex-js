@@ -57,21 +57,21 @@
     <Content Include="lib\jquery\jquery-2.0.3.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="jqdatabind\index.css" />
-    <Content Include="jqdatabind\index.html" />
-    <Content Include="jqdatabind\index.js" />
+    <Content Include="demos\jqdatabind\index.css" />
+    <Content Include="demos\jqdatabind\index.html" />
+    <Content Include="demos\jqdatabind\index.js" />
     <Content Include="js\corex.js" />
     <Content Include="lib\jquery\jquery-2.0.3.js" />
     <Content Include="lib\jquery\jquery-2.0.3.min.js" />
     <Content Include="res\databind.js" />
-    <Content Include="todo\index.css" />
-    <Content Include="todo\index.html" />
-    <Content Include="todo\index.js" />
+    <Content Include="demos\todo\index.css" />
+    <Content Include="demos\todo\index.html" />
+    <Content Include="demos\todo\index.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Corex.cs" />
-    <Compile Include="DataBindingPlugin.cs" />
+    <Compile Include="DataBinding\DataBindingPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <PropertyGroup>
