@@ -8,7 +8,7 @@ using System.Web;
 namespace CorexJs.DataBinding
 {
 
-    [JsType(JsMode.Prototype, Name = "$", PrototypeName = "fn", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "res/databind.js")]
+    [JsType(JsMode.Prototype, Name = "$", PrototypeName = "fn", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "~/res/databind.js")]
     class jQueryPlugin : jQuery
     {
         public jQuery databind() { return Plugin.databind(this); }

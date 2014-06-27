@@ -8,7 +8,7 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Filename = "res/databind.js")]
+    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
     class Binder
     {
         public Binder(BinderOptions options)

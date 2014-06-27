@@ -11,6 +11,8 @@ namespace CorexJs
         public static object tryGet(this object obj, JsString path) { return null; }
         [JsMethod(ExtensionImplementedInInstance =true)]
         public static bool contains<T>(this JsArray<T> list, T obj) { return false; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static bool addRange<T>(this JsArray<T> list, JsArray<T> items) { return false; }
 
         public static void trySet(this object obj, JsString path, object value) { }
     }
