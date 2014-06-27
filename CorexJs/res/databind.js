@@ -309,4 +309,16 @@ $.fn.databind = function (){
 $.fn.databindback = function (){
     return CorexJs.DataBinding.Plugin.databindback(this);
 };
+$.fn.dataparent = function (){
+    var source = this.data("source");
+    var prev = this;
+    var el = this.parent();
+    while (el.length > 0){
+        if (el.data("source") != source)
+            break;
+        prev = el;
+        el = el.parent();
+    }
+    return prev;
+};
 

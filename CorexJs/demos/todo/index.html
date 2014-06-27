@@ -20,8 +20,8 @@
             <input class="Name" data-bindings="name:value triggers(change);" />
             <div class="Items">
                 <div data-bindings="items:children;">
-                    <div class="TodoItem Template" data-onbind="debugger;$(this).toggleClass('Done', source.done);">
-                        <input type="checkbox" data-bindings="done:checked;" onchange="$(this).databindback();$(this).closest('.TodoItem').databind();" />
+                    <div class="TodoItem Template" data-onbind="$(this).toggleClass('Done', source.done);">
+                        <input type="checkbox" data-bindings="done:checked;" onchange="$(this).databindback().dataparent().databind();" />
                         <input data-bindings="title:value triggers(change);"  onfocus="window.setTimeout(this.select.bind(this), 0);" />
                     </div>
                 </div>
