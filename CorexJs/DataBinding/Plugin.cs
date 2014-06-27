@@ -137,7 +137,25 @@ namespace CorexJs.DataBinding
             var list = new JsArray<Binder>();
             obj.forEach((k, v) =>
             {
-                list.push(new Binder(new BinderOptions { sourcePath = k, targetPath = v }));
+                var tokens = v.split(' ');
+                var options = new BinderOptions { sourcePath = k, targetPath = tokens[0] };
+                for (var i = 1; i < tokens.length; i++)
+                {
+                    var token = tokens[i];
+                    var open = token.indexOf("(");
+                    var close = token.indexOf(")");
+                    if(open>0 && close>open)
+                    {
+                        var name = token.substring(0, open);
+                        var values = token.substring(open+1, close);
+                        options.As<JsObject>()[name] = values;
+                    }
+                    else
+                    {
+                        options.As<JsObject>()[token] = true;
+                    }
+                }
+                list.push(new Binder(options));
             });
             return list;
         }
@@ -204,7 +222,7 @@ namespace CorexJs.DataBinding
     [JsType(JsMode.Json)]
     class BinderOptions
     {
-        public bool oneWay { get; set; }
+        public bool oneway { get; set; }
         public JsString sourcePath { get; set; }
         public JsString targetPath { get; set; }
         public JsString triggers { get; set; }

@@ -17,22 +17,23 @@
     </div>
     <div data-bindings=":children;">
         <div class="TodoList Template">
-            <input class="Name" data-binders="return [new Binder({sourcePath:'name', triggers:'change'})];" />
+            <input class="Name" data-bindings="name:value triggers(change);" />
             <div class="Items">
                 <div data-bindings="items:children;">
                     <div class="TodoItem Template" data-onbind="$(this).toggleClass('Done', source.done);">
-                        <input type="checkbox" data-bindings="done:checked;" onchange="$(this).databindback().closest('.TodoItem').databind();" />
-                        <input data-bindings="title:value;" onchange="$(this).databindback();" onfocus="window.setTimeout(this.select.bind(this), 0);" />
+                        <input type="checkbox" data-bindings="done:checked triggers(change);" />
+                        <input data-bindings="title:value triggers(change);" onfocus="window.setTimeout(this.select.bind(this), 0);" />
                     </div>
                 </div>
                 <div>
-                    <button onclick="$(this).closest('.TodoList').data('source').items.push({title:'Task', done:false});$(document).databind();">New Task</button>
+                    <button onclick="deleteList(this);">Delete List</button>
+                    <button onclick="newTask(this);">New Task</button>
                 </div>
             </div>
         </div>
     </div>
     <div style="float:left">
-        <button onclick="$(document).data('source').push({name:'List', items:[]});$(document).databind();">New List</button>
+        <button class="btnNewList" onclick="newList();">New List</button>
     </div>
 </body>
 </html>

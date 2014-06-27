@@ -45,7 +45,7 @@ namespace CorexJs.DataBinding
 
         public virtual void databindback(Event e)
         {
-            if (Options.oneWay)
+            if (Options.oneway)
                 return;
             if (Options.targetPath == "children")
                 return;

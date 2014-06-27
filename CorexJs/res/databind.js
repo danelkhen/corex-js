@@ -50,7 +50,7 @@ Binder.prototype.databind = function (e){
         Binder.databind_tryCopy(source, this.Options.sourcePath, e.target, this.Options.targetPath);
 };
 Binder.prototype.databindback = function (e){
-    if (this.Options.oneWay)
+    if (this.Options.oneway)
         return;
     if (this.Options.targetPath == "children")
         return;
@@ -229,10 +229,25 @@ CorexJs.DataBinding.Plugin.parseBindings = function (s){
         return null;
     var list =  [];
     Object.forEach(obj, function (k, v){
-        list.push(new Binder({
+        var tokens = v.split(" ");
+        var options = {
             sourcePath: k,
-            targetPath: v
-        }));
+            targetPath: tokens[0]
+        };
+        for (var i = 1; i < tokens.length; i++){
+            var token = tokens[i];
+            var open = token.indexOf("(");
+            var close = token.indexOf(")");
+            if (open > 0 && close > open){
+                var name = token.substring(0, open);
+                var values = token.substring(open + 1, close);
+                options[name] = values;
+            }
+            else {
+                options[token] = true;
+            }
+        }
+        list.push(new Binder(options));
     });
     return list;
 };

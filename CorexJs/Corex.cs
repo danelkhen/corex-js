@@ -15,6 +15,12 @@ namespace CorexJs
         public static bool addRange<T>(this JsArray<T> list, JsArray<T> items) { return false; }
 
         public static void trySet(this object obj, JsString path, object value) { }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static bool startsWith(this JsString s, JsString start) { return false; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static bool endsWith(this JsString s, JsString end) { return false; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static bool contains(this JsString s, JsString sub) { return false; }
     }
 
 
