@@ -31,23 +31,33 @@ if (typeof($CreateDelegate)=='undefined'){
 
 var Binder = function (options){
     this.Options = null;
+    this.IsInited = false;
     this.Options = options;
 };
 Binder.prototype.init = function (e){
+    if (this.IsInited){
+        console.log("already inited");
+        return;
+    }
+    this.IsInited = true;
     if (this.Options.targetPath == null)
         this.Options.targetPath = Binder.getDefaultTargetPath(e.target);
     if (this.Options.triggers != null && this.Options.triggers.length > 0){
         var target = $(e.target);
-        target.on(this.Options.triggers, $CreateDelegate(this, this.databindback));
+        target.on(this.Options.triggers, $CreateDelegate(this, this.onTrigger));
     }
+};
+Binder.prototype.onTrigger = function (e){
+    this.databindback(e);
 };
 Binder.prototype.databind = function (e){
     var target = $(e.target);
     var source = target.data("source");
     if (this.Options.targetPath == "children")
         Binder.bindArrayToChildren(target, null, BindingExt.tryGetByPath(source, this.Options.sourcePath));
-    else
+    else {
         Binder.databind_tryCopy(source, this.Options.sourcePath, e.target, this.Options.targetPath);
+    }
 };
 Binder.prototype.databindback = function (e){
     if (this.Options.oneway)
@@ -183,8 +193,10 @@ CorexJs.DataBinding.Plugin.element_teardown_default = function (e){
 CorexJs.DataBinding.Plugin.verifyInit = function (e){
     var target = $(e.target);
     var isInited = target.data("databind-isinited") === true;
-    if (!isInited)
+    if (!isInited){
+        target.data("databind-isinited", true);
         CorexJs.DataBinding.Plugin.triggerDataBindingEvent(target, "setup", "onsetup", CorexJs.DataBinding.Plugin.element_setup_default);
+    }
 };
 CorexJs.DataBinding.Plugin.element_databind_default = function (e){
     CorexJs.DataBinding.Plugin.verifyInit(e);
@@ -231,8 +243,8 @@ CorexJs.DataBinding.Plugin.parseBindings = function (s){
     Object.forEach(obj, function (k, v){
         var tokens = v.split(" ");
         var options = {
-            sourcePath: k,
-            targetPath: tokens[0]
+            sourcePath: tokens[0],
+            targetPath: k
         };
         for (var i = 1; i < tokens.length; i++){
             var token = tokens[i];

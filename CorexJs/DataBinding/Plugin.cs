@@ -75,7 +75,10 @@ namespace CorexJs.DataBinding
             var target = new jQuery(e.target);
             var isInited = target.data("databind-isinited").ExactEquals(true);
             if (!isInited)
+            {
+                target.data("databind-isinited", true);
                 triggerDataBindingEvent(target, "setup", "onsetup", element_setup_default);
+            }
         }
         static void element_databind_default(Event e)
         {
@@ -138,7 +141,7 @@ namespace CorexJs.DataBinding
             obj.forEach((k, v) =>
             {
                 var tokens = v.split(' ');
-                var options = new BinderOptions { sourcePath = k, targetPath = tokens[0] };
+                var options = new BinderOptions { sourcePath = tokens[0], targetPath = k };
                 for (var i = 1; i < tokens.length; i++)
                 {
                     var token = tokens[i];

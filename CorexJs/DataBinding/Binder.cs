@@ -16,23 +16,30 @@ namespace CorexJs.DataBinding
             Options = options;
         }
         BinderOptions Options;
+        private bool IsInited;
 
-        //public static Binder OnChange(JsString sourcePath)
-        //{
-        //    return new Binder(new BinderOptions { SourcePath = sourcePath, BindBackOn = "change" });
-        //}
         public virtual void init(Event e)
         {
+            if (IsInited)
+            {
+                HtmlContext.console.log("already inited");
+                return;
+            }
+            IsInited = true;
             if (Options.targetPath == null)
                 Options.targetPath = getDefaultTargetPath(e.target);
             if (Options.triggers != null && Options.triggers.length > 0)
             {
                 var target = new jQuery(e.target);
-                target.on(Options.triggers, databindback);
+                target.on(Options.triggers, onTrigger);
             }
 
         }
-
+        protected virtual void onTrigger(Event e)
+        {
+            //HtmlContext.console.log("Trigger: "+e.type);
+            databindback(e);
+        }
         public virtual void databind(Event e)
         {
             var target = new jQuery(e.target);
@@ -40,7 +47,10 @@ namespace CorexJs.DataBinding
             if (Options.targetPath == "children")
                 bindArrayToChildren(target, null, source.tryGetByPath(Options.sourcePath));
             else
+            {
                 databind_tryCopy(source, Options.sourcePath, e.target, Options.targetPath);
+                //HtmlContext.console.log("databind: source." + Options.sourcePath + " -> target." + Options.targetPath + " = ", e.target.tryGetByPath(Options.targetPath));
+            }
         }
 
         public virtual void databindback(Event e)
@@ -52,6 +62,7 @@ namespace CorexJs.DataBinding
             var target = new jQuery(e.target);
             var source = target.data("source");
             databind_tryCopy(e.target, Options.targetPath, source, Options.sourcePath);
+            //HtmlContext.console.log("databindback: target." + Options.targetPath + " -> source." + Options.sourcePath +" = ", source.tryGetByPath(Options.sourcePath));
         }
 
         public virtual void destroy(Event e)
@@ -140,4 +151,6 @@ namespace CorexJs.DataBinding
 
 
     }
+
+   
 }
