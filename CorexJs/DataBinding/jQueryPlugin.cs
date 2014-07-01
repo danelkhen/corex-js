@@ -32,6 +32,15 @@ namespace CorexJs.DataBinding
             }
             return prev;
         }
+        public object datasource()
+        {
+            return this.data("source");
+        }
+        //public object withdatasource(object obj)
+        //{
+        //    this.filter(())
+        //    return this.data("source");
+        //}
     }
 
     [JsType(JsMode.Prototype, Export = false)]

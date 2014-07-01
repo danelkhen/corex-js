@@ -15,7 +15,7 @@ namespace CorexJs.DataBinding
         {
             this.oneway = oneway;
         }
-        [JsMethod(Export =false)]
+        [JsMethod(Export = false)]
         public BaseBinder()
         {
 
@@ -36,16 +36,18 @@ namespace CorexJs.DataBinding
                 HtmlContext.console.log("already inited");
                 return;
             }
+            //if (target == null)
+            //    target = e.target;
             inited = true;
         }
 
         public bool oneway { get; set; }
+        //public HtmlElement target { get;  set; }
+
         public virtual void databind(Event e)
         {
             verifyInit(e);
-            var target = new jQuery(e.target);
-            var source = target.data("source");
-            onTransfer(source, e.target);
+            onTransfer(getSource(e), getTarget(e));
         }
 
         public virtual void databindback(Event e)
@@ -53,11 +55,19 @@ namespace CorexJs.DataBinding
             if (oneway)
                 return;
             verifyInit(e);
-            var target = new jQuery(e.target);
-            var source = target.data("source");
-            onTransferBack(source, e.target);
+            onTransferBack(getSource(e), getTarget(e));
 
             //HtmlContext.console.log("databindback: target." + targetPath + " -> source." + sourcePath + " = ", source.tryGetByPath(sourcePath));
+        }
+
+        protected virtual HtmlElement getTarget(Event e)
+        {
+            return e.target;
+        }
+
+        protected virtual object getSource(Event e)
+        {
+            return new jQuery(e.target).data("source");
         }
 
 

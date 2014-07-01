@@ -34,7 +34,7 @@ namespace CorexJs.DataBinding
             var el2 = new jQuery(target);
             var template2 = new jQuery(template);
             if (template2.length == 0)
-                template2 = el2.find(".Template:first");
+                template2 = el2.children(".Template:first");
             if (template2.length == 0)
                 return;
             if (list == null)

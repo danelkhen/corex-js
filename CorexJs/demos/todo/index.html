@@ -14,26 +14,21 @@
     <div>
         <button onclick="save();">Save</button>
         <button onclick="load();">Load</button>
+        <button onclick="newList();">New List</button>
+        <button onclick="newTask();">New Task</button>
+        <button onclick="deleteSelectedTask();">Delete Selected Task</button>
+        <button onclick="deleteSelectedList();">Delete Selected List</button>
     </div>
     <div data-binders="[children()]">
-        <div class="TodoList Template">
+        <div class="TodoList Template" onmousedown="selectList(this);">
             <input class="Name" data-binders="[onchange('name')]" />
-            <div class="Items">
-                <div data-binders="[children('items')]">
-                    <div class="TodoItem Template" data-binders="[toggleclassoneway('done', 'Done')]">
-                        <input type="checkbox" onchange="$(this).databindback().dataparent().databind();" data-binders="[twoway('done')]" />
-                        <input type="text" data-binders="[onchange('title'), oneway('done', 'disabled')]"  onfocus="input_onfocus(event);" />
-                    </div>
-                </div>
-                <div>
-                    <button onclick="deleteList(this);">Delete List</button>
-                    <button onclick="newTask(this);">New Task</button>
+            <div class="Items" data-binders="[children('items')]">
+                <div class="TodoItem Template" data-binders="[toggleclassoneway('done', 'Done')]" onmousedown="selectTask(this);">
+                    <input type="checkbox" onchange="$(this).databindback().dataparent().databind();" data-binders="[twoway('done')]" />
+                    <input type="text" data-binders="[onchange('title'), oneway('done', 'disabled')]"  onfocus="input_onfocus(event);" />
                 </div>
             </div>
         </div>
-    </div>
-    <div style="float:left">
-        <button class="btnNewList" onclick="newList();">New List</button>
     </div>
 </body>
 </html>

@@ -92,17 +92,19 @@ BaseBinder.prototype.init = function (e){
 };
 BaseBinder.prototype.databind = function (e){
     this.verifyInit(e);
-    var target = $(e.target);
-    var source = target.data("source");
-    this.onTransfer(source, e.target);
+    this.onTransfer(this.getSource(e), this.getTarget(e));
 };
 BaseBinder.prototype.databindback = function (e){
     if (this.oneway)
         return;
     this.verifyInit(e);
-    var target = $(e.target);
-    var source = target.data("source");
-    this.onTransferBack(source, e.target);
+    this.onTransferBack(this.getSource(e), this.getTarget(e));
+};
+BaseBinder.prototype.getTarget = function (e){
+    return e.target;
+};
+BaseBinder.prototype.getSource = function (e){
+    return $(e.target).data("source");
 };
 BaseBinder.prototype.onTransfer = function (source, target){
 };
@@ -147,7 +149,7 @@ ChildrenBinder.bindArrayToChildren = function (target, template, source){
     var el2 = $(target);
     var template2 = $(template);
     if (template2.length == 0)
-        template2 = el2.find(".Template:first");
+        template2 = el2.children(".Template:first");
     if (template2.length == 0)
         return;
     if (list == null)
@@ -469,6 +471,9 @@ $.fn.dataparent = function (){
         el = el.parent();
     }
     return prev;
+};
+$.fn.datasource = function (){
+    return this.data("source");
 };
 var ToggleClassBinder = function (source, className, oneWay, triggers){
     this.className = null;

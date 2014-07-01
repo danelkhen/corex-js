@@ -26,3 +26,12 @@
     text-decoration:line-through;
 }
 
+.TodoItem.Selected
+{
+    outline:dotted 1px;
+}
+
+.TodoList.Selected
+{
+    outline:dotted 1px;
+}
