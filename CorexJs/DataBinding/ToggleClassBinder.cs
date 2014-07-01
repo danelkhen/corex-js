@@ -16,6 +16,10 @@ namespace CorexJs.DataBinding
         {
             this.className = className;
         }
+        [JsMethod(Export = false)]
+        public ToggleClassBinder()
+        {
+        }
 
         protected override void init(Event e)
         {

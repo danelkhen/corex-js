@@ -9,63 +9,36 @@ using System.Web;
 namespace CorexJs.DataBinding
 {
     [JsType(JsMode.Prototype, Name = "PropertyBinder", Filename = "~/res/databind.js")]
-    public class PropertyBinder : IBinder
+    public class PropertyBinder : BaseBinder
     {
-        public PropertyBinder(Property source, Property target, bool oneway)
+        public PropertyBinder(Property source, Property target, bool oneway) : base(oneway)
         {
             this.sourceProp = source;
             this.targetProp = target;
             this.oneway = oneway;
         }
+        [JsMethod(Export = false)]
         public PropertyBinder()
         {
 
         }
-        private bool IsInited;
 
-        protected virtual void verifyInit(Event e)
-        {
-            if (IsInited)
-                return;
-            init(e);
-        }
 
-        protected virtual void init(Event e)
-        {
-            if (IsInited)
-            {
-                HtmlContext.console.log("already inited");
-                return;
-            }
-            IsInited = true;
-        }
-
-        public bool oneway { get;set; }
         public Property sourceProp { get; set; }
         public Property targetProp { get;set; }
-        public virtual void databind(Event e)
+
+        protected override void onTransfer(object source, HtmlElement target)
         {
-            verifyInit(e);
-            var target = new jQuery(e.target);
-            var source = target.data("source");
             var value = sourceProp.get(source);
-            targetProp.set(e.target, value);
-            //HtmlContext.console.log("databind: source." + sourcePath + " -> source." + targetPath + " = ", e.target.tryGetByPath(targetPath));
+            targetProp.set(target, value);
         }
 
-        public virtual void databindback(Event e)
+        protected override void onTransferBack(object source, HtmlElement target)
         {
-            if (oneway)
-                return;
-            verifyInit(e);
-            var target = new jQuery(e.target);
-            var source = target.data("source");
-
-            var value = targetProp.get(e.target);
+            var value = targetProp.get(target);
             sourceProp.set(source, value);
-
-            //HtmlContext.console.log("databindback: target." + targetPath + " -> source." + sourcePath + " = ", source.tryGetByPath(sourcePath));
         }
+
 
     }
 
@@ -77,6 +50,9 @@ namespace CorexJs.DataBinding
         public JsFunc<object, object> get { get; set; }
         public JsAction<object, object> set { get; set; }
     }
+
+
+
 
 
 }

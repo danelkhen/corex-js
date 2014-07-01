@@ -73,101 +73,41 @@ if (typeof($CreateDelegate)=='undefined'){
 }
 
 
-var PropertyBinder = function (source, target, oneway){
-    this.IsInited = false;
+var BaseBinder = function (oneway){
+    this.inited = false;
     this.oneway = false;
-    this.sourceProp = null;
-    this.targetProp = null;
-    this.sourceProp = source;
-    this.targetProp = target;
     this.oneway = oneway;
 };
-var PropertyBinder = function (){
-    this.IsInited = false;
-    this.oneway = false;
-    this.sourceProp = null;
-    this.targetProp = null;
-};
-PropertyBinder.prototype.verifyInit = function (e){
-    if (this.IsInited)
+BaseBinder.prototype.verifyInit = function (e){
+    if (this.inited)
         return;
     this.init(e);
 };
-PropertyBinder.prototype.init = function (e){
-    if (this.IsInited){
+BaseBinder.prototype.init = function (e){
+    if (this.inited){
         console.log("already inited");
         return;
     }
-    this.IsInited = true;
+    this.inited = true;
 };
-PropertyBinder.prototype.databind = function (e){
+BaseBinder.prototype.databind = function (e){
     this.verifyInit(e);
     var target = $(e.target);
     var source = target.data("source");
-    var value = this.sourceProp.get(source);
-    this.targetProp.set(e.target, value);
+    this.onTransfer(source, e.target);
 };
-PropertyBinder.prototype.databindback = function (e){
+BaseBinder.prototype.databindback = function (e){
     if (this.oneway)
         return;
     this.verifyInit(e);
     var target = $(e.target);
     var source = target.data("source");
-    var value = this.targetProp.get(e.target);
-    this.sourceProp.set(source, value);
+    this.onTransferBack(source, e.target);
 };
-var PathBinder = function (source, target, oneWay, triggers){
-    this.sourcePath = null;
-    this.targetPath = null;
-    this.triggers = null;
-    PropertyBinder.call(this);
-    this.sourcePath = source;
-    this.targetPath = target;
-    this.oneway = oneWay;
-    this.triggers = triggers;
+BaseBinder.prototype.onTransfer = function (source, target){
 };
-PathBinder.prototype.init = function (e){
-    PropertyBinder.prototype.init.call(this, e);
-    if (Q.isNullOrEmpty(this.targetPath))
-        this.targetPath = PathBinder.getDefaultTargetPath(e.target);
-    this.sourceProp = this.createProperty(this.sourcePath);
-    this.targetProp = this.createProperty(this.targetPath);
-    if (this.triggers != null && this.triggers.length > 0){
-        var target = $(e.target);
-        target.on(this.triggers, $CreateDelegate(this, this.onTrigger));
-    }
+BaseBinder.prototype.onTransferBack = function (source, target){
 };
-PathBinder.prototype.createProperty = function (path){
-    return {
-        get: $CreateAnonymousDelegate(this, function (t){
-            return BindingExt.tryGetByPath(t, path);
-        }),
-        set: $CreateAnonymousDelegate(this, function (t, v){
-            Object.trySet(t, path, v);
-        })
-    };
-};
-PathBinder.prototype.onTrigger = function (e){
-    console.log("Trigger: " + e.type);
-    if (this.oneway)
-        this.databind(e);
-    else
-        this.databindback(e);
-};
-PathBinder.prototype.destroy = function (e){
-    if (this.triggers != null && this.triggers.length > 0){
-        var target = $(e.target);
-        target.off(this.triggers, $CreateDelegate(this, this.databindback));
-    }
-};
-PathBinder.getDefaultTargetPath = function (el){
-    if (el.nodeName == "INPUT"){
-        if (["radio", "checkbox"].contains(el.type))
-            return "checked";
-    }
-    return "value";
-};
-$Inherit(PathBinder, PropertyBinder);
 var BindersContext = function (){
 };
 BindersContext.prototype.oneway = function (source, target){
@@ -252,6 +192,75 @@ ChildrenBinder.bindArrayToChildrenInternal = function (source, target, children,
         index++;
     }
 };
+var PropertyBinder = function (source, target, oneway){
+    this.sourceProp = null;
+    this.targetProp = null;
+    BaseBinder.call(this, oneway);
+    this.sourceProp = source;
+    this.targetProp = target;
+    this.oneway = oneway;
+};
+PropertyBinder.prototype.onTransfer = function (source, target){
+    var value = this.sourceProp.get(source);
+    this.targetProp.set(target, value);
+};
+PropertyBinder.prototype.onTransferBack = function (source, target){
+    var value = this.targetProp.get(target);
+    this.sourceProp.set(source, value);
+};
+$Inherit(PropertyBinder, BaseBinder);
+var PathBinder = function (source, target, oneWay, triggers){
+    this.sourcePath = null;
+    this.targetPath = null;
+    this.triggers = null;
+    PropertyBinder.call(this);
+    this.sourcePath = source;
+    this.targetPath = target;
+    this.oneway = oneWay;
+    this.triggers = triggers;
+};
+PathBinder.prototype.init = function (e){
+    BaseBinder.prototype.init.call(this, e);
+    if (Q.isNullOrEmpty(this.targetPath))
+        this.targetPath = PathBinder.getDefaultTargetPath(e.target);
+    this.sourceProp = this.createProperty(this.sourcePath);
+    this.targetProp = this.createProperty(this.targetPath);
+    if (this.triggers != null && this.triggers.length > 0){
+        var target = $(e.target);
+        target.on(this.triggers, $CreateDelegate(this, this.onTrigger));
+    }
+};
+PathBinder.prototype.createProperty = function (path){
+    return {
+        get: $CreateAnonymousDelegate(this, function (t){
+            return BindingExt.tryGetByPath(t, path);
+        }),
+        set: $CreateAnonymousDelegate(this, function (t, v){
+            Object.trySet(t, path, v);
+        })
+    };
+};
+PathBinder.prototype.onTrigger = function (e){
+    console.log("Trigger: " + e.type);
+    if (this.oneway)
+        this.databind(e);
+    else
+        this.databindback(e);
+};
+PathBinder.prototype.destroy = function (e){
+    if (this.triggers != null && this.triggers.length > 0){
+        var target = $(e.target);
+        target.off(this.triggers, $CreateDelegate(this, this.databindback));
+    }
+};
+PathBinder.getDefaultTargetPath = function (el){
+    if (el.nodeName == "INPUT"){
+        if (["radio", "checkbox"].contains(el.type))
+            return "checked";
+    }
+    return "value";
+};
+$Inherit(PathBinder, PropertyBinder);
 if (typeof(CorexJs) == "undefined")
     var CorexJs = {};
 if (typeof(CorexJs.DataBinding) == "undefined")
