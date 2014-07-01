@@ -8,17 +8,33 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Name="Binder", Filename = "~/res/databind.js")]
-    class Binder
+    [JsType(JsMode.Prototype, Export=false)]
+    public interface IBinder
     {
-        public Binder(BinderOptions options)
+        void databind(Event e);
+        void databindback(Event e);
+    }
+    [JsType(JsMode.Prototype, Name = "Binder", Filename = "~/res/databind.js")]
+    public class Binder : IBinder
+    {
+        public Binder(JsString source, JsString target, bool oneWay, JsString triggers)
         {
-            Options = options;
+            this.sourcePath = source;
+            this.targetPath = target;
+            this.oneway = oneWay;
+            this.triggers = triggers;
         }
-        BinderOptions Options;
+
         private bool IsInited;
 
-        public virtual void init(Event e)
+        protected virtual void verifyInit(Event e)
+        {
+            if (IsInited)
+                return;
+            init(e);
+        }
+
+        protected virtual void init(Event e)
         {
             if (IsInited)
             {
@@ -26,51 +42,49 @@ namespace CorexJs.DataBinding
                 return;
             }
             IsInited = true;
-            if (Options.targetPath == null)
-                Options.targetPath = getDefaultTargetPath(e.target);
-            if (Options.triggers != null && Options.triggers.length > 0)
+            if (targetPath.isNullOrEmpty())
+                targetPath = getDefaultTargetPath(e.target);
+            if (triggers != null && triggers.length > 0)
             {
                 var target = new jQuery(e.target);
-                target.on(Options.triggers, onTrigger);
+                target.on(triggers, onTrigger);
             }
 
         }
         protected virtual void onTrigger(Event e)
         {
-            //HtmlContext.console.log("Trigger: "+e.type);
-            databindback(e);
+            HtmlContext.console.log("Trigger: " + e.type);
+            if (oneway)
+                databind(e);
+            else
+                databindback(e);
         }
         public virtual void databind(Event e)
         {
+            verifyInit(e);
             var target = new jQuery(e.target);
             var source = target.data("source");
-            if (Options.targetPath == "children")
-                bindArrayToChildren(target, null, source.tryGetByPath(Options.sourcePath));
-            else
-            {
-                databind_tryCopy(source, Options.sourcePath, e.target, Options.targetPath);
-                //HtmlContext.console.log("databind: source." + Options.sourcePath + " -> target." + Options.targetPath + " = ", e.target.tryGetByPath(Options.targetPath));
-            }
+            databind_tryCopy(source, sourcePath, e.target, targetPath);
+            HtmlContext.console.log("databind: source." + sourcePath + " -> source." + targetPath + " = ", e.target.tryGetByPath(targetPath));
         }
 
         public virtual void databindback(Event e)
         {
-            if (Options.oneway)
+            if (oneway)
                 return;
-            if (Options.targetPath == "children")
-                return;
+            verifyInit(e);
             var target = new jQuery(e.target);
             var source = target.data("source");
-            databind_tryCopy(e.target, Options.targetPath, source, Options.sourcePath);
-            //HtmlContext.console.log("databindback: target." + Options.targetPath + " -> source." + Options.sourcePath +" = ", source.tryGetByPath(Options.sourcePath));
+            databind_tryCopy(e.target, targetPath, source, sourcePath);
+            HtmlContext.console.log("databindback: target." + targetPath + " -> source." + sourcePath +" = ", source.tryGetByPath(sourcePath));
         }
 
         public virtual void destroy(Event e)
         {
-            if (Options.triggers != null && Options.triggers.length > 0)
+            if (triggers != null && triggers.length > 0)
             {
                 var target = new jQuery(e.target);
-                target.off(Options.triggers, databindback);
+                target.off(triggers, databindback);
             }
         }
 
@@ -80,65 +94,6 @@ namespace CorexJs.DataBinding
             JsObjectExt.trySet(target, targetPath, value);
         }
 
-        static void bindArrayToChildren(object target, object template, object source)
-        {
-            var list = source.As<JsArray<object>>();
-            var el2 = new jQuery(target);
-            var template2 = new jQuery(template);
-            if (template2.length == 0)
-                template2 = el2.find(".Template:first");
-            if (template2.length == 0)
-                return;
-            if (list == null)
-                list = el2.data("source").As<JsArray<object>>();
-            if (!(list is JsArray<object>))
-                return;
-            var children = el2.children(":not(.Template)").toArray();
-
-            JsFunc<object, jQuery> createTemplate = t => template2.clone(true).removeClass("Template").data("source", t);
-
-            bindArrayToChildrenInternal(list, el2, children, createTemplate);
-        }
-
-        static void bindArrayToChildrenInternal(JsArray<object> source, jQuery target, JsArray<HtmlElement> children, JsFunc<object, jQuery> creator)
-        {
-            var index = 0;
-            var index2 = 0;
-            while (index2 < children.length)
-            {
-                var ch2 = new jQuery(children[index2]);
-                var dc2 = ch2.data("source");
-                if (dc2 == null)
-                {
-                    index2++;
-                    continue;
-                }
-                var dc = source[index];
-                if (dc != dc2)
-                {
-                    if (dc == null)
-                    {
-                        ch2.remove();
-                        index2++;
-                        continue;
-                    }
-                    else
-                    {
-                        var ch3 = creator(dc);
-                        ch3.insertBefore(ch2);
-                        index++;
-                        continue;
-                    }
-                }
-                index2++;
-                index++;
-            }
-            while (index < source.length)
-            {
-                target.append(creator(source[index]));
-                index++;
-            }
-        }
         static JsString getDefaultTargetPath(HtmlElement el)
         {
             if (el.nodeName == "INPUT")
@@ -148,9 +103,15 @@ namespace CorexJs.DataBinding
             }
             return "value";
         }
+        public bool oneway { get; set; }
+        public JsString sourcePath { get; set; }
+        public JsString targetPath { get; set; }
+        public JsString triggers { get; set; }
 
 
     }
 
-   
+
+
+
 }

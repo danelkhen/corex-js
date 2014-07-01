@@ -13,8 +13,10 @@ namespace CorexJs.DataBinding
     class jQueryPlugin : jQuery
     {
         public jQuery databind() { return Plugin.databind(this); }
+        public jQuery databindflat() { return Plugin.databindflat(this); }
 
         public jQuery databindback() { return Plugin.databindback(this); }
+        public jQuery addBinder(Binder binder) { return Plugin.addBinder(this, binder); }
 
         public jQuery dataparent()
         {

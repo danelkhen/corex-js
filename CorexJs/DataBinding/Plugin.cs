@@ -8,18 +8,36 @@ namespace CorexJs.DataBinding
     [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]//PreCode = "(function(){", PostCode = "})();", 
     public static class Plugin
     {
-        public static jQuery databind(jQuery q)
+        public static jQuery databindflat(jQuery q)
         {
-            triggerDataBindingEvent(q, "databind", "onbind", element_databind_default);
+            triggerDataBindingEvent(q, "databind", new DataBindEventProps { flat = true }, "onbind", element_databind_default);
             return q;
         }
+        public static jQuery databind(jQuery q)
+        {
+            triggerDataBindingEvent(q, "databind", null, "onbind", element_databind_default);
+            return q;
+        }
+
 
         public static jQuery databindback(jQuery q)
         {
-            triggerDataBindingEvent(q, "databindback", "onbindback", element_databindback_default);
+            triggerDataBindingEvent(q, "databindback", null, "onbindback", element_databindback_default);
             return q;
         }
 
+        public static jQuery addBinder(jQuery q, Binder binder)
+        {
+            var binders = q.ProcessAndGetDataAttribute("binders", evalBinders);
+            //var binders = q.data("binders").As<JsArray<Binder>>();
+            if (binders == null)
+            {
+                binders = new JsArray<Binder>();
+                q.data("binders", binders);
+            }
+            binders.push(binder);
+            return q;
+        }
 
         static T ProcessAndGetDataAttribute<T>(this jQuery q, JsString name, JsFunc<JsString, T> processor) where T :class
         {
@@ -37,8 +55,14 @@ namespace CorexJs.DataBinding
 
         static JsArray<Binder> evalBinders(JsString code)
         {
-            var func = new JsFunction(code);
-            return func.call().As<JsArray<Binder>>();
+            if (!code.contains("return"))
+                code = "return " + code;
+
+            var ctx = new BindersContext();
+            code = "with(ctx){" + code + "}";
+            var func = new JsFunction("ctx", code);
+            var res = func.call(null, ctx).As<JsArray<Binder>>();
+            return res;
         }
         static void element_setup_default(Event e)
         {
@@ -54,8 +78,6 @@ namespace CorexJs.DataBinding
                 }
                 binders.addRange(binders2);
             }
-            if(binders!=null)
-                binders.forEach(t => t.init(e));
         }
 
         static void element_teardown_default(Event e)
@@ -70,32 +92,41 @@ namespace CorexJs.DataBinding
 
         }
 
-        static void verifyInit(Event e)
+        static bool isinited(this jQuery target)
         {
-            var target = new jQuery(e.target);
-            var isInited = target.data("databind-isinited").ExactEquals(true);
+            return target.data("databind-isinited").ExactEquals(true);
+        }
+        static void set_isinited(this jQuery target)
+        {
+            target.data("databind-isinited", true);
+        }
+        static void verifyInit(HtmlElement el)
+        {
+            var target = new jQuery(el);
+            var isInited = target.isinited();
             if (!isInited)
             {
-                target.data("databind-isinited", true);
-                triggerDataBindingEvent(target, "setup", "onsetup", element_setup_default);
+                target.set_isinited();
+                triggerDataBindingEvent(target, "init", null, "oninit", element_setup_default);
             }
         }
         static void element_databind_default(Event e)
         {
-            verifyInit(e);
+            verifyInit(e.target);
 
             //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(J(e.target).data("source")));
             var target = new jQuery(e.target);
             var dataSource = target.data("source");
             var dataMember = target.data("member").As<JsString>();
 
-            verifyInit(e);
-
             var binders = target.data("binders").As<JsArray<Binder>>();
             if (binders != null)
             {
                 binders.forEach(t => t.databind(e));
             }
+
+            if (e.As<DataBindEventProps>().flat)
+                return;
 
             var children = target.children(":not(.Template)");
 
@@ -118,7 +149,7 @@ namespace CorexJs.DataBinding
 
         static void element_databindback_default(Event e)
         {
-            verifyInit(e);
+            verifyInit(e.target);
 
             var target = new jQuery(e.target);
             var dataSource = target.data("source");
@@ -134,33 +165,34 @@ namespace CorexJs.DataBinding
 
         static JsArray<Binder> parseBindings(JsString s)
         {
-            var obj = parseStyleAttr(s);
-            if (obj == null)
-                return null;
-            var list = new JsArray<Binder>();
-            obj.forEach((k, v) =>
-            {
-                var tokens = v.split(' ');
-                var options = new BinderOptions { sourcePath = tokens[0], targetPath = k };
-                for (var i = 1; i < tokens.length; i++)
-                {
-                    var token = tokens[i];
-                    var open = token.indexOf("(");
-                    var close = token.indexOf(")");
-                    if(open>0 && close>open)
-                    {
-                        var name = token.substring(0, open);
-                        var values = token.substring(open+1, close);
-                        options.As<JsObject>()[name] = values;
-                    }
-                    else
-                    {
-                        options.As<JsObject>()[token] = true;
-                    }
-                }
-                list.push(new Binder(options));
-            });
-            return list;
+            return null;
+            //var obj = parseStyleAttr(s);
+            //if (obj == null)
+            //    return null;
+            //var list = new JsArray<Binder>();
+            //obj.forEach((k, v) =>
+            //{
+            //    var tokens = v.split(' ');
+            //    var options = new BinderOptions { sourcePath = tokens[0], targetPath = k };
+            //    for (var i = 1; i < tokens.length; i++)
+            //    {
+            //        var token = tokens[i];
+            //        var open = token.indexOf("(");
+            //        var close = token.indexOf(")");
+            //        if (open > 0 && close > open)
+            //        {
+            //            var name = token.substring(0, open);
+            //            var values = token.substring(open + 1, close);
+            //            options.As<JsObject>()[name] = values;
+            //        }
+            //        else
+            //        {
+            //            options.As<JsObject>()[token] = true;
+            //        }
+            //    }
+            //    list.push(new Binder(options));
+            //});
+            //return list;
         }
 
         static JsObject<JsString> parseStyleAttr(JsString s)
@@ -179,11 +211,11 @@ namespace CorexJs.DataBinding
             return obj;
         }
 
-        static void triggerDataBindingEvent(jQuery q, JsString type, JsString attrName, JsAction<Event> defaultBehavior)
+        static void triggerDataBindingEvent(jQuery q, JsString type, object props, JsString attrName, JsAction<Event> defaultBehavior)
         {
             q.each((i, el) =>
             {
-                var ev = new Event(type);
+                var ev = new Event(type, props);
                 triggerDataBindingAttrEvent(ev, attrName, el);
                 if (ev.isDefaultPrevented())
                     return;
@@ -213,7 +245,16 @@ namespace CorexJs.DataBinding
             var att = target.data(attrName).As<JsString>();
             if (att == null)
                 return;
-            var func = new JsFunction("event", "context", "with(context){"+att+"}");
+            JsFunction func = null;
+            try
+            {
+                func = new JsFunction("event", "context", "with(context){" + att + "}");
+            }
+            catch(JsError ee)
+            {
+                HtmlContext.console.warn(ee, att);
+                return;
+            }
             var returnValue = func.call(e.target, e, globalContext);
             if (!e.isDefaultPrevented() && returnValue.ExactEquals(false))
                 e.preventDefault();
@@ -221,17 +262,6 @@ namespace CorexJs.DataBinding
 
 
 
-    }
-
-
-
-    [JsType(JsMode.Json)]
-    class BinderOptions
-    {
-        public bool oneway { get; set; }
-        public JsString sourcePath { get; set; }
-        public JsString targetPath { get; set; }
-        public JsString triggers { get; set; }
     }
 
 
@@ -246,6 +276,13 @@ namespace CorexJs.DataBinding
             return obj.tryGet(path);
         }
 
+    }
+
+
+    [JsType(JsMode.Json)]
+    class DataBindEventProps
+    {
+        public bool flat { get; set; }
     }
 
 }

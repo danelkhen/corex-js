@@ -15,14 +15,14 @@
         <button onclick="save();">Save</button>
         <button onclick="load();">Load</button>
     </div>
-    <div data-bindings="children:;">
+    <div data-binders="[children()]">
         <div class="TodoList Template">
-            <input class="Name" data-bindings="value:name triggers(change);" />
+            <input class="Name" data-binders="[onchange('name')]" />
             <div class="Items">
-                <div data-bindings="children:items;">
+                <div data-binders="[children('items')]">
                     <div class="TodoItem Template" data-onbind="$(this).toggleClass('Done', source.done);">
-                        <input type="checkbox" data-bindings="checked:done;" onchange="$(this).databindback().dataparent().databind();" />
-                        <input data-bindings="value:title triggers(change);disabled:done;"  onfocus="window.setTimeout(this.select.bind(this), 0);" />
+                        <input type="checkbox" onchange="$(this).databindback().dataparent().databind();" data-binders="[twoway('done')]" />
+                        <input type="text" data-binders="[onchange('title'), oneway('done', 'disabled')]"  onfocus="input_onfocus(event);" />
                     </div>
                 </div>
                 <div>

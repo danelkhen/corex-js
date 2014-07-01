@@ -30,3 +30,7 @@ function newList() {
     $(document).data('source').push({ name: 'List', items: [] });
     $(document).databind();
 }
+
+function input_onfocus(e){
+    window.setTimeout(e.target.select.bind(e.target), 0);
+}
