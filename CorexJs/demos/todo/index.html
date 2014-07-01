@@ -20,7 +20,7 @@
             <input class="Name" data-binders="[onchange('name')]" />
             <div class="Items">
                 <div data-binders="[children('items')]">
-                    <div class="TodoItem Template" data-onbind="$(this).toggleClass('Done', source.done);">
+                    <div class="TodoItem Template" data-binders="[toggleclassoneway('done', 'Done')]">
                         <input type="checkbox" onchange="$(this).databindback().dataparent().databind();" data-binders="[twoway('done')]" />
                         <input type="text" data-binders="[onchange('title'), oneway('done', 'disabled')]"  onfocus="input_onfocus(event);" />
                     </div>

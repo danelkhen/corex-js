@@ -8,16 +8,16 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Export=false)]
+    [JsType(JsMode.Prototype, Export = false)]
     public interface IBinder
     {
         void databind(Event e);
         void databindback(Event e);
     }
-    [JsType(JsMode.Prototype, Name = "Binder", Filename = "~/res/databind.js")]
-    public class Binder : IBinder
+    [JsType(JsMode.Prototype, Name = "PathBinder", Filename = "~/res/databind.js")]
+    public class PathBinder : PropertyBinder
     {
-        public Binder(JsString source, JsString target, bool oneWay, JsString triggers)
+        public PathBinder(JsString source, JsString target, bool oneWay, JsString triggers)
         {
             this.sourcePath = source;
             this.targetPath = target;
@@ -25,31 +25,29 @@ namespace CorexJs.DataBinding
             this.triggers = triggers;
         }
 
-        private bool IsInited;
-
-        protected virtual void verifyInit(Event e)
+        protected override void init(Event e)
         {
-            if (IsInited)
-                return;
-            init(e);
-        }
-
-        protected virtual void init(Event e)
-        {
-            if (IsInited)
-            {
-                HtmlContext.console.log("already inited");
-                return;
-            }
-            IsInited = true;
+            base.init(e);
             if (targetPath.isNullOrEmpty())
                 targetPath = getDefaultTargetPath(e.target);
+
+            sourceProp = createProperty(sourcePath);
+            targetProp = createProperty(targetPath);
             if (triggers != null && triggers.length > 0)
             {
                 var target = new jQuery(e.target);
                 target.on(triggers, onTrigger);
             }
 
+        }
+
+        Property createProperty(JsString path)
+        {
+            return new Property
+            {
+                get = t => t.tryGetByPath(path),
+                set = (t, v) => t.trySet(path, v),
+            };
         }
         protected virtual void onTrigger(Event e)
         {
@@ -58,25 +56,6 @@ namespace CorexJs.DataBinding
                 databind(e);
             else
                 databindback(e);
-        }
-        public virtual void databind(Event e)
-        {
-            verifyInit(e);
-            var target = new jQuery(e.target);
-            var source = target.data("source");
-            databind_tryCopy(source, sourcePath, e.target, targetPath);
-            HtmlContext.console.log("databind: source." + sourcePath + " -> source." + targetPath + " = ", e.target.tryGetByPath(targetPath));
-        }
-
-        public virtual void databindback(Event e)
-        {
-            if (oneway)
-                return;
-            verifyInit(e);
-            var target = new jQuery(e.target);
-            var source = target.data("source");
-            databind_tryCopy(e.target, targetPath, source, sourcePath);
-            HtmlContext.console.log("databindback: target." + targetPath + " -> source." + sourcePath +" = ", source.tryGetByPath(sourcePath));
         }
 
         public virtual void destroy(Event e)
@@ -88,11 +67,6 @@ namespace CorexJs.DataBinding
             }
         }
 
-        static void databind_tryCopy(object source, JsString sourcePath, object target, JsString targetPath)
-        {
-            var value = source.tryGetByPath(sourcePath);
-            JsObjectExt.trySet(target, targetPath, value);
-        }
 
         static JsString getDefaultTargetPath(HtmlElement el)
         {
@@ -103,13 +77,18 @@ namespace CorexJs.DataBinding
             }
             return "value";
         }
-        public bool oneway { get; set; }
+
         public JsString sourcePath { get; set; }
         public JsString targetPath { get; set; }
         public JsString triggers { get; set; }
 
 
     }
+
+
+
+
+
 
 
 

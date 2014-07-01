@@ -19,16 +19,13 @@ namespace CorexJs.DataBinding
 
         public void databind(Event e)
         {
-            //base.databind(e);
             var target = new jQuery(e.target);
             var source = target.data("source");
-            //if (targetPath == "children")
             bindArrayToChildren(target, null, source.tryGetByPath(sourcePath));
         }
 
         public void databindback(Event e)
         {
-            //base.databindback(e);
         }
 
         internal static void bindArrayToChildren(object target, object template, object source)

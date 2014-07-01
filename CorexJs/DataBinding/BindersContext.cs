@@ -9,25 +9,33 @@ namespace CorexJs.DataBinding
     [JsType(JsMode.Prototype, Filename = "~/res/databind.js", Name = "BindersContext")]
     class BindersContext
     {
-        public Binder oneway(JsString source, JsString target)
+        public PathBinder oneway(JsString source, JsString target)
         {
-            return new Binder(source, target, true, null);
+            return new PathBinder(source, target, true, null);
         }
-        public Binder onewayonchange(JsString source, JsString target)
+        public PathBinder onewayonchange(JsString source, JsString target)
         {
-            return new Binder(source, target, true, "change");
+            return new PathBinder(source, target, true, "change");
         }
-        public Binder twoway(JsString source, JsString target)
+        public PathBinder twoway(JsString source, JsString target)
         {
-            return new Binder(source, target, false, null);
+            return new PathBinder(source, target, false, null);
         }
-        public Binder onchange(JsString source, JsString target = null)
+        public PathBinder onchange(JsString source, JsString target = null)
         {
-            return new Binder(source, target, false, "change");
+            return new PathBinder(source, target, false, "change");
         }
         public ChildrenBinder children(JsString source)
         {
             return new ChildrenBinder(source);
+        }
+        public ToggleClassBinder toggleclass(JsString source, JsString className, bool oneway, JsString triggers)
+        {
+            return new ToggleClassBinder(source, className, oneway, triggers);
+        }
+        public ToggleClassBinder toggleclassoneway(JsString source, JsString className, JsString triggers)
+        {
+            return new ToggleClassBinder(source, className, true, triggers);
         }
     }
 }

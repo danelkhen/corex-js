@@ -26,13 +26,13 @@ namespace CorexJs.DataBinding
             return q;
         }
 
-        public static jQuery addBinder(jQuery q, Binder binder)
+        public static jQuery addBinder(jQuery q, PathBinder binder)
         {
             var binders = q.ProcessAndGetDataAttribute("binders", evalBinders);
             //var binders = q.data("binders").As<JsArray<Binder>>();
             if (binders == null)
             {
-                binders = new JsArray<Binder>();
+                binders = new JsArray<PathBinder>();
                 q.data("binders", binders);
             }
             binders.push(binder);
@@ -53,7 +53,7 @@ namespace CorexJs.DataBinding
             return x.As<T>();
         }
 
-        static JsArray<Binder> evalBinders(JsString code)
+        static JsArray<PathBinder> evalBinders(JsString code)
         {
             if (!code.contains("return"))
                 code = "return " + code;
@@ -61,7 +61,7 @@ namespace CorexJs.DataBinding
             var ctx = new BindersContext();
             code = "with(ctx){" + code + "}";
             var func = new JsFunction("ctx", code);
-            var res = func.call(null, ctx).As<JsArray<Binder>>();
+            var res = func.call(null, ctx).As<JsArray<PathBinder>>();
             return res;
         }
         static void element_setup_default(Event e)
@@ -73,7 +73,7 @@ namespace CorexJs.DataBinding
             {
                 if (binders == null)
                 {
-                    binders = new JsArray<Binder>();
+                    binders = new JsArray<PathBinder>();
                     target.data("binders", binders);
                 }
                 binders.addRange(binders2);
@@ -83,7 +83,7 @@ namespace CorexJs.DataBinding
         static void element_teardown_default(Event e)
         {
             var target = new jQuery(e.target);
-            var binders = target.data("binders").As<JsArray<Binder>>();
+            var binders = target.data("binders").As<JsArray<PathBinder>>();
             if (binders != null)
             {
                 binders.forEach(t => t.destroy(e));
@@ -119,7 +119,7 @@ namespace CorexJs.DataBinding
             var dataSource = target.data("source");
             var dataMember = target.data("member").As<JsString>();
 
-            var binders = target.data("binders").As<JsArray<Binder>>();
+            var binders = target.data("binders").As<JsArray<PathBinder>>();
             if (binders != null)
             {
                 binders.forEach(t => t.databind(e));
@@ -154,7 +154,7 @@ namespace CorexJs.DataBinding
             var target = new jQuery(e.target);
             var dataSource = target.data("source");
 
-            var binders = target.data("binders").As<JsArray<Binder>>();
+            var binders = target.data("binders").As<JsArray<PathBinder>>();
             if (binders != null)
                 binders.forEach(t => t.databindback(e));
 
@@ -163,7 +163,7 @@ namespace CorexJs.DataBinding
 
 
 
-        static JsArray<Binder> parseBindings(JsString s)
+        static JsArray<PathBinder> parseBindings(JsString s)
         {
             return null;
             //var obj = parseStyleAttr(s);

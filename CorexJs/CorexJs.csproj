@@ -57,9 +57,6 @@
     <Content Include="lib\jquery\jquery-2.0.3.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="demos\jqdatabind\index.css" />
-    <Content Include="demos\jqdatabind\index.html" />
-    <Content Include="demos\jqdatabind\index.js" />
     <Content Include="js\corex.js" />
     <Content Include="lib\jquery\jquery-2.0.3.js" />
     <Content Include="lib\jquery\jquery-2.0.3.min.js" />
@@ -76,6 +73,7 @@
     <Compile Include="DataBinding\ChildrenBinder.cs" />
     <Compile Include="DataBinding\Plugin.cs" />
     <Compile Include="DataBinding\jQueryPlugin.cs" />
+    <Compile Include="DataBinding\PropertyBinder.cs" />
     <Compile Include="DataBinding\ToggleClassBinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
