@@ -23,7 +23,7 @@ namespace CorexJs.DataBinding
             var source = this.data("source");
             jQuery prev = this;
             jQuery el = this.parent();
-            while (el.length>0)
+            while (el.length > 0)
             {
                 if (el.data("source") != source)
                     break;
@@ -32,15 +32,16 @@ namespace CorexJs.DataBinding
             }
             return prev;
         }
-        public object datasource()
+        public object datasource(object source = null)
         {
+            if (JsContext.arguments.length > 0)
+                return this.data("source", source);
             return this.data("source");
         }
-        //public object withdatasource(object obj)
-        //{
-        //    this.filter(())
-        //    return this.data("source");
-        //}
+        public jQuery wheredatasource(object obj)
+        {
+            return this.filter((i, el) => new jQuery(el).datasource() == obj);
+        }
     }
 
     [JsType(JsMode.Prototype, Export = false)]
@@ -54,6 +55,10 @@ namespace CorexJs.DataBinding
 
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static jQuery dataparent(this jQuery j) { return null; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static object datasource(this jQuery j) { return null; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static jQuery datasource(this jQuery j, object source=null) { return null; }
     }
 
 

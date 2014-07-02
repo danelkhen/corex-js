@@ -351,6 +351,7 @@ CorexJs.DataBinding.Plugin.verifyInit = function (el){
 CorexJs.DataBinding.Plugin.element_databind_default = function (e){
     CorexJs.DataBinding.Plugin.verifyInit(e.target);
     var target = $(e.target);
+    console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
     var dataSource = target.data("source");
     var dataMember = target.data("member");
     var binders = target.data("binders");
@@ -472,8 +473,15 @@ $.fn.dataparent = function (){
     }
     return prev;
 };
-$.fn.datasource = function (){
+$.fn.datasource = function (source){
+    if (arguments.length > 0)
+        return this.data("source", source);
     return this.data("source");
+};
+$.fn.wheredatasource = function (obj){
+    return this.filter($CreateAnonymousDelegate(this, function (i, el){
+        return $(el).datasource() == obj;
+    }));
 };
 var ToggleClassBinder = function (source, className, oneWay, triggers){
     this.className = null;

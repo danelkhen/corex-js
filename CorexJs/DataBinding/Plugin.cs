@@ -114,8 +114,8 @@ namespace CorexJs.DataBinding
         {
             verifyInit(e.target);
 
-            //console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(J(e.target).data("source")));
             var target = new jQuery(e.target);
+            HtmlContext.console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
             var dataSource = target.data("source");
             var dataMember = target.data("member").As<JsString>();
 

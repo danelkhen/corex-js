@@ -3,13 +3,13 @@
 }
 
 function save() {
-    var lists = $(document).databindback().data("source");
+    var lists = $(document).databindback().datasource();
     localStorage["TodoLists"] = JSON.stringify(lists);
 }
 
 function load() {
     var lists = JSON.parse(localStorage["TodoLists"] || null) || [];
-    $(document).data("source", lists).databind();
+    $(document).datasource(lists).databind();
 }
 
 function newTask() {
@@ -34,13 +34,9 @@ function deleteList(el) {
 
 function newList() {
     var list = { name: 'List', items: [] };
-    $(document).data('source').push(list);
+    $(document).datasource().push(list);
     $(document).databind();
-    //selectList()
-}
-
-function input_onfocus(e) {
-    window.setTimeout(e.target.select.bind(e.target), 0);
+    selectList($(".TodoList:not(.Template)").wheredatasource(list)[0]);
 }
 
 function deleteTask(el) {
@@ -60,9 +56,11 @@ function deleteSelectedList() {
 }
 
 function selectTask(el) {
-    $('.TodoItem.Selected').removeClass('Selected'); $(el).addClass('Selected');
+    $('.TodoItem.Selected').removeClass('Selected'); 
+    $(el).addClass('Selected');
 }
 
 function selectList(el) {
-    $('.TodoList.Selected').removeClass('Selected'); $(el).addClass('Selected');
+    $('.TodoList.Selected').removeClass('Selected'); 
+    $(el).addClass('Selected');
 }

@@ -25,7 +25,7 @@
             <div class="Items" data-binders="[children('items')]">
                 <div class="TodoItem Template" data-binders="[toggleclassoneway('done', 'Done')]" onmousedown="selectTask(this);">
                     <input type="checkbox" onchange="$(this).databindback().dataparent().databind();" data-binders="[twoway('done')]" />
-                    <input type="text" data-binders="[onchange('title'), oneway('done', 'disabled')]"  onfocus="input_onfocus(event);" />
+                    <input type="text" data-binders="[onchange('title'), oneway('done', 'disabled')]" />
                 </div>
             </div>
         </div>
