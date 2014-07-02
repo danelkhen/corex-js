@@ -51,8 +51,9 @@ Passing of the Source on a Target to a Target's children
 An object handling the DataBind and DataBindBack events for a specific Target. The 'return' statement can be omitted, and shortcuts are provided with BindersContext instance.
 In markup:
 ```
-<input data-binders=" [onchange('name')]" />
+<input data-binders="[onchange('name')]" />
 ```
+This will call BindersContext.onchange('name') - a shortcut function that creates a twoway binder with an element.onchange trigger to bindback.
 
 ###### DataParent
 The topmost element from a specific element that still has the same Source as the current element, useful when wanting to update the entire UI related to a Source.
