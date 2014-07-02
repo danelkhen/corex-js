@@ -3,6 +3,9 @@ corex-js
 
 Core extensions and utility functions for js and mini databinding framework (Booking.com hackathon project)
 
+#### Demo: Todo App
+* [Sources](https://github.com/danelkhen/corex-js/tree/master/CorexJs/demos/todo)
+* [App](https://rawgit.com/danelkhen/corex-js/master/CorexJs/demos/todo/index.html)
 
 #### DataBinding
 
