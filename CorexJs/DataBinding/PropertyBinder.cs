@@ -8,7 +8,7 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Name = "PropertyBinder", Filename = "~/res/databind.js")]
+    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
     public class PropertyBinder : BaseBinder
     {
         public PropertyBinder(Property source, Property target, bool oneway) : base(oneway)
@@ -31,12 +31,14 @@ namespace CorexJs.DataBinding
         {
             var value = sourceProp.get(source);
             targetProp.set(target, value);
+            HtmlContext.console.log("onTransfer", source, target, value);
         }
 
         protected override void onTransferBack(object source, HtmlElement target)
         {
             var value = targetProp.get(target);
             sourceProp.set(source, value);
+            HtmlContext.console.log("onTransferBack", source, target, value);
         }
 
 

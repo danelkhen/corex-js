@@ -6,7 +6,7 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Filename = "~/res/databind.js", Name = "BindersContext")]
+    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
     class BindersContext
     {
         public PathBinder oneway(JsString source, JsString target)

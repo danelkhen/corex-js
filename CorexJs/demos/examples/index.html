@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Examples</title>
+    <link href="index.css" rel="stylesheet" />
+    <script src="../../js/corex.js"></script>
+    <script src="../../lib/jquery/jquery-2.0.3.js"></script>
+    <script src="../../res/databind.js"></script>
+    <script src="index.js"></script>
+    <script>$(function () { $(document).databind(); });</script>
+</head>
+<body>
+    <div data-source="{ name: 'shooki', cool:true }">
+        <input data-binders="[onchange('name')]" />
+        <input type="checkbox" data-binders="[onchange('cool')]" />
+    </div>
+
+    <div data-source="{ name: 'shooki', category:'c' }">
+        <input data-binders="[onchange('name')]" />
+        <select data-binders="[children().datasource(['a','b','c']), onchange('category')]">
+            <option class="Template" data-binders="[oneway('', 'value'),oneway('', 'textContent')]"></option>
+        </select>
+    </div>
+
+    <div data-source="{ name: 'shooki', category:'c' }">
+        <input data-binders="[onchange('name')]" />
+        <select data-binders="[children().datasource([{id:'a',name:'aa'},{id:'b',name:'bb'},{id:'c',name:'cc'}]), onchange('category')]">
+            <option class="Template" data-binders="[oneway('id', 'value'),oneway('name', 'textContent')]"></option>
+        </select>
+    </div>
+
+</body>
+</html>

@@ -8,7 +8,7 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Name = "PathBinder", Filename = "~/res/databind.js")]
+    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
     public class PathBinder : PropertyBinder
     {
         public PathBinder(JsString source, JsString target, bool oneWay, JsString triggers)

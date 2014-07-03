@@ -34,9 +34,9 @@ namespace CorexJs.DataBinding
         }
         public object datasource(object source = null)
         {
-            if (JsContext.arguments.length > 0)
-                return this.data("source", source);
-            return this.data("source");
+            if (JsContext.arguments.length == 0)
+                return Plugin.get_datasource(this);
+            return Plugin.set_datasource(this, source);
         }
         public jQuery wheredatasource(object obj)
         {

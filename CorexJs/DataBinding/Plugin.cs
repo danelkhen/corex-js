@@ -39,18 +39,39 @@ namespace CorexJs.DataBinding
             return q;
         }
 
+        public static jQuery set_datasource(jQuery q, object source)
+        {
+            return q.data("source", source);
+        }
+
+        public static object get_datasource(jQuery q)
+        {
+            return q.ProcessAndGetDataAttribute<object>("source", evalDataSource);
+        }
+
         static T ProcessAndGetDataAttribute<T>(this jQuery q, JsString name, JsFunc<JsString, T> processor) where T :class
         {
             var x = q.data(name);
             if (x == null)
                 return null;
-            if (JsContext.JsTypeOf(x)== JsTypes.@string)
+            if (JsContext.JsTypeOf(x)== JsTypes.@string && q.attr("data-"+name)==x)
             {
                 var value = processor(x.As<JsString>());
                 q.data(name, value);
                 return value;
             }
             return x.As<T>();
+        }
+
+        static JsArray<PathBinder> evalDataSource(JsString code)
+        {
+            if (!code.contains("return"))
+                code = "return " + code;
+
+            var ctx = new BindersContext();
+            var func = new JsFunction(code);
+            var res = func.call(null).As<JsArray<PathBinder>>();
+            return res;
         }
 
         static JsArray<PathBinder> evalBinders(JsString code)
@@ -116,7 +137,7 @@ namespace CorexJs.DataBinding
 
             var target = new jQuery(e.target);
             HtmlContext.console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
-            var dataSource = target.data("source");
+            var dataSource = target.datasource();
             var dataMember = target.data("member").As<JsString>();
 
             var binders = target.data("binders").As<JsArray<PathBinder>>();
@@ -137,10 +158,10 @@ namespace CorexJs.DataBinding
             children.toArray().forEach(t =>
             {
                 var t2 = new jQuery(t);
-                var ctx = t2.data("source");
+                var ctx = t2.datasource();// ("source");
                 if (ctx == null || t2.data("inherited-source") == ctx)
                 {
-                    t2.data("source", childSource);
+                    t2.datasource(childSource);
                     t2.data("inherited-source", childSource);
                 }
             });
@@ -152,7 +173,7 @@ namespace CorexJs.DataBinding
             verifyInit(e.target);
 
             var target = new jQuery(e.target);
-            var dataSource = target.data("source");
+            var dataSource = target.datasource();
 
             var binders = target.data("binders").As<JsArray<PathBinder>>();
             if (binders != null)
@@ -232,7 +253,7 @@ namespace CorexJs.DataBinding
             var target = new jQuery(el);
             var context = new
             {
-                source = target.data("source"),
+                source = target.datasource(),
                 member = target.data("member").As<JsString>(),
             };
             e.target = el;

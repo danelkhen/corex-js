@@ -73,78 +73,98 @@ if (typeof($CreateDelegate)=='undefined'){
 }
 
 
-var BaseBinder = function (oneway){
+if (typeof(C) == "undefined")
+    var C = {};
+if (typeof(C.DataBinding) == "undefined")
+    C.DataBinding = {};
+C.DataBinding.BaseBinder = function (oneway){
     this.inited = false;
     this.oneway = false;
+    this.CustomSource = null;
     this.oneway = oneway;
 };
-BaseBinder.prototype.verifyInit = function (e){
+C.DataBinding.BaseBinder.prototype.verifyInit = function (e){
     if (this.inited)
         return;
     this.init(e);
 };
-BaseBinder.prototype.init = function (e){
+C.DataBinding.BaseBinder.prototype.init = function (e){
     if (this.inited){
         console.log("already inited");
         return;
     }
     this.inited = true;
 };
-BaseBinder.prototype.databind = function (e){
+C.DataBinding.BaseBinder.prototype.databind = function (e){
     this.verifyInit(e);
     this.onTransfer(this.getSource(e), this.getTarget(e));
 };
-BaseBinder.prototype.databindback = function (e){
+C.DataBinding.BaseBinder.prototype.databindback = function (e){
     if (this.oneway)
         return;
     this.verifyInit(e);
     this.onTransferBack(this.getSource(e), this.getTarget(e));
 };
-BaseBinder.prototype.getTarget = function (e){
+C.DataBinding.BaseBinder.prototype.getTarget = function (e){
     return e.target;
 };
-BaseBinder.prototype.getSource = function (e){
-    return $(e.target).data("source");
+C.DataBinding.BaseBinder.prototype.getSource = function (e){
+    if (this.CustomSource != null)
+        return this.CustomSource;
+    return $(e.target).datasource();
 };
-BaseBinder.prototype.onTransfer = function (source, target){
+C.DataBinding.BaseBinder.prototype.datasource = function (obj){
+    this.CustomSource = obj;
+    return this;
 };
-BaseBinder.prototype.onTransferBack = function (source, target){
+C.DataBinding.BaseBinder.prototype.onTransfer = function (source, target){
 };
-var BindersContext = function (){
+C.DataBinding.BaseBinder.prototype.onTransferBack = function (source, target){
 };
-BindersContext.prototype.oneway = function (source, target){
-    return new PathBinder(source, target, true, null);
+C.DataBinding.BindersContext = function (){
 };
-BindersContext.prototype.onewayonchange = function (source, target){
-    return new PathBinder(source, target, true, "change");
+C.DataBinding.BindersContext.prototype.oneway = function (source, target){
+    return new C.DataBinding.PathBinder(source, target, true, null);
 };
-BindersContext.prototype.twoway = function (source, target){
-    return new PathBinder(source, target, false, null);
+C.DataBinding.BindersContext.prototype.onewayonchange = function (source, target){
+    return new C.DataBinding.PathBinder(source, target, true, "change");
 };
-BindersContext.prototype.onchange = function (source, target){
-    return new PathBinder(source, target, false, "change");
+C.DataBinding.BindersContext.prototype.twoway = function (source, target){
+    return new C.DataBinding.PathBinder(source, target, false, null);
 };
-BindersContext.prototype.children = function (source){
-    return new ChildrenBinder(source);
+C.DataBinding.BindersContext.prototype.onchange = function (source, target){
+    return new C.DataBinding.PathBinder(source, target, false, "change");
 };
-BindersContext.prototype.toggleclass = function (source, className, oneway, triggers){
-    return new ToggleClassBinder(source, className, oneway, triggers);
+C.DataBinding.BindersContext.prototype.children = function (source){
+    return new C.DataBinding.ChildrenBinder(source);
 };
-BindersContext.prototype.toggleclassoneway = function (source, className, triggers){
-    return new ToggleClassBinder(source, className, true, triggers);
+C.DataBinding.BindersContext.prototype.toggleclass = function (source, className, oneway, triggers){
+    return new C.DataBinding.ToggleClassBinder(source, className, oneway, triggers);
 };
-var ChildrenBinder = function (sourcePath){
+C.DataBinding.BindersContext.prototype.toggleclassoneway = function (source, className, triggers){
+    return new C.DataBinding.ToggleClassBinder(source, className, true, triggers);
+};
+C.DataBinding.ChildrenBinder = function (sourcePath){
     this.sourcePath = null;
+    this.CustomSource = null;
     this.sourcePath = sourcePath;
 };
-ChildrenBinder.prototype.databind = function (e){
-    var target = $(e.target);
-    var source = target.data("source");
-    ChildrenBinder.bindArrayToChildren(target, null, BindingExt.tryGetByPath(source, this.sourcePath));
+C.DataBinding.ChildrenBinder.prototype.databind = function (e){
+    var source = this.getSource(e);
+    C.DataBinding.ChildrenBinder.bindArrayToChildren($(e.target), null, BindingExt.tryGetByPath(source, this.sourcePath));
 };
-ChildrenBinder.prototype.databindback = function (e){
+C.DataBinding.ChildrenBinder.prototype.getSource = function (e){
+    if (this.CustomSource != null)
+        return this.CustomSource;
+    return $(e.target).datasource();
 };
-ChildrenBinder.bindArrayToChildren = function (target, template, source){
+C.DataBinding.ChildrenBinder.prototype.datasource = function (obj){
+    this.CustomSource = obj;
+    return this;
+};
+C.DataBinding.ChildrenBinder.prototype.databindback = function (e){
+};
+C.DataBinding.ChildrenBinder.bindArrayToChildren = function (target, template, source){
     var list = source;
     var el2 = $(target);
     var template2 = $(template);
@@ -158,11 +178,12 @@ ChildrenBinder.bindArrayToChildren = function (target, template, source){
         return;
     var children = el2.children(":not(.Template)").toArray();
     var createTemplate = function (t){
-        return template2.clone(true).removeClass("Template").data("source", t);
+        return template2.clone(true).removeClass("Template").datasource(t);
     };
-    ChildrenBinder.bindArrayToChildrenInternal(list, el2, children, createTemplate);
+    C.DataBinding.ChildrenBinder.bindArrayToChildrenInternal(list, el2, children, createTemplate);
+    el2.children(":not(.Template)").databind();
 };
-ChildrenBinder.bindArrayToChildrenInternal = function (source, target, children, creator){
+C.DataBinding.ChildrenBinder.bindArrayToChildrenInternal = function (source, target, children, creator){
     var index = 0;
     var index2 = 0;
     while (index2 < children.length){
@@ -194,37 +215,39 @@ ChildrenBinder.bindArrayToChildrenInternal = function (source, target, children,
         index++;
     }
 };
-var PropertyBinder = function (source, target, oneway){
+C.DataBinding.PropertyBinder = function (source, target, oneway){
     this.sourceProp = null;
     this.targetProp = null;
-    BaseBinder.call(this, oneway);
+    C.DataBinding.BaseBinder.call(this, oneway);
     this.sourceProp = source;
     this.targetProp = target;
     this.oneway = oneway;
 };
-PropertyBinder.prototype.onTransfer = function (source, target){
+C.DataBinding.PropertyBinder.prototype.onTransfer = function (source, target){
     var value = this.sourceProp.get(source);
     this.targetProp.set(target, value);
+    console.log("onTransfer", source, target, value);
 };
-PropertyBinder.prototype.onTransferBack = function (source, target){
+C.DataBinding.PropertyBinder.prototype.onTransferBack = function (source, target){
     var value = this.targetProp.get(target);
     this.sourceProp.set(source, value);
+    console.log("onTransferBack", source, target, value);
 };
-$Inherit(PropertyBinder, BaseBinder);
-var PathBinder = function (source, target, oneWay, triggers){
+$Inherit(C.DataBinding.PropertyBinder, C.DataBinding.BaseBinder);
+C.DataBinding.PathBinder = function (source, target, oneWay, triggers){
     this.sourcePath = null;
     this.targetPath = null;
     this.triggers = null;
-    PropertyBinder.call(this);
+    C.DataBinding.PropertyBinder.call(this);
     this.sourcePath = source;
     this.targetPath = target;
     this.oneway = oneWay;
     this.triggers = triggers;
 };
-PathBinder.prototype.init = function (e){
-    BaseBinder.prototype.init.call(this, e);
+C.DataBinding.PathBinder.prototype.init = function (e){
+    C.DataBinding.BaseBinder.prototype.init.call(this, e);
     if (Q.isNullOrEmpty(this.targetPath))
-        this.targetPath = PathBinder.getDefaultTargetPath(e.target);
+        this.targetPath = C.DataBinding.PathBinder.getDefaultTargetPath(e.target);
     this.sourceProp = this.createProperty(this.sourcePath);
     this.targetProp = this.createProperty(this.targetPath);
     if (this.triggers != null && this.triggers.length > 0){
@@ -232,7 +255,7 @@ PathBinder.prototype.init = function (e){
         target.on(this.triggers, $CreateDelegate(this, this.onTrigger));
     }
 };
-PathBinder.prototype.createProperty = function (path){
+C.DataBinding.PathBinder.prototype.createProperty = function (path){
     return {
         get: $CreateAnonymousDelegate(this, function (t){
             return BindingExt.tryGetByPath(t, path);
@@ -242,49 +265,45 @@ PathBinder.prototype.createProperty = function (path){
         })
     };
 };
-PathBinder.prototype.onTrigger = function (e){
+C.DataBinding.PathBinder.prototype.onTrigger = function (e){
     console.log("Trigger: " + e.type);
     if (this.oneway)
         this.databind(e);
     else
         this.databindback(e);
 };
-PathBinder.prototype.destroy = function (e){
+C.DataBinding.PathBinder.prototype.destroy = function (e){
     if (this.triggers != null && this.triggers.length > 0){
         var target = $(e.target);
         target.off(this.triggers, $CreateDelegate(this, this.databindback));
     }
 };
-PathBinder.getDefaultTargetPath = function (el){
+C.DataBinding.PathBinder.getDefaultTargetPath = function (el){
     if (el.nodeName == "INPUT"){
         if (["radio", "checkbox"].contains(el.type))
             return "checked";
     }
     return "value";
 };
-$Inherit(PathBinder, PropertyBinder);
-if (typeof(CorexJs) == "undefined")
-    var CorexJs = {};
-if (typeof(CorexJs.DataBinding) == "undefined")
-    CorexJs.DataBinding = {};
-CorexJs.DataBinding.Plugin = function (){
+$Inherit(C.DataBinding.PathBinder, C.DataBinding.PropertyBinder);
+C.DataBinding.Plugin = function (){
 };
-CorexJs.DataBinding.Plugin.databindflat = function (q){
-    CorexJs.DataBinding.Plugin.triggerDataBindingEvent(q, "databind", {
+C.DataBinding.Plugin.databindflat = function (q){
+    C.DataBinding.Plugin.triggerDataBindingEvent(q, "databind", {
         flat: true
-    }, "onbind", CorexJs.DataBinding.Plugin.element_databind_default);
+    }, "onbind", C.DataBinding.Plugin.element_databind_default);
     return q;
 };
-CorexJs.DataBinding.Plugin.databind = function (q){
-    CorexJs.DataBinding.Plugin.triggerDataBindingEvent(q, "databind", null, "onbind", CorexJs.DataBinding.Plugin.element_databind_default);
+C.DataBinding.Plugin.databind = function (q){
+    C.DataBinding.Plugin.triggerDataBindingEvent(q, "databind", null, "onbind", C.DataBinding.Plugin.element_databind_default);
     return q;
 };
-CorexJs.DataBinding.Plugin.databindback = function (q){
-    CorexJs.DataBinding.Plugin.triggerDataBindingEvent(q, "databindback", null, "onbindback", CorexJs.DataBinding.Plugin.element_databindback_default);
+C.DataBinding.Plugin.databindback = function (q){
+    C.DataBinding.Plugin.triggerDataBindingEvent(q, "databindback", null, "onbindback", C.DataBinding.Plugin.element_databindback_default);
     return q;
 };
-CorexJs.DataBinding.Plugin.addBinder = function (q, binder){
-    var binders = CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute(q, "binders", CorexJs.DataBinding.Plugin.evalBinders);
+C.DataBinding.Plugin.addBinder = function (q, binder){
+    var binders = C.DataBinding.Plugin.ProcessAndGetDataAttribute(q, "binders", C.DataBinding.Plugin.evalBinders);
     if (binders == null){
         binders =  [];
         q.data("binders", binders);
@@ -292,30 +311,44 @@ CorexJs.DataBinding.Plugin.addBinder = function (q, binder){
     binders.push(binder);
     return q;
 };
-CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute = function (q, name, processor){
+C.DataBinding.Plugin.set_datasource = function (q, source){
+    return q.data("source", source);
+};
+C.DataBinding.Plugin.get_datasource = function (q){
+    return C.DataBinding.Plugin.ProcessAndGetDataAttribute(q, "source", C.DataBinding.Plugin.evalDataSource);
+};
+C.DataBinding.Plugin.ProcessAndGetDataAttribute = function (q, name, processor){
     var x = q.data(name);
     if (x == null)
         return null;
-    if (typeof(x) == "string"){
+    if (typeof(x) == "string" && q.attr("data-" + name) == x){
         var value = processor(x);
         q.data(name, value);
         return value;
     }
     return x;
 };
-CorexJs.DataBinding.Plugin.evalBinders = function (code){
+C.DataBinding.Plugin.evalDataSource = function (code){
     if (!code.contains("return"))
         code = "return " + code;
-    var ctx = new BindersContext();
+    var ctx = new C.DataBinding.BindersContext();
+    var func = new Function(code);
+    var res = func.call(null);
+    return res;
+};
+C.DataBinding.Plugin.evalBinders = function (code){
+    if (!code.contains("return"))
+        code = "return " + code;
+    var ctx = new C.DataBinding.BindersContext();
     code = "with(ctx){" + code + "}";
     var func = new Function("ctx", code);
     var res = func.call(null, ctx);
     return res;
 };
-CorexJs.DataBinding.Plugin.element_setup_default = function (e){
+C.DataBinding.Plugin.element_setup_default = function (e){
     var target = $(e.target);
-    var binders2 = CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute(target, "bindings", CorexJs.DataBinding.Plugin.parseBindings);
-    var binders = CorexJs.DataBinding.Plugin.ProcessAndGetDataAttribute(target, "binders", CorexJs.DataBinding.Plugin.evalBinders);
+    var binders2 = C.DataBinding.Plugin.ProcessAndGetDataAttribute(target, "bindings", C.DataBinding.Plugin.parseBindings);
+    var binders = C.DataBinding.Plugin.ProcessAndGetDataAttribute(target, "binders", C.DataBinding.Plugin.evalBinders);
     if (binders2 != null){
         if (binders == null){
             binders =  [];
@@ -324,7 +357,7 @@ CorexJs.DataBinding.Plugin.element_setup_default = function (e){
         binders.addRange(binders2);
     }
 };
-CorexJs.DataBinding.Plugin.element_teardown_default = function (e){
+C.DataBinding.Plugin.element_teardown_default = function (e){
     var target = $(e.target);
     var binders = target.data("binders");
     if (binders != null){
@@ -334,25 +367,25 @@ CorexJs.DataBinding.Plugin.element_teardown_default = function (e){
         target.removeData("binders");
     }
 };
-CorexJs.DataBinding.Plugin.isinited = function (target){
+C.DataBinding.Plugin.isinited = function (target){
     return target.data("databind-isinited") === true;
 };
-CorexJs.DataBinding.Plugin.set_isinited = function (target){
+C.DataBinding.Plugin.set_isinited = function (target){
     target.data("databind-isinited", true);
 };
-CorexJs.DataBinding.Plugin.verifyInit = function (el){
+C.DataBinding.Plugin.verifyInit = function (el){
     var target = $(el);
-    var isInited = CorexJs.DataBinding.Plugin.isinited(target);
+    var isInited = C.DataBinding.Plugin.isinited(target);
     if (!isInited){
-        CorexJs.DataBinding.Plugin.set_isinited(target);
-        CorexJs.DataBinding.Plugin.triggerDataBindingEvent(target, "init", null, "oninit", CorexJs.DataBinding.Plugin.element_setup_default);
+        C.DataBinding.Plugin.set_isinited(target);
+        C.DataBinding.Plugin.triggerDataBindingEvent(target, "init", null, "oninit", C.DataBinding.Plugin.element_setup_default);
     }
 };
-CorexJs.DataBinding.Plugin.element_databind_default = function (e){
-    CorexJs.DataBinding.Plugin.verifyInit(e.target);
+C.DataBinding.Plugin.element_databind_default = function (e){
+    C.DataBinding.Plugin.verifyInit(e.target);
     var target = $(e.target);
     console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
-    var dataSource = target.data("source");
+    var dataSource = target.datasource();
     var dataMember = target.data("member");
     var binders = target.data("binders");
     if (binders != null){
@@ -368,18 +401,18 @@ CorexJs.DataBinding.Plugin.element_databind_default = function (e){
         childSource = childSource[dataMember];
     children.toArray().forEach(function (t){
         var t2 = $(t);
-        var ctx = t2.data("source");
+        var ctx = t2.datasource();
         if (ctx == null || t2.data("inherited-source") == ctx){
-            t2.data("source", childSource);
+            t2.datasource(childSource);
             t2.data("inherited-source", childSource);
         }
     });
     children.databind();
 };
-CorexJs.DataBinding.Plugin.element_databindback_default = function (e){
-    CorexJs.DataBinding.Plugin.verifyInit(e.target);
+C.DataBinding.Plugin.element_databindback_default = function (e){
+    C.DataBinding.Plugin.verifyInit(e.target);
     var target = $(e.target);
-    var dataSource = target.data("source");
+    var dataSource = target.datasource();
     var binders = target.data("binders");
     if (binders != null)
         binders.forEach(function (t){
@@ -387,10 +420,10 @@ CorexJs.DataBinding.Plugin.element_databindback_default = function (e){
         });
     target.children(":not(.Template)").databindback();
 };
-CorexJs.DataBinding.Plugin.parseBindings = function (s){
+C.DataBinding.Plugin.parseBindings = function (s){
     return null;
 };
-CorexJs.DataBinding.Plugin.parseStyleAttr = function (s){
+C.DataBinding.Plugin.parseStyleAttr = function (s){
     if (s == null || s == "")
         return null;
     var pairs = s.split(";");
@@ -403,10 +436,10 @@ CorexJs.DataBinding.Plugin.parseStyleAttr = function (s){
     });
     return obj;
 };
-CorexJs.DataBinding.Plugin.triggerDataBindingEvent = function (q, type, props, attrName, defaultBehavior){
+C.DataBinding.Plugin.triggerDataBindingEvent = function (q, type, props, attrName, defaultBehavior){
     q.each(function (i, el){
         var ev = new jQuery.Event(type, props);
-        CorexJs.DataBinding.Plugin.triggerDataBindingAttrEvent(ev, attrName, el);
+        C.DataBinding.Plugin.triggerDataBindingAttrEvent(ev, attrName, el);
         if (ev.isDefaultPrevented())
             return;
         var target = $(el);
@@ -416,16 +449,16 @@ CorexJs.DataBinding.Plugin.triggerDataBindingEvent = function (q, type, props, a
         defaultBehavior(ev);
     });
 };
-CorexJs.DataBinding.Plugin.triggerDataBindingAttrEvent = function (e, attrName, el){
+C.DataBinding.Plugin.triggerDataBindingAttrEvent = function (e, attrName, el){
     var target = $(el);
     var context = {
-        source: target.data("source"),
+        source: target.datasource(),
         member: target.data("member")
     };
     e.target = el;
-    CorexJs.DataBinding.Plugin.triggerAttributeEvent(e, attrName, context);
+    C.DataBinding.Plugin.triggerAttributeEvent(e, attrName, context);
 };
-CorexJs.DataBinding.Plugin.triggerAttributeEvent = function (e, attrName, globalContext){
+C.DataBinding.Plugin.triggerAttributeEvent = function (e, attrName, globalContext){
     var target = $(e.target);
     var att = target.data(attrName);
     if (att == null)
@@ -450,16 +483,16 @@ BindingExt.tryGetByPath = function (obj, path){
     return Object.tryGet(obj, path);
 };
 $.fn.databind = function (){
-    return CorexJs.DataBinding.Plugin.databind(this);
+    return C.DataBinding.Plugin.databind(this);
 };
 $.fn.databindflat = function (){
-    return CorexJs.DataBinding.Plugin.databindflat(this);
+    return C.DataBinding.Plugin.databindflat(this);
 };
 $.fn.databindback = function (){
-    return CorexJs.DataBinding.Plugin.databindback(this);
+    return C.DataBinding.Plugin.databindback(this);
 };
 $.fn.addBinder = function (binder){
-    return CorexJs.DataBinding.Plugin.addBinder(this, binder);
+    return C.DataBinding.Plugin.addBinder(this, binder);
 };
 $.fn.dataparent = function (){
     var source = this.data("source");
@@ -474,22 +507,22 @@ $.fn.dataparent = function (){
     return prev;
 };
 $.fn.datasource = function (source){
-    if (arguments.length > 0)
-        return this.data("source", source);
-    return this.data("source");
+    if (arguments.length == 0)
+        return C.DataBinding.Plugin.get_datasource(this);
+    return C.DataBinding.Plugin.set_datasource(this, source);
 };
 $.fn.wheredatasource = function (obj){
     return this.filter($CreateAnonymousDelegate(this, function (i, el){
         return $(el).datasource() == obj;
     }));
 };
-var ToggleClassBinder = function (source, className, oneWay, triggers){
+C.DataBinding.ToggleClassBinder = function (source, className, oneWay, triggers){
     this.className = null;
-    PathBinder.call(this, source, null, oneWay, triggers);
+    C.DataBinding.PathBinder.call(this, source, null, oneWay, triggers);
     this.className = className;
 };
-ToggleClassBinder.prototype.init = function (e){
-    PathBinder.prototype.init.call(this, e);
+C.DataBinding.ToggleClassBinder.prototype.init = function (e){
+    C.DataBinding.PathBinder.prototype.init.call(this, e);
     this.targetProp = {
         get: $CreateAnonymousDelegate(this, function (t){
             return $(t).hasClass(this.className);
@@ -499,5 +532,5 @@ ToggleClassBinder.prototype.init = function (e){
         })
     };
 };
-$Inherit(ToggleClassBinder, PathBinder);
+$Inherit(C.DataBinding.ToggleClassBinder, C.DataBinding.PathBinder);
 

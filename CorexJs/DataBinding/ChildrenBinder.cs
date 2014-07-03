@@ -8,7 +8,7 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Name = "ChildrenBinder", Filename = "~/res/databind.js")]
+    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
     class ChildrenBinder : IBinder
     {
         JsString sourcePath;
@@ -19,10 +19,23 @@ namespace CorexJs.DataBinding
 
         public void databind(Event e)
         {
-            var target = new jQuery(e.target);
-            var source = target.data("source");
-            bindArrayToChildren(target, null, source.tryGetByPath(sourcePath));
+            var source = getSource(e);
+            bindArrayToChildren(new jQuery(e.target), null, source.tryGetByPath(sourcePath));
         }
+        protected virtual object getSource(Event e)
+        {
+            if (CustomSource != null)
+                return CustomSource;
+            return new jQuery(e.target).datasource();
+        }
+        public ChildrenBinder datasource(object obj)
+        {
+            CustomSource = obj;
+            return this;
+        }
+
+        public object CustomSource { get; set; }
+
 
         public void databindback(Event e)
         {
@@ -43,9 +56,10 @@ namespace CorexJs.DataBinding
                 return;
             var children = el2.children(":not(.Template)").toArray();
 
-            JsFunc<object, jQuery> createTemplate = t => template2.clone(true).removeClass("Template").data("source", t);
+            JsFunc<object, jQuery> createTemplate = t => template2.clone(true).removeClass("Template").datasource(t);
 
             bindArrayToChildrenInternal(list, el2, children, createTemplate);
+            el2.children(":not(.Template)").databind();
         }
 
         internal static void bindArrayToChildrenInternal(JsArray<object> source, jQuery target, JsArray<HtmlElement> children, JsFunc<object, jQuery> creator)

@@ -8,7 +8,7 @@ using System.Web;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Name = "BaseBinder", Filename = "~/res/databind.js")]
+    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
     public class BaseBinder : IBinder
     {
         public BaseBinder(bool oneway)
@@ -42,7 +42,6 @@ namespace CorexJs.DataBinding
         }
 
         public bool oneway { get; set; }
-        //public HtmlElement target { get;  set; }
 
         public virtual void databind(Event e)
         {
@@ -67,9 +66,17 @@ namespace CorexJs.DataBinding
 
         protected virtual object getSource(Event e)
         {
-            return new jQuery(e.target).data("source");
+            if (CustomSource != null)
+                return CustomSource;
+            return new jQuery(e.target).datasource();
+        }
+        public BaseBinder datasource(object obj)
+        {
+            CustomSource = obj;
+            return this;
         }
 
+        public object CustomSource { get; set; }
 
         protected virtual void onTransfer(object source, HtmlElement target)
         {

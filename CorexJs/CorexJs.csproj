@@ -41,19 +41,22 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SharpKit.Html, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2575297a09c47a96, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\github\SharpKit\SDK\Defs\Html\bin\v4.0\SharpKit.Html.dll</HintPath>
+      <HintPath>..\..\SharpKit\SDK\Defs\bin\SharpKit.Html.dll</HintPath>
     </Reference>
     <Reference Include="SharpKit.JavaScript, Version=1.5.0.0, Culture=neutral, PublicKeyToken=2575297a09c47a96, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\github\SharpKit\SDK\Defs\JavaScript\bin\v4.0\SharpKit.JavaScript.dll</HintPath>
+      <HintPath>..\..\SharpKit\SDK\Defs\bin\SharpKit.JavaScript.dll</HintPath>
     </Reference>
     <Reference Include="SharpKit.jQuery, Version=1.6.4.0, Culture=neutral, PublicKeyToken=2575297a09c47a96, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\github\SharpKit\SDK\Defs\jQuery\bin\v4.0\SharpKit.jQuery.dll</HintPath>
+      <HintPath>..\..\SharpKit\SDK\Defs\bin\SharpKit.jQuery.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="demos\examples\index.css" />
+    <Content Include="demos\examples\index.html" />
+    <Content Include="demos\examples\index.js" />
     <Content Include="lib\jquery\jquery-2.0.3.min.map" />
   </ItemGroup>
   <ItemGroup>

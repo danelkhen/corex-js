@@ -7,7 +7,7 @@ using SharpKit.jQuery;
 
 namespace CorexJs.DataBinding
 {
-    [JsType(JsMode.Prototype, Name = "ToggleClassBinder", Filename = "~/res/databind.js")]
+    [JsType(JsMode.Prototype, Filename = "~/res/databind.js")]
     public class ToggleClassBinder : PathBinder
     {
         private JsString className;
