@@ -123,6 +123,24 @@ C.DataBinding.BaseBinder.prototype.onTransferBack = function (source, target){
 };
 C.DataBinding.BindersContext = function (){
 };
+C.DataBinding.BindersContext.prototype.default = function (s){
+    if (s.contains("-->")){
+        var tokens = s.split("-->");
+        return this.children(tokens[0]);
+    }
+    else if (s.contains("<->")){
+        var tokens = s.split("<->");
+        return this.twoway(tokens[0], tokens[1]);
+    }
+    else if (s.contains("->")){
+        var tokens = s.split("->");
+        return this.oneway(tokens[0], tokens[1]);
+    }
+    else {
+        var tokens = s.split("->");
+        return this.oneway(tokens[0], tokens[1]);
+    }
+};
 C.DataBinding.BindersContext.prototype.oneway = function (source, target){
     return new C.DataBinding.PathBinder(source, target, true, null);
 };
@@ -188,7 +206,7 @@ C.DataBinding.ChildrenBinder.bindArrayToChildrenInternal = function (source, tar
     var index2 = 0;
     while (index2 < children.length){
         var ch2 = $(children[index2]);
-        var dc2 = ch2.data("source");
+        var dc2 = ch2.datasource();
         if (dc2 == null){
             index2++;
             continue;
@@ -226,12 +244,14 @@ C.DataBinding.PropertyBinder = function (source, target, oneway){
 C.DataBinding.PropertyBinder.prototype.onTransfer = function (source, target){
     var value = this.sourceProp.get(source);
     this.targetProp.set(target, value);
-    console.log("onTransfer", source, target, value);
+    if (C.DataBinding.Plugin.logEnabled)
+        console.log("onTransfer", source, target, value);
 };
 C.DataBinding.PropertyBinder.prototype.onTransferBack = function (source, target){
     var value = this.targetProp.get(target);
     this.sourceProp.set(source, value);
-    console.log("onTransferBack", source, target, value);
+    if (C.DataBinding.Plugin.logEnabled)
+        console.log("onTransferBack", source, target, value);
 };
 $Inherit(C.DataBinding.PropertyBinder, C.DataBinding.BaseBinder);
 C.DataBinding.PathBinder = function (source, target, oneWay, triggers){
@@ -266,7 +286,8 @@ C.DataBinding.PathBinder.prototype.createProperty = function (path){
     };
 };
 C.DataBinding.PathBinder.prototype.onTrigger = function (e){
-    console.log("Trigger: " + e.type);
+    if (C.DataBinding.Plugin.logEnabled)
+        console.log("Trigger: " + e.type);
     if (this.oneway)
         this.databind(e);
     else
@@ -288,6 +309,7 @@ C.DataBinding.PathBinder.getDefaultTargetPath = function (el){
 $Inherit(C.DataBinding.PathBinder, C.DataBinding.PropertyBinder);
 C.DataBinding.Plugin = function (){
 };
+C.DataBinding.Plugin.logEnabled = false;
 C.DataBinding.Plugin.databindflat = function (q){
     C.DataBinding.Plugin.triggerDataBindingEvent(q, "databind", {
         flat: true
@@ -343,6 +365,11 @@ C.DataBinding.Plugin.evalBinders = function (code){
     code = "with(ctx){" + code + "}";
     var func = new Function("ctx", code);
     var res = func.call(null, ctx);
+    res.forEach(function (t, i){
+        if (typeof(t)=='string'){
+            res[i] = ctx.default(t);
+        }
+    });
     return res;
 };
 C.DataBinding.Plugin.element_setup_default = function (e){
@@ -384,7 +411,8 @@ C.DataBinding.Plugin.verifyInit = function (el){
 C.DataBinding.Plugin.element_databind_default = function (e){
     C.DataBinding.Plugin.verifyInit(e.target);
     var target = $(e.target);
-    console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
+    if (C.DataBinding.Plugin.logEnabled)
+        console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
     var dataSource = target.datasource();
     var dataMember = target.data("member");
     var binders = target.data("binders");
@@ -494,7 +522,7 @@ $.fn.databindback = function (){
 $.fn.addBinder = function (binder){
     return C.DataBinding.Plugin.addBinder(this, binder);
 };
-$.fn.dataparent = function (){
+$.fn.dataowner = function (){
     var source = this.data("source");
     var prev = this;
     var el = this.parent();
@@ -505,6 +533,9 @@ $.fn.dataparent = function (){
         el = el.parent();
     }
     return prev;
+};
+$.fn.dataparent = function (){
+    return this.dataowner().parent().dataowner();
 };
 $.fn.datasource = function (source){
     if (arguments.length == 0)

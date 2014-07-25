@@ -20,11 +20,12 @@
         <button onclick="deleteSelectedList();">Delete Selected List</button>
     </div>
     <div data-binders="[children()]">
-        <div class="TodoList Template" onmousedown="selectList(this);">
+        <div class="TodoList Template" onmousedown="selectList(this);" data-onbindback="scheduleSave();">
             <input class="Name" data-binders="[onchange('name')]" />
+            <div class="DoneCount" data-onbind="DoneCount_onbind(event);"></div>
             <div class="Items" data-binders="[children('items')]">
                 <div class="TodoItem Template" data-binders="[toggleclassoneway('done', 'Done')]" onmousedown="selectTask(this);">
-                    <input type="checkbox" onchange="$(this).databindback().dataparent().databind();" data-binders="[twoway('done')]" />
+                    <input type="checkbox" onchange="$(this).databindback().dataowner().databind().dataparent().children('.DoneCount').databind();" data-binders="[twoway('done')]" />
                     <input type="text" data-binders="[onchange('title'), oneway('done', 'disabled')]" />
                 </div>
             </div>

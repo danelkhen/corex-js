@@ -18,7 +18,7 @@ namespace CorexJs.DataBinding
         public jQuery databindback() { return Plugin.databindback(this); }
         public jQuery addBinder(PathBinder binder) { return Plugin.addBinder(this, binder); }
 
-        public jQuery dataparent()
+        public jQuery dataowner()
         {
             var source = this.data("source");
             jQuery prev = this;
@@ -31,6 +31,10 @@ namespace CorexJs.DataBinding
                 el = el.parent();
             }
             return prev;
+        }
+        public jQuery dataparent()
+        {
+            return this.dataowner().parent().dataowner();
         }
         public object datasource(object source = null)
         {
@@ -55,6 +59,8 @@ namespace CorexJs.DataBinding
 
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static jQuery dataparent(this jQuery j) { return null; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static jQuery dataowner(this jQuery j) { return null; }
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static object datasource(this jQuery j) { return null; }
         [JsMethod(ExtensionImplementedInInstance = true)]

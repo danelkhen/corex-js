@@ -2,19 +2,22 @@ var Q = function () {
 };
 
 Q.copy = function (src, target, options, depth) {
-    if(depth==null)
-        depth = 0;
-    if(depth==100){
-        console.warn("Q.copy is in depth of 100 - possible circular reference")
-    }
     ///<summary>Copies an object into a target object, recursively cloning any object or array in the way, overwrite=true will overwrite a primitive field value even if exists</summary>
     ///<param name="src" />
     ///<param name="target" />
     ///<param name="options" type="Object">{ overwrite:false }</param>
     ///<returns type="Object">The copied object</returns>
-    options = options || { overwrite: false };
+    if(depth==null)
+        depth = 0;
+    if(depth==100){
+        console.warn("Q.copy is in depth of 100 - possible circular reference")
+    }
+    if(src===null && target===undefined)
+        return null;
     if (src == target || src == null)
         return target;
+    options = options || { overwrite: false };
+    
     if (typeof (src) != "object") {
         if (options.overwrite || target == null)
             return src;
@@ -361,6 +364,14 @@ Q._canInlineArray = function(list){
 }
 
 Q.stringifyFormatted2 = function (obj, sb) {
+    if(obj===undefined){
+        sb.push("undefined");
+        return;
+    }
+    if(obj===null){
+        sb.push("null");
+        return;
+    }
     var type = typeof (obj);
     if (type == "object") {
         if (obj instanceof Array) {
@@ -565,6 +576,12 @@ function createCompareFuncFromSelector(selector, desc) {
         return compare(selector(x), selector(y)) * desc;
     };
 }
+Array.prototype.orderBy = function(selector, desc) {
+    return this.toArray().sortBy(selector, desc);
+}
+Array.prototype.orderByDescending = function(selector, desc) {
+    return this.orderBy(selector, true);
+}
 Array.prototype.sortBy = function (selector, desc) {
     var compareFunc;
     if (selector instanceof Array) {
@@ -704,7 +721,6 @@ String.prototype.replaceAll = function (token, newToken, ignoreCase) {
     }
     return str;
 };
-
 
 
 
@@ -870,6 +886,10 @@ Date.prototype.Subtract$$TimeSpan = function (value) {
     newDate.setMilliseconds(this.getMilliseconds() + value.getTotalMilliseconds());
     return newDate;
 };
+Date._dowNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+Date._dowNamesAbbr = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+Date.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 Date.prototype.format = function (format) {
     if (typeof (format) == "object") {
         var options = format;
@@ -887,14 +907,26 @@ Date.prototype.format = function (format) {
     s = s.replaceAll("y", this.year().toString());
     s = s.replaceAll("MM", this.month().format("00"));
     s = s.replaceAll("M", this.month().toString());
-    s = s.replaceAll("dd", this.day().format("00"));
-    s = s.replaceAll("d", this.day().toString());
     s = s.replaceAll("HH", this.hour().format("00"));
     s = s.replaceAll("H", this.hour().toString());
     s = s.replaceAll("mm", this.minute().format("00"));
     s = s.replaceAll("m", this.minute().toString());
     s = s.replaceAll("ss", this.second().format("00"));
     s = s.replaceAll("s", this.second().toString());
+    s = s.replaceAll("ff", this.ms().format("00"));
+    s = s.replaceAll("f", this.ms().toString());
+
+    s = s.replaceAll("dddd", "_____________________");
+    s = s.replaceAll("ddd", "_________________");
+
+    
+    s = s.replaceAll("dd", this.day().format("00"));
+    s = s.replaceAll("d", this.day().toString());
+
+    s = s.replaceAll("_____________________", Date._dowNames[this.getDay()]);
+    s = s.replaceAll("_________________", Date._dowNamesAbbr[this.getDay()]);
+
+
     return s.toString();
 };
 String.prototype.truncateEnd = function (finalLength) {
@@ -1587,3 +1619,35 @@ Object.deleteKeysWithValues = function(obj, keysValues){
             delete obj[key];
     });
 }
+
+
+Array.prototype.selectRecursive = function (selector, recursiveFunc) {
+    if (recursiveFunc == null) {
+        recursiveFunc = selector;
+        selector = null;
+    }
+    var list = this.select(selector);
+    var children = this.select(recursiveFunc);
+    var list2 = children.selectRecursive(selector, recursiveFunc);
+    list.addRange(list2);
+    return list;
+}
+Array.prototype.selectManyRecursive = function (selector, recursiveFunc) {
+    if (recursiveFunc == null) {
+        recursiveFunc = selector;
+        selector = null;
+    }
+    var list;
+    if(selector==null)
+        list = this.toArray();
+    else
+        list = this.selectMany(selector);
+    var children = this.selectMany(recursiveFunc);
+    if(children.length>0){
+        var list2 = children.selectManyRecursive(selector, recursiveFunc);
+        list.addRange(list2);
+    }
+    return list;
+}
+
+Array.prototype.peek = Array.prototype.last;

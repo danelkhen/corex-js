@@ -56,11 +56,22 @@ function deleteSelectedList() {
 }
 
 function selectTask(el) {
-    $('.TodoItem.Selected').removeClass('Selected'); 
+    $('.TodoItem.Selected').removeClass('Selected');
     $(el).addClass('Selected');
 }
 
 function selectList(el) {
-    $('.TodoList.Selected').removeClass('Selected'); 
+    $('.TodoList.Selected').removeClass('Selected');
     $(el).addClass('Selected');
+}
+
+function DoneCount_onbind(e) {
+    var el = $(e.target);
+    var tl = el.datasource();
+    el.text(tl.items.where('t=>t.done'.toLambda()).length + ' out of ' + tl.items.length);
+}
+
+var scheduleSaveTimer = new Timer(scheduleSave);
+function scheduleSave() {
+    scheduleSaveTimer.set(0);
 }

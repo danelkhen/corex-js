@@ -69,7 +69,7 @@ namespace CorexJs.DataBinding
             while (index2 < children.length)
             {
                 var ch2 = new jQuery(children[index2]);
-                var dc2 = ch2.data("source");
+                var dc2 = ch2.datasource();
                 if (dc2 == null)
                 {
                     index2++;

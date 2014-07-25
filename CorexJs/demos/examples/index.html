@@ -14,6 +14,10 @@
         <input data-binders="[onchange('name')]" />
         <input type="checkbox" data-binders="[onchange('cool')]" />
     </div>
+    <div data-source="{ name: 'shooki', cool:true }">
+        <input data-binders="['name<->value']" />
+        <input type="checkbox" data-binders="['cool<->checked']" />
+    </div>
 
     <div data-source="{ name: 'shooki', category:'c' }">
         <input data-binders="[onchange('name')]" />

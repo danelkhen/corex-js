@@ -26,13 +26,13 @@ namespace CorexJs.DataBinding
             return q;
         }
 
-        public static jQuery addBinder(jQuery q, PathBinder binder)
+        public static jQuery addBinder(jQuery q, IBinder binder)
         {
             var binders = q.ProcessAndGetDataAttribute("binders", evalBinders);
             //var binders = q.data("binders").As<JsArray<Binder>>();
             if (binders == null)
             {
-                binders = new JsArray<PathBinder>();
+                binders = new JsArray<IBinder>();
                 q.data("binders", binders);
             }
             binders.push(binder);
@@ -49,12 +49,12 @@ namespace CorexJs.DataBinding
             return q.ProcessAndGetDataAttribute<object>("source", evalDataSource);
         }
 
-        static T ProcessAndGetDataAttribute<T>(this jQuery q, JsString name, JsFunc<JsString, T> processor) where T :class
+        static T ProcessAndGetDataAttribute<T>(this jQuery q, JsString name, JsFunc<JsString, T> processor) where T : class
         {
             var x = q.data(name);
             if (x == null)
                 return null;
-            if (JsContext.JsTypeOf(x)== JsTypes.@string && q.attr("data-"+name)==x)
+            if (JsContext.JsTypeOf(x) == JsTypes.@string && q.attr("data-" + name) == x)
             {
                 var value = processor(x.As<JsString>());
                 q.data(name, value);
@@ -74,7 +74,7 @@ namespace CorexJs.DataBinding
             return res;
         }
 
-        static JsArray<PathBinder> evalBinders(JsString code)
+        static JsArray<IBinder> evalBinders(JsString code)
         {
             if (!code.contains("return"))
                 code = "return " + code;
@@ -82,7 +82,14 @@ namespace CorexJs.DataBinding
             var ctx = new BindersContext();
             code = "with(ctx){" + code + "}";
             var func = new JsFunction("ctx", code);
-            var res = func.call(null, ctx).As<JsArray<PathBinder>>();
+            var res = func.call(null, ctx).As<JsArray<IBinder>>();
+            res.forEach((t, i) =>
+            {
+                if (t.IsJsString())
+                {
+                    res[i] = ctx.@default(t.As<JsString>());
+                }
+            });
             return res;
         }
         static void element_setup_default(Event e)
@@ -94,7 +101,7 @@ namespace CorexJs.DataBinding
             {
                 if (binders == null)
                 {
-                    binders = new JsArray<PathBinder>();
+                    binders = new JsArray<IBinder>();
                     target.data("binders", binders);
                 }
                 binders.addRange(binders2);
@@ -131,12 +138,13 @@ namespace CorexJs.DataBinding
                 triggerDataBindingEvent(target, "init", null, "oninit", element_setup_default);
             }
         }
+        public static bool logEnabled { get; set; }
         static void element_databind_default(Event e)
         {
             verifyInit(e.target);
 
             var target = new jQuery(e.target);
-            HtmlContext.console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
+            if (logEnabled) HtmlContext.console.log(e.type, e.target.nodeName, e.target.className, JSON.stringify(target.datasource()));
             var dataSource = target.datasource();
             var dataMember = target.data("member").As<JsString>();
 
@@ -184,7 +192,7 @@ namespace CorexJs.DataBinding
 
 
 
-        static JsArray<PathBinder> parseBindings(JsString s)
+        static JsArray<IBinder> parseBindings(JsString s)
         {
             return null;
             //var obj = parseStyleAttr(s);
@@ -271,7 +279,7 @@ namespace CorexJs.DataBinding
             {
                 func = new JsFunction("event", "context", "with(context){" + att + "}");
             }
-            catch(JsError ee)
+            catch (JsError ee)
             {
                 HtmlContext.console.warn(ee, att);
                 return;
@@ -306,6 +314,14 @@ namespace CorexJs.DataBinding
         public bool flat { get; set; }
     }
 
+
+
+    static class Extensions
+    {
+        [JsMethod(InlineCodeExpression = "typeof(obj)=='string'")]
+        public static bool IsJsString(this object obj) { return false; }
+
+    }
 }
 
 

@@ -31,27 +31,20 @@ namespace CorexJs.DataBinding
         {
             var value = sourceProp.get(source);
             targetProp.set(target, value);
-            HtmlContext.console.log("onTransfer", source, target, value);
+            if (Plugin.logEnabled) HtmlContext.console.log("onTransfer", source, target, value);
         }
 
         protected override void onTransferBack(object source, HtmlElement target)
         {
             var value = targetProp.get(target);
             sourceProp.set(source, value);
-            HtmlContext.console.log("onTransferBack", source, target, value);
+            if (Plugin.logEnabled) HtmlContext.console.log("onTransferBack", source, target, value);
         }
 
 
     }
 
 
-
-    [JsType(JsMode.Json)]
-    public class Property
-    {
-        public JsFunc<object, object> get { get; set; }
-        public JsAction<object, object> set { get; set; }
-    }
 
 
 

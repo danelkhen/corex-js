@@ -78,6 +78,7 @@
     <Compile Include="DataBinding\PathBinder.cs" />
     <Compile Include="DataBinding\Plugin.cs" />
     <Compile Include="DataBinding\jQueryPlugin.cs" />
+    <Compile Include="DataBinding\Property.cs" />
     <Compile Include="DataBinding\PropertyBinder.cs" />
     <Compile Include="DataBinding\ToggleClassBinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

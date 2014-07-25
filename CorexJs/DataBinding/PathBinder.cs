@@ -55,7 +55,7 @@ namespace CorexJs.DataBinding
         }
         protected virtual void onTrigger(Event e)
         {
-            HtmlContext.console.log("Trigger: " + e.type);
+            if (Plugin.logEnabled) HtmlContext.console.log("Trigger: " + e.type);
             if (oneway)
                 databind(e);
             else
