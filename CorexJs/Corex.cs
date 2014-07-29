@@ -6,6 +6,7 @@ namespace CorexJs
     [JsType(JsMode.Prototype, Name = "Object", Export = false)]
     public static class JsObjectExt
     {
+        public static JsArray<JsString> keys(this object obj) { return null; }
         public static void forEach(this object obj, Action<JsString, object> action) { }
         public static void forEach<T>(this JsObject<T> obj, Action<JsString, T> action) { }
         public static object tryGet(this object obj, JsString path) { return null; }

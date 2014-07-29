@@ -13,4 +13,5 @@ namespace CorexJs.DataBinding
         public JsFunc<object, object> get { get; set; }
         public JsAction<object, object> set { get; set; }
     }
+
 }
