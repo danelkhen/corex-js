@@ -19,6 +19,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,33 +55,13 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="demos\examples\index.css" />
-    <Content Include="demos\examples\index.html" />
-    <Content Include="demos\examples\index.js" />
-    <Content Include="lib\jquery\jquery-2.0.3.min.map" />
+    <Content Include="js\corex-ui.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="js\corex.js" />
-    <Content Include="lib\jquery\jquery-2.0.3.js" />
-    <Content Include="lib\jquery\jquery-2.0.3.min.js" />
-    <Content Include="res\databind.js" />
-    <Content Include="demos\todo\index.css" />
-    <Content Include="demos\todo\index.html" />
-    <Content Include="demos\todo\index.js" />
-    <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Corex.cs" />
-    <Compile Include="DataBinding\BaseBinder.cs" />
-    <Compile Include="DataBinding\Binder.cs" />
-    <Compile Include="DataBinding\BindersContext.cs" />
-    <Compile Include="DataBinding\ChildrenBinder.cs" />
-    <Compile Include="DataBinding\PathBinder.cs" />
-    <Compile Include="DataBinding\Plugin.cs" />
-    <Compile Include="DataBinding\jQueryPlugin.cs" />
-    <Compile Include="DataBinding\Property.cs" />
-    <Compile Include="DataBinding\PropertyBinder.cs" />
-    <Compile Include="DataBinding\ToggleClassBinder.cs" />
+    <Compile Include="cs\Corex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <PropertyGroup>
