@@ -1,5 +1,5 @@
 ﻿function jQueryHelper() {
-    Function.addTo(jQueryHelper, [parseSelector, createElementFromSelectorNode, getOrAppendChildBySelector]);
+    Function.addTo(jQueryHelper, [parseSelector, createElementFromSelectorNode, getOrAppendChildBySelector, createElementFromSelector]);
 
     function parseSelector(s) {
         var sizzle = jQuery.find;
@@ -7,6 +7,10 @@
         return groups;
     }
 
+    function createElementFromSelector(selector) {
+        var nodes = parseSelector(selector);
+        return createElementFromSelectorNode(nodes[0]);
+    }
     function createElementFromSelectorNode(node) {
         var tagName = "div";
         var tagToken = node.first(function (t) { return t.type == "TAG"; });
@@ -112,6 +116,9 @@ jQuery.fn.getAppendRemoveForEach = function (selector, list, action, options) {
     options.list = list;
     options.action = action;
     options.removeRemaining = true;
+    return jQueryHelper.getOrAppendChildBySelector(this, selector, options);
+}
+jQuery.fn.create = function (selector) {
     return jQueryHelper.getOrAppendChildBySelector(this, selector, options);
 }
 
