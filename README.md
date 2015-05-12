@@ -4,6 +4,7 @@ corex-js
 Core extensions and utility functions for js (corex.js) and jquery (corex-ui.js)
 
 Corex
+```
 Object
     // ******* Class Methods *******
     toArray ( obj )
@@ -235,21 +236,21 @@ Timer
     set ( ms )
     onTick (  )
     clear ( ms )
-
+```
 
 
 
 Corex UI - jQuery object extensions
+```
+// creates an element from a selector -> $.create("div.nice-panel#mydiv") -> <div class="nice-panel" id="mydiv"></div>
+$.create(selector)
 
-    // creates an element from a selector -> $.create("div.nice-panel#mydiv") -> <div class="nice-panel" id="mydiv"></div>
-    $.create(selector)
+// gets or appends a child element according to a selector
+.getAppend(selector, options)
 
-    // gets or appends a child element according to a selector
-    .getAppend(selector, options)
-
-    // gets a total number of children elements according to a selector, creating and appending new ones if needed, as well as removing if there are more than the total.
-    .getAppendRemove(selector, total)
+// gets a total number of children elements according to a selector, creating and appending new ones if needed, as well as removing if there are more than the total.
+.getAppendRemove(selector, total)
     
-    // will get/append a child element for every item in the supplied list, and invoke action(el, obj) on each element/object pair
-    .getAppendRemoveForEach(selector, list, action)
-
+// will get/append a child element for every item in the supplied list, and invoke action(el, obj) on each element/object pair
+.getAppendRemoveForEach(selector, list, action)
+```
