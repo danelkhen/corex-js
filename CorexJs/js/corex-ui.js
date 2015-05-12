@@ -133,3 +133,16 @@ jQuery.fn.bindChildrenToList = function (selector, list, action, options) {
     options.removeRemaining = true;
     return jQueryHelper.getOrAppendChildBySelector(this, selector, options);
 }
+
+//Turns a jquery object to an array of single jquery objects
+jQuery.fn.toArray$ = function (action) {
+    var list = [];
+    for (var i = 0; i < this.length; i++)
+        list.push($(this[i]));
+    return list;
+}
+
+//Turns an array of jquery objects to a single jquery object
+jQuery.fromArray$ = function (list) {
+    return $(list.selectMany(function (j) { return j.toArray(); }));
+}
