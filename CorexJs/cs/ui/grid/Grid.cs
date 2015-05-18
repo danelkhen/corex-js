@@ -172,6 +172,7 @@ namespace corexjs.ui.grid
             Render();
         }
 
+        jQuery DataRows;
         void RenderTable()
         {
             var table = El.getAppend("table");
@@ -185,7 +186,7 @@ namespace corexjs.ui.grid
                 RenderHeaderCell(col, th);
             });
             var list = CurrentList;
-            tbody.bindChildrenToList("tr", list, (tr, obj, i) =>
+            DataRows = tbody.bindChildrenToList("tr", list, (tr, obj, i) =>
             {
                 var trClass = "";
                 if (Options.RowClass != null)
@@ -346,6 +347,15 @@ namespace corexjs.ui.grid
         public T GetItem(jQuery el)
         {
             return el.closest("tr").DataItem<T>();
+        }
+        public jQuery GetRow(T item)
+        {
+            if (DataRows == null)
+                return new jQuery();
+            var index = CurrentList.indexOf(item);
+            if (index != null)
+                return new jQuery(DataRows[index]);
+            return new jQuery();
         }
         public static Grid<T> Get(jQuery el)
         {

@@ -13,6 +13,7 @@ corexjs.ui.grid.Grid = function (el, opts){
     this.tbSearch = null;
     this.OrderByCol = null;
     this.OrderByColClickCount = null;
+    this.DataRows = null;
     this.Options = null;
     this.El = null;
     this.CurrentListBeforePaging = null;
@@ -125,7 +126,7 @@ corexjs.ui.grid.Grid.prototype.RenderTable = function (){
         this.RenderHeaderCell(col, th);
     }));
     var list = this.CurrentList;
-    tbody.bindChildrenToList("tr", list, $CreateAnonymousDelegate(this, function (tr, obj, i){
+    this.DataRows = tbody.bindChildrenToList("tr", list, $CreateAnonymousDelegate(this, function (tr, obj, i){
         var trClass = "";
         if (this.Options.RowClass != null)
             trClass = this.Options.RowClass(obj, i);
@@ -243,6 +244,14 @@ corexjs.ui.grid.Grid.prototype.RenderPager = function (){
 };
 corexjs.ui.grid.Grid.prototype.GetItem = function (el){
     return el.closest("tr").data('DataItem');
+};
+corexjs.ui.grid.Grid.prototype.GetRow = function (item){
+    if (this.DataRows == null)
+        return $();
+    var index = this.CurrentList.indexOf(item);
+    if (index != null)
+        return $(this.DataRows[index]);
+    return $();
 };
 corexjs.ui.grid.Grid.Get = function (el){
     return el.data("Grid");
