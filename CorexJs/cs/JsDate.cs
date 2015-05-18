@@ -6,7 +6,7 @@ namespace corexjs
     [JsType(JsMode.Prototype, Export = false, Name = "Date")]
     public class JsDateEx : JsDate
     {
-        public static JsDateEx @new(JsNumber y = null, JsNumber M = null, JsNumber d = null, JsNumber h = null, JsNumber m = null, JsNumber s = null, JsNumber f = null) { return null; }
+        public static JsDateEx create(JsNumber y = null, JsNumber M = null, JsNumber d = null, JsNumber h = null, JsNumber m = null, JsNumber s = null, JsNumber f = null) { return null; }
 
         public JsDateEx(JsString s)
         {
@@ -85,6 +85,11 @@ namespace corexjs
             get;
             [JsMethod(Name = "day")]
             set;
+        }
+
+        public static JsDateEx fromUnix(JsNumber epoch)
+        {
+            throw new NotImplementedException();
         }
 
     }
