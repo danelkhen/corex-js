@@ -55,13 +55,25 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="js\corex-ui.js" />
+    <Content Include="js\corex-sk.js" />
+    <Content Include="js\corex-jquery.js" />
+    <Content Include="js\grid.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="js\corex.js" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="cs\Corex.cs" />
+    <Compile Include="cs\jQuery.cs" />
+    <Compile Include="cs\Utils.cs" />
+    <Compile Include="cs\Extensions.cs" />
+    <Compile Include="cs\JsArray.cs" />
+    <Compile Include="cs\JsDate.cs" />
+    <Compile Include="cs\ui\grid\Grid.cs" />
+    <Compile Include="cs\ui\grid\GridOptions.cs" />
+    <Compile Include="cs\ui\grid\Plugin.cs" />
+    <Compile Include="cs\JsObject.cs" />
+    <Compile Include="cs\Q.cs" />
+    <Compile Include="cs\Timer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <PropertyGroup>
