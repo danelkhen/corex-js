@@ -1,23 +1,12 @@
-﻿using SharpKit.Html;
-using SharpKit.JavaScript;
-using SharpKit.jQuery;
+﻿using corexjs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace corexjs
+namespace SharpKit.JavaScript
 {
 
     [JsType(JsMode.Prototype, Export = false)]
     public static class Extensions
     {
-        [JsMethod(InlineCodeExpression = "$(el)")]
-        public static jQuery ToJ(this HtmlElement el) { return null; }
-        [JsMethod(InlineCodeExpression = "$(s)")]
-        public static jQuery ToJ(this JsString s) { return null; }
-        [JsMethod(InlineCodeExpression = "$(s)")]
-        public static jQuery ToJ(this string s) { return null; }
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static void remove<T>(this JsArray<T> list, T item) { }
 
@@ -181,23 +170,6 @@ namespace corexjs
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static JsArray<T> addRange<T>(this JsArray<T> list, JsArray<T> items) { return null; }
 
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery getAppend(this jQuery j, JsString selector) { return null; }
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery getAppendRemove(this jQuery j, JsString selector, JsNumber total) { return null; }
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery getAppendRemove(this jQuery j, JsString selector, bool condition) { return null; }
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery tab(this jQuery j, JsString cmd) { return null; }
-
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery bindChildrenToList<T>(this jQuery j, JsString selector, JsArray<T> list, JsAction<jQuery, T> action) { return null; }
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery getAppendRemoveForEach<T>(this jQuery j, JsString selector, JsArray<T> list, JsAction<jQuery, T> action) { return null; }
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery bindChildrenToList<T>(this jQuery j, JsString selector, JsArray<T> list, JsAction<jQuery, T, JsNumber> action) { return null; }
-        [JsMethod(ExtensionImplementedInInstance = true)]
-        public static jQuery off(this jQuery j) { return null; }
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static JsString format(this JsNumber x, JsString format) { return null; }
 

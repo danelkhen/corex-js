@@ -58,6 +58,7 @@
     <Content Include="js\corex-sk.js" />
     <Content Include="js\corex-jquery.js" />
     <Content Include="js\grid.js" />
+    <Content Include="js\sk.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="js\corex.js" />

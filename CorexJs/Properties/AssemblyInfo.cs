@@ -34,6 +34,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: JsExport(DefaultFilename = "js/corex-sk.js", CodeInjectionFilename ="js/corex-sk.js")]
+[assembly: JsExport(DefaultFilename = "js/corex-sk.js", CodeInjectionFilename ="js/sk.js")]
 //[assembly: JsNamespace(Namespace ="CorexJs", JsNamespace="corex")]
 //[assembly: JsNamespace(Namespace = "CorexJs.DataBinding", JsNamespace = "C")]

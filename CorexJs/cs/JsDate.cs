@@ -59,7 +59,7 @@ namespace corexjs
             throw new NotImplementedException();
         }
 
-        internal int compareTo(JsDateEx startDate)
+        public int compareTo(JsDateEx startDate)
         {
             throw new NotImplementedException();
         }
