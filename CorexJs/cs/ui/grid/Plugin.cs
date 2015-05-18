@@ -4,7 +4,7 @@ using SharpKit.jQuery;
 namespace corexjs.ui.grid
 {
 
-    [JsType(JsMode.Prototype, Name = "jQuery", PrototypeName = "fn", OmitDefaultConstructor = true, Filename = "~/js/grid.js")]
+    [JsType(JsMode.Prototype, Name = "jQuery", PrototypeName = "fn", OmitDefaultConstructor = true, OmitInheritance = true, Filename = "~/js/grid.js")]
     public class jQueryGridPlugin : jQuery
     {
         public jQuery Grid<T>(GridOptions<T> opts)

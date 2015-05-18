@@ -44,7 +44,7 @@ namespace corexjs.ui.grid
     ///
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [JsType(JsMode.Prototype, Filename = "~/js/grid.js")]
+    [JsType(JsMode.Prototype, Filename = "~/js/grid.js", NativeOverloads=false)]
     public class Grid<T>
     {
 
@@ -173,6 +173,7 @@ namespace corexjs.ui.grid
         }
 
         jQuery DataRows;
+        private JsArray<GridCol<T>> VisibleColumns;
         void RenderTable()
         {
             var table = El.getAppend("table");
@@ -180,39 +181,31 @@ namespace corexjs.ui.grid
             var tbody = table.getAppend("tbody");
             var tfoot = table.getAppendRemove("tfoot", Options.FooterItem != null ? 1 : 0);
 
-            var visibleColumns = Options.Columns.where(t => t.Visible == true);
-            var ths = thead.getAppend("tr").bindChildrenToList("th", visibleColumns, (th, col) =>
+            VisibleColumns = Options.Columns.where(t => t.Visible == true);
+            var ths = thead.getAppend("tr").bindChildrenToList("th", VisibleColumns, (th, col) =>
             {
                 RenderHeaderCell(col, th);
             });
             var list = CurrentList;
             DataRows = tbody.bindChildrenToList("tr", list, (tr, obj, i) =>
             {
-                var trClass = "";
-                if (Options.RowClass != null)
-                    trClass = Options.RowClass(obj, i);
-                if (tr[0].className != trClass)
-                    tr[0].className = trClass;
-                tr.bindChildrenToList("td", visibleColumns, (td, col) =>
-                {
-                    RenderCell(col, obj, td);
-                });
+                RenderRow(tr, obj, i);
             });
             if (Options.FooterItem != null)
             {
-                tfoot.getAppend("tr").bindChildrenToList("th", visibleColumns, (th, col) => RenderCell(col, Options.FooterItem, th));
+                tfoot.getAppend("tr").bindChildrenToList("th", VisibleColumns, (th, col) => RenderCell(col, Options.FooterItem, th));
             }
-            if (visibleColumns.first(t => t.Width != null) != null)
+            if (VisibleColumns.first(t => t.Width != null) != null)
             {
                 table.css("width", "");
-                var widths = visibleColumns.select((col, i) =>
+                var widths = VisibleColumns.select((col, i) =>
                 {
                     var th = ths[i];
                     if (col.Width == null)
                         return th.offsetWidth.As<JsNumber>();
                     return col.Width;
                 });
-                visibleColumns.forEach((col, i) =>
+                VisibleColumns.forEach((col, i) =>
                 {
                     var th = ths[i];
                     if (col.Width == null)
@@ -224,6 +217,30 @@ namespace corexjs.ui.grid
                 var totalWidth = widths.sum();
                 table.css("width", totalWidth + "px");
             }
+        }
+
+        public void RenderRow(T obj)
+        {
+            if (DataRows == null)
+                return;
+            var index = CurrentList.indexOf(obj);
+            if (index < 0)
+                return;
+            var tr = DataRows[index].ToJ();
+            RenderRow(tr, obj, index);
+        }
+
+        public void RenderRow(jQuery tr, T obj, JsNumber index = null)
+        {
+            var trClass = "";
+            if (Options.RowClass != null)
+                trClass = Options.RowClass(obj, index);
+            if (tr[0].className != trClass)
+                tr[0].className = trClass;
+            tr.bindChildrenToList("td", VisibleColumns, (td, col) =>
+            {
+                RenderCell(col, obj, td);
+            });
         }
 
         void RenderHeaderCell(GridCol<T> col, jQuery th)
@@ -258,17 +275,17 @@ namespace corexjs.ui.grid
                 th.css("width", col.Width + "px");
         }
 
-        void RenderCell(GridCol<T> col, T item, jQuery td)
+        void RenderCell(GridCol<T> col, T obj, jQuery td)
         {
             if (col.RenderCell != null)
             {
-                col.RenderCell(col, item, td);
+                col.RenderCell(col, obj, td);
                 return;
             }
 
-            object value = item;
+            object value = obj;
             if (col.Getter != null)
-                value = col.Getter(item);
+                value = col.Getter(obj);
             JsString sValue = value.As<JsString>();
             if (col.Format != null && value != null)
                 sValue = col.Format(value);
@@ -319,7 +336,7 @@ namespace corexjs.ui.grid
                 Render();
             });
             var info = pager.getAppend(".PagerInfo");
-            info.text(Options.PageIndex + 1 + " / " + TotalPages + " (Total: "+CurrentListBeforePaging.length+")");
+            info.text(Options.PageIndex + 1 + " / " + TotalPages + " (Total: " + CurrentListBeforePaging.length + ")");
             pager.getAppend("a.NextPage").text("Next").off().mousedown(e =>
             {
                 e.preventDefault();
@@ -348,11 +365,11 @@ namespace corexjs.ui.grid
         {
             return el.closest("tr").DataItem<T>();
         }
-        public jQuery GetRow(T item)
+        public jQuery GetRow(T obj)
         {
             if (DataRows == null)
                 return new jQuery();
-            var index = CurrentList.indexOf(item);
+            var index = CurrentList.indexOf(obj);
             if (index != null)
                 return new jQuery(DataRows[index]);
             return new jQuery();
