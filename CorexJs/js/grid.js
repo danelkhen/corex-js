@@ -9,7 +9,6 @@ if (typeof(corexjs.ui.grid) == "undefined")
 corexjs.ui.grid.Grid = function (el, opts){
     this.SearchTimer = null;
     this.TotalPages = null;
-    this.CurrentList = null;
     this.tbSearch = null;
     this.OrderByCol = null;
     this.OrderByColClickCount = null;
@@ -17,6 +16,7 @@ corexjs.ui.grid.Grid = function (el, opts){
     this.VisibleColumns = null;
     this.Options = null;
     this.El = null;
+    this.CurrentList = null;
     this.CurrentListBeforePaging = null;
     this.El = el;
     this.Options = opts;

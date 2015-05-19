@@ -8,7 +8,15 @@ namespace SharpKit.JavaScript
     public static class Extensions
     {
         [JsMethod(ExtensionImplementedInInstance = true)]
-        public static void remove<T>(this JsArray<T> list, T item) { }
+        public static JsArrayDiff<T> diff<T>(this JsArray<T> list, JsArray<T> list2) { return null; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static JsArray<T> toList<T>(this JsArray<T> list) { return null; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static bool itemsEqual<T>(this JsArray<T> list, JsArray<T> list2) { return false; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static bool remove<T>(this JsArray<T> list, T item) { return false; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static void removeAt<T>(this JsArray<T> list, JsNumber index) { }
 
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static void insert<T>(this JsArray<T> list, JsNumber index, T item) { }
@@ -176,5 +184,12 @@ namespace SharpKit.JavaScript
     }
 
 
+    [JsType(JsMode.Json)]
+    public class JsArrayDiff<T>
+    {
+        public JsArray<T> added { get; set; }
+        public JsArray<T> removed { get; set; }
+
+    }
 
 }

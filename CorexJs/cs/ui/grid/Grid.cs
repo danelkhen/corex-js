@@ -62,7 +62,7 @@ namespace corexjs.ui.grid
 
         Timer SearchTimer;
         JsNumber TotalPages;
-        JsArray<T> CurrentList;
+        public JsArray<T> CurrentList { get; set; }
         jQuery tbSearch;
         GridCol<T> OrderByCol;
         JsNumber OrderByColClickCount;
