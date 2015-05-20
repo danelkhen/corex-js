@@ -44,7 +44,7 @@ namespace corexjs.ui.grid
     ///
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [JsType(JsMode.Prototype, Filename = "~/js/grid.js", NativeOverloads=false)]
+    [JsType(JsMode.Prototype, Filename = "~/js/grid.js", NativeOverloads = false)]
     public class Grid<T>
     {
 
@@ -174,15 +174,17 @@ namespace corexjs.ui.grid
 
         jQuery DataRows;
         private JsArray<GridCol<T>> VisibleColumns;
+        private jQuery HeaderRows;
+
         void RenderTable()
         {
-            var table = El.getAppend("table");
-            var thead = table.getAppend("thead");
-            var tbody = table.getAppend("tbody");
-            var tfoot = table.getAppendRemove("tfoot", Options.FooterItem != null ? 1 : 0);
+            Table = El.getAppend("table");
+            var thead = Table.getAppend("thead");
+            var tbody = Table.getAppend("tbody");
+            var tfoot = Table.getAppendRemove("tfoot", Options.FooterItem != null ? 1 : 0);
 
             VisibleColumns = Options.Columns.where(t => t.Visible == true);
-            var ths = thead.getAppend("tr").bindChildrenToList("th", VisibleColumns, (th, col) =>
+            HeaderRows = thead.getAppend("tr").bindChildrenToList("th", VisibleColumns, (th, col) =>
             {
                 RenderHeaderCell(col, th);
             });
@@ -195,30 +197,36 @@ namespace corexjs.ui.grid
             {
                 tfoot.getAppend("tr").bindChildrenToList("th", VisibleColumns, (th, col) => RenderCell(col, Options.FooterItem, th));
             }
-            if (VisibleColumns.first(t => t.Width != null) != null)
-            {
-                table.css("width", "");
-                ths.css("width", "");
-                var widths = VisibleColumns.select((col, i) =>
-                {
-                    var th = ths[i];
-                    if (col.Width == null)
-                        return th.offsetWidth.As<JsNumber>();
-                    return col.Width;
-                });
-                VisibleColumns.forEach((col, i) =>
-                {
-                    var th = ths[i];
-                    if (col.Width == null)
-                        th.style.width = th.offsetWidth + "px";
-                    //else
-                    //    th.style.width = col.Width;
-                });
-
-                var totalWidth = widths.sum();
-                table.css("width", totalWidth + "px");
-            }
+            //TODO: works ok when table width=100%, with overflow ellipsis, disabling for now:
+            //AutoSizeColumns();
         }
+
+        void AutoSizeColumns()
+        {
+            if (VisibleColumns.first(t => t.Width != null) == null)
+                return;
+            Table.css("width", "");
+            HeaderRows.css("width", "");
+            var widths = VisibleColumns.select((col, i) =>
+            {
+                var th = HeaderRows[i];
+                if (col.Width == null)
+                    return th.offsetWidth.As<JsNumber>();
+                return col.Width;
+            });
+            VisibleColumns.forEach((col, i) =>
+            {
+                var th = HeaderRows[i];
+                if (col.Width == null)
+                    th.style.width = th.offsetWidth + "px";
+                else
+                    th.style.width = col.Width + "px";
+            });
+
+            var totalWidth = widths.sum();
+            Table.css("width", totalWidth + "px");
+        }
+
 
         public void RenderRow(T obj)
         {
@@ -361,6 +369,7 @@ namespace corexjs.ui.grid
 
 
         public JsArray<T> CurrentListBeforePaging { get; set; }
+        jQuery Table;
 
         public T GetItem(jQuery el)
         {
