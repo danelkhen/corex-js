@@ -3,7 +3,6 @@ using System;
 
 namespace SharpKit.JavaScript
 {
-
     [JsType(JsMode.Prototype, Export = false)]
     public static class Extensions
     {
