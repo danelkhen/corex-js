@@ -10,8 +10,6 @@ namespace SharpKit.JavaScript
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static JsArrayDiff<T> diff<T>(this JsArray<T> list, JsArray<T> list2) { return null; }
         [JsMethod(ExtensionImplementedInInstance = true)]
-        public static JsArray<T> toList<T>(this JsArray<T> list) { return null; }
-        [JsMethod(ExtensionImplementedInInstance = true)]
         public static bool itemsEqual<T>(this JsArray<T> list, JsArray<T> list2) { return false; }
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static bool remove<T>(this JsArray<T> list, T item) { return false; }
