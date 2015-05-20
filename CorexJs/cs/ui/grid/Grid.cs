@@ -198,6 +198,7 @@ namespace corexjs.ui.grid
             if (VisibleColumns.first(t => t.Width != null) != null)
             {
                 table.css("width", "");
+                ths.css("width", "");
                 var widths = VisibleColumns.select((col, i) =>
                 {
                     var th = ths[i];

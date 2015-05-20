@@ -139,6 +139,7 @@ corexjs.ui.grid.Grid.prototype.RenderTable = function (){
         return t.Width != null;
     })) != null){
         table.css("width", "");
+        ths.css("width", "");
         var widths = this.VisibleColumns.select($CreateAnonymousDelegate(this, function (col, i){
             var th = ths[i];
             if (col.Width == null)
