@@ -47,14 +47,23 @@ namespace corexjs.ui.grid
     [JsType(JsMode.Prototype, Filename = "~/js/grid.js", NativeOverloads = false)]
     public class Grid<T>
     {
+        public Grid()
+        {
+            Init();
+        }
 
         public Grid(jQuery el, GridOptions<T> opts)
         {
             El = el;
             Options = opts;
-            SearchTimer = new Timer(Search);
-            Render();
+            Init();
+            //Render();
         }
+        void Init()
+        {
+            SearchTimer = new Timer(Search);
+        }
+
 
         public GridOptions<T> Options { get; set; }
 
@@ -73,6 +82,8 @@ namespace corexjs.ui.grid
             RenderSearch();
             RenderPager();
             RenderTable();
+            if (Options.RenderFinished!=null)
+                Options.RenderFinished();
         }
 
         void Verify()

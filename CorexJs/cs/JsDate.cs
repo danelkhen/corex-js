@@ -65,6 +65,7 @@ namespace corexjs
         }
 
 
+        [JsProperty(NativeProperty = false)]
         public JsNumber Year
         {
             [JsMethod(Name = "year")]
@@ -72,6 +73,7 @@ namespace corexjs
             [JsMethod(Name = "year")]
             set;
         }
+        [JsProperty(NativeProperty = false)]
         public JsNumber Month
         {
             [JsMethod(Name = "month")]
@@ -79,6 +81,7 @@ namespace corexjs
             [JsMethod(Name = "month")]
             set;
         }
+        [JsProperty(NativeProperty = false)]
         public JsNumber Day
         {
             [JsMethod(Name = "day")]

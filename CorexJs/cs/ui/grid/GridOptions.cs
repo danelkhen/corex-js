@@ -54,5 +54,6 @@ namespace corexjs.ui.grid
         public JsFunc<T, object> OrderBy { get; set; }
         public bool OrderByDesc { get; set; }
         public JsFunc<T, JsNumber, JsString> RowClass { get; set; }
+        public JsAction RenderFinished { get; set; }
     }
 }
