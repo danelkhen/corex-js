@@ -61,7 +61,7 @@ namespace corexjs.ui.grid
         }
         void Init()
         {
-            SearchTimer = new Timer(Search);
+            RenderTimer = new Timer(Render);
         }
 
 
@@ -69,15 +69,16 @@ namespace corexjs.ui.grid
 
         public jQuery El { get; set; }
 
-        Timer SearchTimer;
+        Timer RenderTimer;
         JsNumber TotalPages;
         public JsArray<T> CurrentList { get; set; }
         jQuery tbSearch;
-        GridCol<T> OrderByCol;
+        public GridCol<T> OrderByCol { get; set; }
         JsNumber OrderByColClickCount;
 
         public void Render()
         {
+            SharpKit.Html.HtmlContext.console.info("Grid.Render");
             Verify();
             RenderSearch();
             RenderPager();
@@ -154,7 +155,7 @@ namespace corexjs.ui.grid
         }
         void Search()
         {
-            Render();
+            RenderTimer.set(100);
         }
 
         void OrderBy(GridCol<T> col)
@@ -331,7 +332,7 @@ namespace corexjs.ui.grid
                 tbSearch.on("input", e =>
                 {
                     Options.Query = tbSearch.valString();
-                    SearchTimer.set(1);
+                    Search();
                 });
             }
         }
