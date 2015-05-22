@@ -4,13 +4,21 @@ using System;
 
 namespace corexjs
 {
-    [JsType(JsMode.Prototype)]
+    [JsType(JsMode.Prototype, NativeOverloads = false)]
     public static class Utils
     {
-        public static JsFunc<T, T, JsNumber> ToComparer<T, V>(this JsFunc<T, V> getter)
+        public static JsFunc<T, T, JsNumber> ToComparer<T, V>(this JsFunc<T, V> getter, bool desc=false)
         {
+            if (desc)
+                return getter.ToDescendingComparer();
             var valueComparer = GetDefaultComparer<V>();
             var comparer = new JsFunc<T, T, JsNumber>((x, y) => valueComparer(getter(x), getter(y)));
+            return comparer;
+        }
+        public static JsFunc<T, T, JsNumber> ToDescendingComparer<T, V>(this JsFunc<T, V> getter)
+        {
+            var valueComparer = GetDefaultComparer<V>();
+            var comparer = new JsFunc<T, T, JsNumber>((x, y) => valueComparer(getter(x), getter(y))*-1);
             return comparer;
         }
         public static JsFunc<T, T, JsNumber> ToDescending<T>(this JsFunc<T, T, JsNumber> comparer)
@@ -26,6 +34,10 @@ namespace corexjs
                     diff = comparer2(x, y);
                 return diff;
             });
+        }
+        public static JsFunc<T, T, JsNumber> ThenBy<T,V>(this JsFunc<T, T, JsNumber> comparer, JsFunc<T, V> getter, bool desc = false)
+        {
+            return comparer.ThenBy(getter.ToComparer(desc));
         }
         public static JsArray<T> Order<T>(this JsFunc<T, T, JsNumber> comparer, JsArray<T> list)
         {
@@ -68,7 +80,7 @@ namespace corexjs
     }
 
 
-    [JsType(JsMode.Prototype, Export = false, Name = "Comaprer")]
+    [JsType(JsMode.Prototype, Export = false, Name = "Comparer")]
     public class Comparer<T>
     {
         public JsNumber compare(T x, T y) { return null; }

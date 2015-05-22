@@ -11,6 +11,7 @@ namespace corexjs.ui.grid
         public JsNativeFunc<T, object> Prop { get; set; }
         public JsString Title { get; set; }
         public JsFunc<T, object> Getter { get; set; }
+        public JsFunc<T, T, JsNumber> Comparer { get; set; }
         public JsBoolean Visible { get; set; }
         public JsFunc<object, JsString> Format { get; set; }
         public JsFunc<object, JsString> ClassFunc { get; set; }
@@ -52,6 +53,7 @@ namespace corexjs.ui.grid
         public JsNumber PageSize { get; set; }
         public JsString Query { get; set; }
         public JsFunc<T, object> OrderBy { get; set; }
+        public JsFunc<T, T, JsNumber> OrderBy2 { get; set; }
         public bool OrderByDesc { get; set; }
         public JsFunc<T, JsNumber, JsString> RowClass { get; set; }
         public JsAction RenderFinished { get; set; }

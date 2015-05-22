@@ -14,7 +14,7 @@ namespace SharpKit.JavaScript
         // Parameters:
         //   sortFunction:
         //     Optional. OriginalValue of the function used to determine the order of the elements.
-        [JsMethod(NativeOverloads = true, NativeDelegates = true)]
+        [JsMethod(ExtensionImplementedInInstance =true)]
         public static JsArray<T> sort<T>(this JsArray<T> list, JsFunc<T, T, JsNumber> sortFunction) { return null; }
 
         [JsMethod(ExtensionImplementedInInstance = true)]

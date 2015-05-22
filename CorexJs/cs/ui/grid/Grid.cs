@@ -104,6 +104,8 @@ namespace corexjs.ui.grid
                     col.Getter = col.Prop.As<JsFunc<T, object>>();
                 if (col.Getter == null && col.Name != null)
                     col.Getter = t => t.As<JsObject>()[col.Name].As<JsString>();
+                if (col.Comparer == null && col.Getter != null)
+                    col.Comparer = col.Getter.ToComparer();
                 if (col.Title == null && col.Name != null)
                     col.Title = col.Name;
                 if (col.Visible == null)
@@ -121,9 +123,9 @@ namespace corexjs.ui.grid
             if (Options.OrderBy == null)
                 return;
             if (Options.OrderByDesc)
-                CurrentList = CurrentList.orderByDescending(Options.OrderBy);
+                CurrentList = Options.OrderBy2.ToDescending().Order(CurrentList);//.orderByDescending(Options.OrderBy);
             else
-                CurrentList = CurrentList.orderBy(Options.OrderBy);
+                CurrentList = Options.OrderBy2.Order(CurrentList);
         }
 
         void ApplyPaging()
@@ -164,6 +166,7 @@ namespace corexjs.ui.grid
                 OrderByCol = col;
                 Options.OrderBy = t => OrderByCol.Getter(t);
                 Options.OrderByDesc = false;
+                Options.OrderBy2 = OrderByCol.Comparer;//.Getter.ToComparer();
             }
             else
             {
@@ -322,18 +325,17 @@ namespace corexjs.ui.grid
         }
         void RenderSearch()
         {
-            if (SearchEl == null)
+            if (SearchEl == null && SearchInputEl == null)
                 SearchEl = El.getAppend(".Search").addClass("form-inline");
             if (SearchInputEl == null)
                 SearchInputEl = SearchEl.getAppend("input.tbSearch").addClass("form-control").attr("placeholder", "Find");
-            if (!SearchInputEl.DataGetSet("GridSearchInputEventAttached", true))
+            if (SearchInputEl.DataGetSet("GridSearchInputEventAttached", true))
+                return;
+            SearchInputEl.on("input", e =>
             {
-                SearchInputEl.on("input", e =>
-                {
-                    Options.Query = SearchInputEl.valString();
-                    Search();
-                });
-            }
+                Options.Query = SearchInputEl.valString();
+                Search();
+            });
         }
         void RenderPager()
         {
@@ -348,16 +350,17 @@ namespace corexjs.ui.grid
             El.toggleClass("HasPrevPage", Options.PageIndex > 0);
             El.toggleClass("HasNextPage", Options.PageIndex < TotalPages - 1);
             var pages = JsArrayEx.generateNumbers(0, TotalPages);
-            var pager = El.getAppend(".Pager");
-            pager.getAppend("a.PrevPage").text("Prev").off().mousedown(e =>
+            if (PagerEl == null)
+                PagerEl = El.getAppend(".Pager").addClass("btn-group");
+            PagerEl.getAppend("a.btn.btn-default.PrevPage").getAppend("span.glyphicon.glyphicon-backward").parent().off().mousedown(e =>
             {
                 e.preventDefault();
                 Options.PageIndex--;
                 Render();
             });
-            var info = pager.getAppend(".PagerInfo");
+            var info = PagerEl.getAppend("a.btn.btn-default.PagerInfo");
             info.text(Options.PageIndex + 1 + " / " + TotalPages + " (Total: " + CurrentListBeforePaging.length + ")");
-            pager.getAppend("a.NextPage").text("Next").off().mousedown(e =>
+            PagerEl.getAppend("a.btn.btn-default.NextPage").getAppend("span.glyphicon.glyphicon-forward").parent().off().mousedown(e =>
             {
                 e.preventDefault();
                 Options.PageIndex++;
@@ -380,7 +383,8 @@ namespace corexjs.ui.grid
 
 
         public JsArray<T> CurrentListBeforePaging { get; set; }
-        public jQuery SearchEl { get; private set; }
+        public jQuery SearchEl { get; set; }
+        public jQuery PagerEl { get; set; }
 
         jQuery Table;
 
