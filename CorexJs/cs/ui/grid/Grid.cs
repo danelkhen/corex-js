@@ -57,7 +57,6 @@ namespace corexjs.ui.grid
             El = el;
             Options = opts;
             Init();
-            //Render();
         }
         void Init()
         {
@@ -72,18 +71,17 @@ namespace corexjs.ui.grid
         Timer RenderTimer;
         JsNumber TotalPages;
         public JsArray<T> CurrentList { get; set; }
-        jQuery tbSearch;
+        public jQuery SearchInputEl { get; set; }
         public GridCol<T> OrderByCol { get; set; }
         JsNumber OrderByColClickCount;
 
         public void Render()
         {
-            SharpKit.Html.HtmlContext.console.info("Grid.Render");
             Verify();
             RenderSearch();
             RenderPager();
             RenderTable();
-            if (Options.RenderFinished!=null)
+            if (Options.RenderFinished != null)
                 Options.RenderFinished();
         }
 
@@ -324,14 +322,15 @@ namespace corexjs.ui.grid
         }
         void RenderSearch()
         {
-            var searchEl = El.getAppend(".Search").addClass("form-inline");
-            tbSearch = searchEl.getAppend("input.tbSearch").addClass("form-control").attr("placeholder", "Find");
-            if (tbSearch.data("x") == null)
+            if (SearchEl == null)
+                SearchEl = El.getAppend(".Search").addClass("form-inline");
+            if (SearchInputEl == null)
+                SearchInputEl = SearchEl.getAppend("input.tbSearch").addClass("form-control").attr("placeholder", "Find");
+            if (!SearchInputEl.DataGetSet("GridSearchInputEventAttached", true))
             {
-                tbSearch.data("x", true);
-                tbSearch.on("input", e =>
+                SearchInputEl.on("input", e =>
                 {
-                    Options.Query = tbSearch.valString();
+                    Options.Query = SearchInputEl.valString();
                     Search();
                 });
             }
@@ -381,6 +380,8 @@ namespace corexjs.ui.grid
 
 
         public JsArray<T> CurrentListBeforePaging { get; set; }
+        public jQuery SearchEl { get; private set; }
+
         jQuery Table;
 
         public T GetItem(jQuery el)

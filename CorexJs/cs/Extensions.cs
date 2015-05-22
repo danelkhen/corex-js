@@ -6,6 +6,17 @@ namespace SharpKit.JavaScript
     [JsType(JsMode.Prototype, Export = false)]
     public static class Extensions
     {
+        //
+        // Summary:
+        //     Returns an Array object with the elements sorted. Warning: Array itself is sorted
+        //     internally
+        //
+        // Parameters:
+        //   sortFunction:
+        //     Optional. OriginalValue of the function used to determine the order of the elements.
+        [JsMethod(NativeOverloads = true, NativeDelegates = true)]
+        public static JsArray<T> sort<T>(this JsArray<T> list, JsFunc<T, T, JsNumber> sortFunction) { return null; }
+
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static JsArrayDiff<T> diff<T>(this JsArray<T> list, JsArray<T> list2) { return null; }
         [JsMethod(ExtensionImplementedInInstance = true)]
