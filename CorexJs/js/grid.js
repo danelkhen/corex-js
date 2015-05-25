@@ -86,7 +86,7 @@ corexjs.ui.grid.Grid.prototype.Verify = function (){
     this.ApplyPaging();
 };
 corexjs.ui.grid.Grid.prototype.ApplyOrderBy = function (){
-    if (this.Options.OrderBy == null)
+    if (this.Options.OrderBy2 == null)
         return;
     if (this.Options.OrderByDesc)
         this.CurrentList = corexjs.Utils.Order$1(corexjs.Utils.ToDescending$1(this.Options.OrderBy2), this.CurrentList);
@@ -125,9 +125,6 @@ corexjs.ui.grid.Grid.prototype.OrderBy = function (col){
     if (this.OrderByCol != col){
         this.OrderByColClickCount = 1;
         this.OrderByCol = col;
-        this.Options.OrderBy = $CreateAnonymousDelegate(this, function (t){
-            return this.OrderByCol.Getter(t);
-        });
         this.Options.OrderByDesc = false;
         this.Options.OrderBy2 = this.OrderByCol.Comparer;
     }
@@ -137,7 +134,7 @@ corexjs.ui.grid.Grid.prototype.OrderBy = function (col){
             this.Options.OrderByDesc = true;
         }
         else if (this.OrderByColClickCount == 3){
-            this.Options.OrderBy = null;
+            this.Options.OrderBy2 = null;
             this.OrderByCol = null;
             this.OrderByColClickCount = null;
         }

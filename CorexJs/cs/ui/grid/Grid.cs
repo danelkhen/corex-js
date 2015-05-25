@@ -120,7 +120,7 @@ namespace corexjs.ui.grid
 
         void ApplyOrderBy()
         {
-            if (Options.OrderBy == null)
+            if (Options.OrderBy2 == null)
                 return;
             if (Options.OrderByDesc)
                 CurrentList = Options.OrderBy2.ToDescending().Order(CurrentList);//.orderByDescending(Options.OrderBy);
@@ -164,7 +164,7 @@ namespace corexjs.ui.grid
             {
                 OrderByColClickCount = 1;
                 OrderByCol = col;
-                Options.OrderBy = t => OrderByCol.Getter(t);
+                //Options.OrderBy = t => OrderByCol.Getter(t);
                 Options.OrderByDesc = false;
                 Options.OrderBy2 = OrderByCol.Comparer;//.Getter.ToComparer();
             }
@@ -177,7 +177,7 @@ namespace corexjs.ui.grid
                 }
                 else if (OrderByColClickCount == 3)
                 {
-                    Options.OrderBy = null;
+                    Options.OrderBy2 = null;
                     OrderByCol = null;
                     OrderByColClickCount = null;
                 }

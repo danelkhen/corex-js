@@ -52,7 +52,7 @@ namespace corexjs.ui.grid
         public JsNumber PageIndex { get; set; }
         public JsNumber PageSize { get; set; }
         public JsString Query { get; set; }
-        public JsFunc<T, object> OrderBy { get; set; }
+        //public JsFunc<T, object> OrderBy { get; set; }
         public JsFunc<T, T, JsNumber> OrderBy2 { get; set; }
         public bool OrderByDesc { get; set; }
         public JsFunc<T, JsNumber, JsString> RowClass { get; set; }
