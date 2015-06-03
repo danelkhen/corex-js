@@ -313,11 +313,12 @@
         this.splice.apply(this, args);
     }
     Array.prototype.last = function (predicate) {
-        if (this.length == 0)
+        var len = this.length;
+        if (len == 0)
             return null;
         if (predicate == null)
-            return this[this.length - 1];
-        for (var i = this.length; i >= 0; i--) {
+            return this[len - 1];
+        for (var i = len-1; i >= 0; i--) {
             if (predicate(this[i]))
                 return this[i];
         }
@@ -530,20 +531,22 @@
     //finalCallback -> function(results);
     Array.prototype.mapAsyncParallel = function (asyncFunc, finalCallback) {
         var results = [];
-        var length = this.length;
+        var list = this;
+        var length = list.length;
         if (length == 0) {
             finalCallback(results);
             return;
         }
-        var cb = function (res) {
-            results.push(res);
-            if (results.length == length)
+        var finished = 0;
+        var cb = function (res, index) {
+            results[index] = res;
+            finished++;
+            if (finished == length)
                 finalCallback(results);
         };
-        for (var i = 0; i < length; i++) {
-            var item = this[i];
-            asyncFunc(item, cb);
-        }
+        list.forEach(function (item, i) {
+            asyncFunc(item, function (res) { cb(res, i); });
+        });
     }
     Array.prototype.clear = function () {
         this.splice(0, this.length);
@@ -1532,7 +1535,7 @@
     function Q() {
     };
     Q.copy = function (src, target, options, depth) {
-        ///<summary>Copies an object into a target object, 
+        ///<summary>Copies an object into a target object,
         ///recursively cloning any native json object or array on the way, overwrite=true will overwrite a primitive field value even if exists
         ///Custom objects and functions are copied as/is by reference.
         ///</summary>
