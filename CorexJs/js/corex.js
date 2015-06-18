@@ -663,6 +663,8 @@
         return list;
     }
     Array.prototype.sum = function () {
+        if (this.length == 0)
+            return 0;
         var sum = this[0];
         for (var i = 1; i < this.length; i++)
             sum += this[i];
