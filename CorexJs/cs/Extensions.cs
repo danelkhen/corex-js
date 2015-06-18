@@ -54,7 +54,6 @@ namespace SharpKit.JavaScript
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static void mapAsyncParallel<T, R>(this JsArray<T> list, JsAction<T, JsAction<R>> action, JsAction<JsArray<R>> finalCallback) { }
 
-        [Obsolete("Not implemented")]
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static void forEachAsyncParallel<T>(this JsArray<T> list, JsAction<T, JsAction> action, JsAction finalCallback) { }
 

@@ -548,6 +548,26 @@
             asyncFunc(item, function (res) { cb(res, i); });
         });
     }
+    //Performs an async function on each item in the array, invoking a finalCallback when all are completed
+    //asyncFunc -> function(item, callback -> function(result))
+    //finalCallback -> function(results);
+    Array.prototype.forEachAsyncParallel = function (asyncFunc, finalCallback) {
+        var list = this;
+        var length = list.length;
+        if (length == 0) {
+            finalCallback();
+            return;
+        }
+        var finished = 0;
+        var cb = function (res, index) {
+            finished++;
+            if (finished == length)
+                finalCallback();
+        };
+        list.forEach(function (item, i) {
+            asyncFunc(item, cb);//function () { cb(i); });
+        });
+    }
     Array.prototype.clear = function () {
         this.splice(0, this.length);
     }
@@ -655,6 +675,8 @@
         return list;
     }
     Array.prototype.avg = function () {
+        if (this.length == 0)
+            return null;
         return this.sum() / this.length;
     }
     Array.prototype.selectMany = function (selector) {
