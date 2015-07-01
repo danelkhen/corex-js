@@ -1195,7 +1195,7 @@
             return new Date(y, m - 1);
         if (y != null)
             return new Date(y);
-        var x = new Date(0);
+        var x = new Date(1970, 0, 1);
         x.setHours(0, 0, 0, 0);
         return x;
     }
