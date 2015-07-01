@@ -1950,22 +1950,23 @@
         if (query.length == 0)
             return obj;
         var parts = query.split('&');
-        $.map(parts, function (part) {
-            var keyval = part.split('=');
-            var key = keyval[0];
-            var eValue = keyval[1];
+        var pairs = parts.select(function (part) { return part.split('='); });
+        pairs.forEach(function(pair){
+            var key = pair[0];
+            var eValue = pair[1];
             var value;
+            var defaultValue = defaults[key];
             var currentValue = obj[key];
-            if (currentValue == null || currentValue == defaults[key]) {
+            if (currentValue == null || currentValue == defaultValue) {
                 value = decodeURIComponent(eValue);
                 obj[key] = value;
             }
-            else if (currentValue instanceof Array || defaults[key] instanceof Array) {
+            else if (currentValue instanceof Array || defaultValue instanceof Array) {
                 if (currentValue == null) {
                     currentValue = [];
                     obj[key] = currentValue;
                 }
-                if (defaults[key] != null && currentValue.itemsEqual(defaults[key]))
+                if (defaultValue != null && currentValue.itemsEqual(defaultValue))
                     currentValue.clear();
                 if (eValue != "") {
                     var items = eValue.split(",").select(function (item) { return decodeURIComponent(item); });
@@ -1981,6 +1982,11 @@
                 //value = decodeURIComponent(eValue);
                 //obj[key] = [currentValue, value];
             }
+            if (typeof (defaultValue) == "boolean" && typeof (value) != "boolean") {
+                var boolValue = value == 1 || value == true || value == "1" || value == "true";
+                obj[key] = boolValue;
+            }
+
         });
         return obj;
     }
