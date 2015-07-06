@@ -910,6 +910,9 @@
     Date.prototype.totalMinutes = function () {
         return this.valueOf() / (60 * 1000);
     };
+    Date.prototype.totalSeconds = function () {
+        return this.valueOf() / 1000;
+    };
     Date.prototype.month = function (value) {
         if (value == null) {
             if (this._Kind == 1)
