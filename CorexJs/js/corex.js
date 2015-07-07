@@ -1290,6 +1290,7 @@
 
 //******** String
 (function () {
+    String.prototype.forEach = Array.prototype.forEach;
 
     String.prototype.contains = function (s) {
         return this.indexOf(s) >= 0;
