@@ -318,7 +318,7 @@
             return null;
         if (predicate == null)
             return this[len - 1];
-        for (var i = len-1; i >= 0; i--) {
+        for (var i = len - 1; i >= 0; i--) {
             if (predicate(this[i]))
                 return this[i];
         }
@@ -753,6 +753,20 @@
     }
     Array.prototype.selectWith = function (list, func) {
         return Array.selectTwice(this, list, action);
+    }
+
+    //Produces a cartesian product of two lists, if no selector(x1, y1) is defined, will return an array of pairs [[x1,y1],[x1,y2],[x1,y3]...]
+    Array.prototype.crossJoin = function (list2, selector) {
+        var list1 = this;
+        var list3 = [];
+        if (selector == null)
+            selector = function (x, y) { return [x, y]; };
+        list1.forEach(function (t1) {
+            list2.forEach(function (t2) {
+                list3.push(selector(t1, t2));
+            });
+        });
+        return list3;
     }
 
     //Array Static Extensions
@@ -1838,14 +1852,26 @@
         if (typeof (selector) == "function")
             return selector;
         if (selector instanceof Array) {
-            var list = selector.map(Q.createSelectorFunction);
+            var list = selector;
+            if (typeof (list[0]) == "string") {
+                return function (t) {
+                    var obj = {};
+                    for (var i = 0; i < list.length; i++) {
+                        var prop = list[i];
+                        obj[prop] = t[prop];
+                    }
+                    return obj;
+                };
+            }
+
+            var list2 = selector.map(Q.createSelectorFunction);
             return function (t) {
                 var value = t;
-                for (var i = 0; i < list.length; i++) {
+                for (var i = 0; i < list2.length; i++) {
                     if (value == null)
                         return undefined;
-                    var func = list[i];
-                    var value = func(value);
+                    var func = list2[i];
+                    value = func(value);
                 };
                 return value;
             };
@@ -1955,7 +1981,7 @@
             return obj;
         var parts = query.split('&');
         var pairs = parts.select(function (part) { return part.split('='); });
-        pairs.forEach(function(pair){
+        pairs.forEach(function (pair) {
             var key = pair[0];
             var eValue = pair[1];
             var value;
