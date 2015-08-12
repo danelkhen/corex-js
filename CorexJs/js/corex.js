@@ -426,6 +426,14 @@
         selector = Q.createSelectorFunction(selector);
         return this.filter(function (t, i) { return selector(t, i) != value; });
     }
+    Array.prototype.firstEq = function (selector, value) {
+        selector = Q.createSelectorFunction(selector);
+        return this.first(function (t, i) { return selector(t, i) == value; });
+    }
+    Array.prototype.firstNotEq = function (selector, value) {
+        selector = Q.createSelectorFunction(selector);
+        return this.first(function (t, i) { return selector(t, i) != value; });
+    }
     Array.prototype.addRange = function (items) {
         this.push.apply(this, items);
     }
