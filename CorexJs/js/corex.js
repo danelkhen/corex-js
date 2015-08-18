@@ -917,11 +917,12 @@
                 return this.getUTCFullYear();
             return this.getFullYear();
         }
-        if (this._Kind == 1)
-            this.setUTCFullYear(value);
+        var d = this.clone();
+        if (d._Kind == 1)
+            d.setUTCFullYear(value);
         else
-            this.setFullYear(value);
-        return this;
+            d.setFullYear(value);
+        return d;
     };
     Date.prototype.totalDays = function () {
         return this.valueOf() / (24 * 60 * 60 * 1000);
@@ -941,11 +942,12 @@
                 return this.getUTCMonth() + 1;
             return this.getMonth() + 1;
         }
-        if (this._Kind == 1)
-            this.setUTCMonth(value - 1);
+        var d = this.clone();
+        if (d._Kind == 1)
+            d.setUTCMonth(value - 1);
         else
-            this.setMonth(value - 1);
-        return this;
+            d.setMonth(value - 1);
+        return d;
     };
     Date.prototype.day = function (value) {
         if (value == null) {
@@ -953,11 +955,12 @@
                 return this.getUTCDate();
             return this.getDate();
         }
-        if (this._Kind == 1)
-            this.setUTCDate(value);
+        var d = this.clone();
+        if (d._Kind == 1)
+            d.setUTCDate(value);
         else
-            this.setDate(value);
-        return this;
+            d.setDate(value);
+        return d;
     };
     Date.prototype.hour = function (value) {
         if (value == null) {
@@ -965,11 +968,12 @@
                 return this.getUTCHours();
             return this.getHours();
         }
-        if (this._Kind == 1)
-            this.setUTCHours(value);
+        var d = this.clone();
+        if (d._Kind == 1)
+            d.setUTCHours(value);
         else
-            this.setHours(value);
-        return this;
+            d.setHours(value);
+        return d;
     };
     Date.prototype.minute = function (value) {
         if (value == null) {
@@ -977,11 +981,12 @@
                 return this.getUTCMinutes();
             return this.getMinutes();
         }
-        if (this._Kind == 1)
-            this.setUTCMinutes(value);
+        var d = this.clone();
+        if (d._Kind == 1)
+            d.setUTCMinutes(value);
         else
-            this.setMinutes(value);
-        return this;
+            d.setMinutes(value);
+        return d;
     };
     Date.prototype.second = function (value) {
         if (value == null) {
@@ -989,11 +994,12 @@
                 return this.getUTCSeconds();
             return this.getSeconds();
         }
-        if (this._Kind == 1)
-            this.setUTCSeconds(value);
+        var d = this.clone();
+        if (d._Kind == 1)
+            d.setUTCSeconds(value);
         else
-            this.setSeconds(value);
-        return this;
+            d.setSeconds(value);
+        return d;
     };
     Date.prototype.ms = function (value) {
         if (value == null) {
@@ -1001,11 +1007,12 @@
                 return this.getUTCMilliseconds();
             return this.getMilliseconds();
         }
-        if (this._Kind == 1)
-            this.setUTCMilliseconds(value);
+        var d = this.clone();
+        if (d._Kind == 1)
+            d.setUTCMilliseconds(value);
         else
-            this.setMilliseconds(value);
-        return this;
+            d.setMilliseconds(value);
+        return d;
     };
     Date.prototype.toUnix = function () {
         if (this._Kind == 1)
