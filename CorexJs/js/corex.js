@@ -1247,7 +1247,7 @@
             ctx.failed = true;
             return;
         }
-        setter.call(ctx.date, value);
+        ctx.date = setter.call(ctx.date, value);
         ctx.format = ctx.format.replaceAt(index, part.length, "".padRight(part.length));
         ctx.s = ctx.s.replaceAt(index, part.length, "".padRight(part.length));
     }
