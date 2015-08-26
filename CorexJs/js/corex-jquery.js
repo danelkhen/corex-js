@@ -118,8 +118,8 @@ jQuery.fn.getAppendRemoveForEach = function (selector, list, action, options) {
     options.removeRemaining = true;
     return jQueryHelper.getOrAppendChildBySelector(this, selector, options);
 }
-jQuery.fn.create = function (selector) {
-    return jQueryHelper.getOrAppendChildBySelector(this, selector, options);
+jQuery.create = function (selector) {
+    return jQueryHelper.createElementFromSelector(selector);
 }
 
 //binds a container's children selector to a list, matching the number of elements to the list.length (creating/deleting elements where needed), optionally performing action(el, dataItem, index) on each element
