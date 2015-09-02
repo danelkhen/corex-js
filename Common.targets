@@ -1,0 +1,11 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <OutputPath>bin\</OutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="SharpKit.JavaScript" />
+        <Reference Include="SharpKit.Html" />
+        <Reference Include="SharpKit.jQuery" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\SharpKit\5\SharpKit.CSharp.targets" />
+</Project>

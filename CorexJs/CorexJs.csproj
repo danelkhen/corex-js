@@ -55,26 +55,19 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="js\corex-sk.js" />
-    <Content Include="js\corex-jquery.js" />
-    <Content Include="js\grid.js" />
-    <Content Include="js\sk.js" />
+    <Content Include="corex-jquery.js" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="js\corex.js" />
+    <Content Include="corex.js" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="cs\jQuery.cs" />
-    <Compile Include="cs\Utils.cs" />
-    <Compile Include="cs\Extensions.cs" />
-    <Compile Include="cs\JsArray.cs" />
-    <Compile Include="cs\JsDate.cs" />
-    <Compile Include="cs\ui\grid\Grid.cs" />
-    <Compile Include="cs\ui\grid\GridOptions.cs" />
-    <Compile Include="cs\ui\grid\Plugin.cs" />
-    <Compile Include="cs\JsObject.cs" />
-    <Compile Include="cs\Q.cs" />
-    <Compile Include="cs\Timer.cs" />
+    <Compile Include="src\jQuery.cs" />
+    <Compile Include="src\Extensions.cs" />
+    <Compile Include="src\JsArray.cs" />
+    <Compile Include="src\JsDate.cs" />
+    <Compile Include="src\JsObject.cs" />
+    <Compile Include="src\Q.cs" />
+    <Compile Include="src\Timer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <PropertyGroup>
@@ -82,7 +75,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildBinPath)\SharpKit\5\SharpKit.CSharp.targets" />
+  <Import Project="..\Common.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ProjectExtensions>
