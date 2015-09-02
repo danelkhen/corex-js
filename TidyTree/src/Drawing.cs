@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TidyTree
+namespace tidytree
 {
 
     [JsType(JsMode.Json)]

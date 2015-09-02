@@ -1,6 +1,6 @@
 ﻿using SharpKit.JavaScript;
 
-namespace TidyTree
+namespace tidytree
 {
     [JsType(JsMode.Prototype)]
     class TidyTree

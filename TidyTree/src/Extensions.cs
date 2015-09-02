@@ -1,7 +1,7 @@
 ﻿using SharpKit.JavaScript;
 using System;
 
-namespace TidyTree
+namespace tidytree
 {
     [JsType(JsMode.Prototype, IgnoreGenericTypeArguments = true)]
     public static class Extensions

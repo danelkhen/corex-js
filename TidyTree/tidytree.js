@@ -43,45 +43,45 @@ if (typeof($CreateDelegate)=='undefined'){
 }
 
 
-if (typeof(TidyTree) == "undefined")
-    var TidyTree = {};
-TidyTree.JsDictionary = function (){
+if (typeof(tidytree) == "undefined")
+    var tidytree = {};
+tidytree.JsDictionary = function (){
     this.KeyGen = null;
     this.Obj = null;
     this.Count = 0;
     this.Obj = new Object();
     this.Count = 0;
     this.KeyGen = $CreateAnonymousDelegate(this, function (k){
-        return TidyTree.Extensions.GetHashKey(k);
+        return tidytree.Extensions.GetHashKey(k);
     });
 };
-TidyTree.JsDictionary.prototype.Clear = function (){
+tidytree.JsDictionary.prototype.Clear = function (){
     this.Obj = new Object();
     this.Count = 0;
 };
-TidyTree.JsDictionary.prototype.Add = function (key, value){
+tidytree.JsDictionary.prototype.Add = function (key, value){
     var k = this.KeyGen(key);
     if (this.Obj.hasOwnProperty(k))
         throw new Error();
     this.Obj[k] = value;
     this.Count++;
 };
-TidyTree.JsDictionary.prototype.get_Item = function (key){
+tidytree.JsDictionary.prototype.get_Item = function (key){
     var k = this.KeyGen(key);
     if (!this.Obj.hasOwnProperty(k))
         throw new Error();
     return this.Obj[k];
 };
-TidyTree.JsDictionary.prototype.get_Values = function (){
+tidytree.JsDictionary.prototype.get_Values = function (){
     return Object.values(this.Obj);
 };
-TidyTree.Extensions = function (){
+tidytree.Extensions = function (){
 };
-TidyTree.Extensions._hashKeyPrefix = "hashkey\0";
-TidyTree.Extensions._hashKeyIndex = 0;
-TidyTree.Extensions._hashKeyPrefix = "hashkey\0";
-TidyTree.Extensions._hashKeyIndex = 0;
-TidyTree.Extensions.GetHashKey = function (obj2){
+tidytree.Extensions._hashKeyPrefix = "hashkey\0";
+tidytree.Extensions._hashKeyIndex = 0;
+tidytree.Extensions._hashKeyPrefix = "hashkey\0";
+tidytree.Extensions._hashKeyIndex = 0;
+tidytree.Extensions.GetHashKey = function (obj2){
     var obj = obj2;
     if (obj == undefined)
         return "undefined";
@@ -94,27 +94,27 @@ TidyTree.Extensions.GetHashKey = function (obj2){
         return obj.As();
     if (type == "object" || type == "function"){
         if (obj._hashKey == null){
-            obj._hashKey = TidyTree.Extensions._hashKeyPrefix + TidyTree.Extensions._hashKeyIndex;
-            TidyTree.Extensions._hashKeyIndex++;
+            obj._hashKey = tidytree.Extensions._hashKeyPrefix + tidytree.Extensions._hashKeyIndex;
+            tidytree.Extensions._hashKeyIndex++;
         }
         return obj._hashKey;
     }
     return obj.toString();
 };
-TidyTree.Extensions.Aggregate = function (source, seed, func){
+tidytree.Extensions.Aggregate = function (source, seed, func){
     var tAccumulate = seed;
     for (var $i2 = 0,$l2 = source.length,current = source[$i2]; $i2 < $l2; $i2++, current = source[$i2]){
         tAccumulate = func(tAccumulate, current);
     }
     return tAccumulate;
 };
-TidyTree.TidyTree = function (){
+tidytree.TidyTree = function (){
     this.Map = null;
 };
-TidyTree.TidyTree.prototype.layout = function (node, distance){
-    TidyTree.TreeNodeExtensions.Verify(node);
+tidytree.TidyTree.prototype.layout = function (node, distance){
+    tidytree.TreeNodeExtensions.Verify(node);
     var layout = (function (){
-        var $v1 = new TidyTree.TreeLayout();
+        var $v1 = new tidytree.TreeLayout();
         $v1.Distance = distance;
         $v1.Tree = node;
         return $v1;
@@ -123,19 +123,19 @@ TidyTree.TidyTree.prototype.layout = function (node, distance){
     this.Map = layout.GetNodeCoordinates();
     this.update(node);
 };
-TidyTree.TidyTree.prototype.update = function (node2){
+tidytree.TidyTree.prototype.update = function (node2){
     node2.Position = this.Map.get_Item(node2);
     if (node2.Children != null)
         node2.Children.forEach($CreateDelegate(this, this.update));
 };
-TidyTree.TreeLayout = function (){
+tidytree.TreeLayout = function (){
     this.Tree2 = null;
     this.Nodes = null;
     this.Distance = null;
     this.Tree = null;
-    this.Nodes = new TidyTree.JsDictionary();
+    this.Nodes = new tidytree.JsDictionary();
 };
-TidyTree.TreeLayout.prototype.ToTreeLayoutNode = function (node){
+tidytree.TreeLayout.prototype.ToTreeLayoutNode = function (node){
     var node2 = {
         Source: node,
         Mod: 0,
@@ -154,21 +154,21 @@ TidyTree.TreeLayout.prototype.ToTreeLayoutNode = function (node){
     this.Nodes.Add(node, node2);
     return node2;
 };
-TidyTree.TreeLayout.prototype.GetNode = function (node){
+tidytree.TreeLayout.prototype.GetNode = function (node){
     return this.Nodes.get_Item(node);
 };
-TidyTree.TreeLayout.prototype.PerformLayout = function (){
+tidytree.TreeLayout.prototype.PerformLayout = function (){
     if (this.Distance == null)
         this.Distance = 10;
     this.Nodes.Clear();
     this.Tree2 = this.ToTreeLayoutNode(this.Tree);
-    var treeNodes = TidyTree.LayoutTreeNodeExtensions.IterateNodesBreadth(this.Tree2);
+    var treeNodes = tidytree.LayoutTreeNodeExtensions.IterateNodesBreadth(this.Tree2);
     var parents = treeNodes.where($CreateAnonymousDelegate(this, function (x){
         return x.Children.length > 0;
     }));
     for (var $i3 = 0,$l3 = parents.length,treeNode = parents[$i3]; $i3 < $l3; $i3++, treeNode = parents[$i3]){
         for (var i = 0; i != treeNode.Children.length; ++i){
-            TidyTree.LayoutTreeNodeExtensions.GetChild(treeNode, i).Number = i;
+            tidytree.LayoutTreeNodeExtensions.GetChild(treeNode, i).Number = i;
         }
     }
     var r = this.Nodes.get_Item(this.Tree);
@@ -176,8 +176,8 @@ TidyTree.TreeLayout.prototype.PerformLayout = function (){
     this.SecondWalk(r, -r.Prelim);
     this.NormalizeCoordinates();
 };
-TidyTree.TreeLayout.prototype.GetNodeCoordinates = function (){
-    var dict = new TidyTree.JsDictionary();
+tidytree.TreeLayout.prototype.GetNodeCoordinates = function (){
+    var dict = new tidytree.JsDictionary();
     if (this.Nodes == null || this.Nodes.Count == 0)
         return dict;
     for (var $i4 = 0,$t4 = this.Nodes.get_Values(),$l4 = $t4.length,node = $t4[$i4]; $i4 < $l4; $i4++, node = $t4[$i4]){
@@ -189,7 +189,7 @@ TidyTree.TreeLayout.prototype.GetNodeCoordinates = function (){
     }
     return dict;
 };
-TidyTree.TreeLayout.prototype.GetBounds = function (){
+tidytree.TreeLayout.prototype.GetBounds = function (){
     var xmin,xmax,ymin,ymax;
     xmin = xmax = ymin = ymax = 0;
     var list = this.Nodes.get_Values().toArray();
@@ -211,7 +211,7 @@ TidyTree.TreeLayout.prototype.GetBounds = function (){
         Height: ymax + this.Distance
     };
 };
-TidyTree.TreeLayout.prototype.NormalizeCoordinates = function (){
+tidytree.TreeLayout.prototype.NormalizeCoordinates = function (){
     var list = this.Nodes.get_Values().toArray();
     var xmin = 0,ymin = 0;
     for (var i = 0; i != list.length; ++i){
@@ -225,26 +225,26 @@ TidyTree.TreeLayout.prototype.NormalizeCoordinates = function (){
         list[i].Y -= ymin;
     }
 };
-TidyTree.TreeLayout.prototype.FirstWalk = function (v){
+tidytree.TreeLayout.prototype.FirstWalk = function (v){
     var w;
-    if (TidyTree.LayoutTreeNodeExtensions.IsLeaf(v)){
+    if (tidytree.LayoutTreeNodeExtensions.IsLeaf(v)){
         w = this.LeftSibling(v);
         if (w != null)
             v.Prelim = w.Prelim + this.Distance;
         return;
     }
     var node = v;
-    var defaultAncestor = TidyTree.LayoutTreeNodeExtensions.GetChild(node, 0);
+    var defaultAncestor = tidytree.LayoutTreeNodeExtensions.GetChild(node, 0);
     for (var i = 0; i != node.Children.length; ++i){
-        var s = TidyTree.LayoutTreeNodeExtensions.GetChild(node, i);
+        var s = tidytree.LayoutTreeNodeExtensions.GetChild(node, i);
         w = s;
         this.FirstWalk(w);
         defaultAncestor = this.Apportion(w, defaultAncestor);
     }
     this.ExecuteShifts(v);
     var c = node.Children.length;
-    var leftmost = TidyTree.LayoutTreeNodeExtensions.GetChild(node, 0);
-    var rightmost = TidyTree.LayoutTreeNodeExtensions.GetChild(node, c - 1);
+    var leftmost = tidytree.LayoutTreeNodeExtensions.GetChild(node, 0);
+    var rightmost = tidytree.LayoutTreeNodeExtensions.GetChild(node, c - 1);
     var midPoint = (leftmost.Prelim + rightmost.Prelim) / 2;
     w = this.LeftSibling(v);
     if (w != null){
@@ -255,15 +255,15 @@ TidyTree.TreeLayout.prototype.FirstWalk = function (v){
         v.Prelim = midPoint;
     }
 };
-TidyTree.TreeLayout.prototype.SecondWalk = function (v, m){
+tidytree.TreeLayout.prototype.SecondWalk = function (v, m){
     v.X = v.Prelim + m;
-    v.Y = TidyTree.LayoutTreeNodeExtensions.GetBranchLevel(this.Tree2, v) * this.Distance;
+    v.Y = tidytree.LayoutTreeNodeExtensions.GetBranchLevel(this.Tree2, v) * this.Distance;
     var symbExprNode = v.Source;
     for (var $i5 = 0,$t5 = symbExprNode.Children,$l5 = $t5.length,s = $t5[$i5]; $i5 < $l5; $i5++, s = $t5[$i5]){
         this.SecondWalk(this.Nodes.get_Item(s), m + v.Mod);
     }
 };
-TidyTree.TreeLayout.prototype.Apportion = function (v, defaultAncestor){
+tidytree.TreeLayout.prototype.Apportion = function (v, defaultAncestor){
     var w = this.LeftSibling(v);
     if (w == null)
         return defaultAncestor;
@@ -304,7 +304,7 @@ TidyTree.TreeLayout.prototype.Apportion = function (v, defaultAncestor){
     }
     return defaultAncestor;
 };
-TidyTree.TreeLayout.prototype.MoveSubtree = function (wm, wp, shift){
+tidytree.TreeLayout.prototype.MoveSubtree = function (wm, wp, shift){
     var subtrees = wp.Number - wm.Number;
     wp.Change -= shift / subtrees;
     wp.Shift += shift;
@@ -312,83 +312,83 @@ TidyTree.TreeLayout.prototype.MoveSubtree = function (wm, wp, shift){
     wp.Prelim += shift;
     wp.Mod += shift;
 };
-TidyTree.TreeLayout.prototype.ExecuteShifts = function (v){
-    if (TidyTree.LayoutTreeNodeExtensions.IsLeaf(v))
+tidytree.TreeLayout.prototype.ExecuteShifts = function (v){
+    if (tidytree.LayoutTreeNodeExtensions.IsLeaf(v))
         return;
     var shift = 0;
     var change = 0;
     for (var i = v.Children.length - 1; i >= 0; --i){
-        var w = TidyTree.LayoutTreeNodeExtensions.GetChild(v, i);
+        var w = tidytree.LayoutTreeNodeExtensions.GetChild(v, i);
         w.Prelim += shift;
         w.Mod += shift;
         change += w.Change;
         shift += (w.Shift + change);
     }
 };
-TidyTree.TreeLayout.prototype.Ancestor = function (vi, v){
+tidytree.TreeLayout.prototype.Ancestor = function (vi, v){
     var ancestor = vi.Ancestor;
     return ancestor.Parent == v.Parent ? ancestor : null;
 };
-TidyTree.TreeLayout.prototype.NextLeft = function (v){
+tidytree.TreeLayout.prototype.NextLeft = function (v){
     var c = v.Children.length;
-    return c == 0 ? v.Thread : TidyTree.LayoutTreeNodeExtensions.GetChild(v, 0);
+    return c == 0 ? v.Thread : tidytree.LayoutTreeNodeExtensions.GetChild(v, 0);
 };
-TidyTree.TreeLayout.prototype.NextRight = function (v){
+tidytree.TreeLayout.prototype.NextRight = function (v){
     var c = v.Children.length;
-    return c == 0 ? v.Thread : TidyTree.LayoutTreeNodeExtensions.GetChild(v, c - 1);
+    return c == 0 ? v.Thread : tidytree.LayoutTreeNodeExtensions.GetChild(v, c - 1);
 };
-TidyTree.TreeLayout.prototype.LeftSibling = function (n){
+tidytree.TreeLayout.prototype.LeftSibling = function (n){
     var parent = n.Parent;
     if (parent == null)
         return null;
     var i = parent.Children.indexOf(n);
     if (i == 0)
         return null;
-    return TidyTree.LayoutTreeNodeExtensions.GetChild(parent, i - 1);
+    return tidytree.LayoutTreeNodeExtensions.GetChild(parent, i - 1);
 };
-TidyTree.TreeLayout.prototype.LeftmostSibling = function (n){
+tidytree.TreeLayout.prototype.LeftmostSibling = function (n){
     var parent = n.Parent;
     if (parent == null)
         return null;
     var i = parent.Children.indexOf(n);
     if (i == 0)
         return null;
-    return TidyTree.LayoutTreeNodeExtensions.GetChild(parent, 0);
+    return tidytree.LayoutTreeNodeExtensions.GetChild(parent, 0);
 };
-TidyTree.TreeNodeExtensions = function (){
+tidytree.TreeNodeExtensions = function (){
 };
-TidyTree.TreeNodeExtensions.Verify = function (node){
+tidytree.TreeNodeExtensions.Verify = function (node){
     if (node.Children == null)
         node.Children =  [];
     node.Children.forEach(function (t){
         t.Parent = node;
-        TidyTree.TreeNodeExtensions.Verify(t);
+        tidytree.TreeNodeExtensions.Verify(t);
     });
 };
-TidyTree.LayoutTreeNodeExtensions = function (){
+tidytree.LayoutTreeNodeExtensions = function (){
 };
-TidyTree.LayoutTreeNodeExtensions.GetBranchLevel = function (root, point){
+tidytree.LayoutTreeNodeExtensions.GetBranchLevel = function (root, point){
     if (root == point)
         return 0;
     for (var $i6 = 0,$t6 = root.Children,$l6 = $t6.length,subtree = $t6[$i6]; $i6 < $l6; $i6++, subtree = $t6[$i6]){
-        var branchLevel = TidyTree.LayoutTreeNodeExtensions.GetBranchLevel(subtree, point);
+        var branchLevel = tidytree.LayoutTreeNodeExtensions.GetBranchLevel(subtree, point);
         if (branchLevel < 2147483647)
             return 1 + branchLevel;
     }
     return Number.MAX_VALUE;
 };
-TidyTree.LayoutTreeNodeExtensions.IsLeaf = function (node){
+tidytree.LayoutTreeNodeExtensions.IsLeaf = function (node){
     return node.Source.Children.length == 0;
 };
-TidyTree.LayoutTreeNodeExtensions.GetChild = function (node, index){
+tidytree.LayoutTreeNodeExtensions.GetChild = function (node, index){
     return node.Children[index];
 };
-TidyTree.LayoutTreeNodeExtensions.IterateNodesBreadth = function (self){
+tidytree.LayoutTreeNodeExtensions.IterateNodesBreadth = function (self){
     var list =  [self];
     var i = 0;
     while (i != list.length){
         for (var j = 0; j != list[i].Children.length; ++j)
-            list.push(TidyTree.LayoutTreeNodeExtensions.GetChild(list[i], j));
+            list.push(tidytree.LayoutTreeNodeExtensions.GetChild(list[i], j));
         ++i;
     }
     return list;

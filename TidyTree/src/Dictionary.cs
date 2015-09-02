@@ -1,7 +1,7 @@
 ﻿using SharpKit.JavaScript;
 using corexjs;
 
-namespace TidyTree
+namespace tidytree
 {
     [JsType(JsMode.Prototype)]
     public class JsDictionary<K, T>

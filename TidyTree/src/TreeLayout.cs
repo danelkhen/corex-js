@@ -1,7 +1,7 @@
 ﻿using SharpKit.Html;
 using SharpKit.JavaScript;
 
-namespace TidyTree
+namespace tidytree
 {
     /// <summary>
     /// An algorithm implementation of Reingold–Tilford Tree - aka Tidy Tree
