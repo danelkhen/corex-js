@@ -1,4 +1,5 @@
-﻿function jQueryHelper() {
+﻿"use strict";
+function jQueryHelper() {
     var _svgElements = { altGlyph: 1, altGlyphDef: 1, altGlyphItem: 1, animate: 1, animateColor: 1, animateMotion: 1, animateTransform: 1, circle: 1, clipPath: 1, "color-profile": 1, cursor: 1, defs: 1, desc: 1, ellipse: 1, feBlend: 1, feColorMatrix: 1, feComponentTransfer: 1, feComposite: 1, feConvolveMatrix: 1, feDiffuseLighting: 1, feDisplacementMap: 1, feDistantLight: 1, feFlood: 1, feFuncA: 1, feFuncB: 1, feFuncG: 1, feFuncR: 1, feGaussianBlur: 1, feImage: 1, feMerge: 1, feMergeNode: 1, feMorphology: 1, feOffset: 1, fePointLight: 1, feSpecularLighting: 1, feSpotLight: 1, feTile: 1, feTurbulence: 1, filter: 1, font: 1, "font-face": 1, "font-face-format": 1, "font-face-name": 1, "font-face-src": 1, "font-face-uri": 1, foreignObject: 1, g: 1, glyph: 1, glyphRef: 1, hkern: 1, image: 1, line: 1, linearGradient: 1, marker: 1, mask: 1, metadata: 1, "missing-glyph": 1, mpath: 1, path: 1, pattern: 1, polygon: 1, polyline: 1, radialGradient: 1, rect: 1, script: 1, set: 1, stop: 1, style: 1, svg: 1, "switch": 1, symbol: 1, text: 1, textPath: 1, title: 1, tref: 1, tspan: 1, use: 1, view: 1, vkern: 1, };
     Function.addTo(jQueryHelper, [parseSelector, createElementFromSelectorNode, getOrAppendChildBySelector, createElementFromSelector]);
 

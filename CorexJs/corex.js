@@ -1,4 +1,4 @@
-
+"use strict";
 //******** Object
 (function () {
     Object.toArray = function (obj) {
