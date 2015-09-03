@@ -66,6 +66,7 @@
     <Compile Include="src\JsArray.cs" />
     <Compile Include="src\JsDate.cs" />
     <Compile Include="src\JsDictionary.cs" />
+    <Compile Include="src\JsMap.cs" />
     <Compile Include="src\JsObject.cs" />
     <Compile Include="src\Q.cs" />
     <Compile Include="src\Timer.cs" />
