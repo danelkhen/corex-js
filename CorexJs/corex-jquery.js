@@ -20,8 +20,9 @@ function jQueryHelper() {
             tagName = tagToken.value;
 
         var idToken = node.first(function (t) { return t.type == "ID"; });
+        var isSvg = _svgElements[tagName];
         var el;
-        if(_svgElements[tagName])
+        if (isSvg)
             el = $(document.createElementNS("http://www.w3.org/2000/svg", tagName));
         else
             el = $("<" + tagName + "/>");
@@ -36,8 +37,12 @@ function jQueryHelper() {
         }
 
         var classes = node.whereEq("type", "CLASS").select(function (t) { return t.value.substr(1); });
-        if (classes.length > 0)
-            el.addClass(classes.join(" "));
+        if (classes.length > 0) {
+            if(isSvg)
+                el.attr("class", classes.join(" "));
+            else
+                el.addClass(classes.join(" "));
+        }
 
         return el;
     }
@@ -104,7 +109,7 @@ function jQueryHelper() {
         if (removeRemaining) {
             while (childEls.length > total) {
                 var parentEl = childEls.pop();
-                if(destroy)
+                if (destroy)
                     destroy(parentEl);
                 $(parentEl).remove();
             }
