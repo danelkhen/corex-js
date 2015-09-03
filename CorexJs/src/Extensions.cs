@@ -6,6 +6,8 @@ namespace SharpKit.JavaScript
     [JsType(JsMode.Prototype, Export = false)]
     public static class Extensions
     {
+        [JsMethod(Name ="Array.fromIterator", Global = true)]
+        public static JsArray<T> toArray<T>(this IJsIterator<T> iterator) { return null; }
         //
         // Summary:
         //     Returns an Array object with the elements sorted. Warning: Array itself is sorted

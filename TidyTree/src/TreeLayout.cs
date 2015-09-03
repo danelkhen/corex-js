@@ -1,6 +1,4 @@
-﻿using CorexJs;
-using SharpKit.Html;
-using SharpKit.JavaScript;
+﻿using SharpKit.JavaScript;
 
 namespace tidytree
 {
@@ -13,11 +11,11 @@ namespace tidytree
 
         public TreeLayout()
         {
-            Nodes = new JsDictionary<TreeNode, TreeLayoutNode>();
+            Nodes = new JsMap<TreeNode, TreeLayoutNode>();
         }
 
         TreeLayoutNode Tree2;
-        JsDictionary<TreeNode, TreeLayoutNode> Nodes;
+        JsMap<TreeNode, TreeLayoutNode> Nodes;
         public JsNumber Distance { get; set; }
         public TreeNode Tree { get; set; }
 
@@ -27,7 +25,7 @@ namespace tidytree
             node2.Ancestor = node2;
             node2.Children = node.Children.select(ToTreeLayoutNode);
             node2.Children.forEach(t => t.Parent = node2);
-            Nodes.add(node, node2);
+            Nodes.set(node, node2);
             return node2;
         }
 
@@ -63,15 +61,15 @@ namespace tidytree
         /// Returns a hashmap of coordinates for each node
         /// </summary>
         /// <returns></returns>
-        public JsDictionary<TreeNode, Point> GetNodeCoordinates()
+        public JsMap<TreeNode, Point> GetNodeCoordinates()
         {
-            var dict = new JsDictionary<TreeNode, Point>();
-            if (Nodes == null || Nodes.count == 0)
+            var dict = new JsMap<TreeNode, Point>();
+            if (Nodes == null || Nodes.size == 0)
                 return dict;
-            foreach (var node in Nodes.values())
+            foreach (var node in Nodes.values().toArray())
             {
                 var p = new Point { X = node.X, Y = node.Y };
-                dict.add(node.Source, p);
+                dict[node.Source] =  p;
             }
             return dict;
         }

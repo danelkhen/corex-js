@@ -900,6 +900,15 @@
     }
     Array.slice = Array.prototype.slice.toStaticFunction();
     Array.concat = Array.prototype.concat.toStaticFunction();
+    Array.fromIterator = function (iterator) {
+        var list = [];
+        var iteration = iterator.next();
+        while (!iteration.done) {
+            list.push(iteration.value);
+            iteration = iterator.next();
+        }
+        return list;
+    }
 
 })();
 

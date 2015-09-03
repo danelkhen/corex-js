@@ -61,6 +61,7 @@
     <Content Include="corex.js" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\IJsIterator.cs" />
     <Compile Include="src\jQuery.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\JsArray.cs" />

@@ -83,7 +83,7 @@ tidytree.TreeLayout = function (){
     this.Nodes = null;
     this.Distance = null;
     this.Tree = null;
-    this.Nodes = new Dictionary();
+    this.Nodes = new Map();
 };
 tidytree.TreeLayout.prototype.ToTreeLayoutNode = function (node){
     var node2 = {
@@ -101,7 +101,7 @@ tidytree.TreeLayout.prototype.ToTreeLayoutNode = function (node){
     node2.Children.forEach($CreateAnonymousDelegate(this, function (t){
         t.Parent = node2;
     }));
-    this.Nodes.add(node, node2);
+    this.Nodes.set(node, node2);
     return node2;
 };
 tidytree.TreeLayout.prototype.GetNode = function (node){
@@ -127,22 +127,22 @@ tidytree.TreeLayout.prototype.PerformLayout = function (){
     this.NormalizeCoordinates();
 };
 tidytree.TreeLayout.prototype.GetNodeCoordinates = function (){
-    var dict = new Dictionary();
-    if (this.Nodes == null || this.Nodes.count == 0)
+    var dict = new Map();
+    if (this.Nodes == null || this.Nodes.size == 0)
         return dict;
-    for (var $i4 = 0,$t4 = this.Nodes.values(),$l4 = $t4.length,node = $t4[$i4]; $i4 < $l4; $i4++, node = $t4[$i4]){
+    for (var $i4 = 0,$t4 = Array.fromIterator(this.Nodes.values()),$l4 = $t4.length,node = $t4[$i4]; $i4 < $l4; $i4++, node = $t4[$i4]){
         var p = {
             X: node.X,
             Y: node.Y
         };
-        dict.add(node.Source, p);
+        dict.set(node.Source, p);
     }
     return dict;
 };
 tidytree.TreeLayout.prototype.GetBounds = function (){
     var xmin,xmax,ymin,ymax;
     xmin = xmax = ymin = ymax = 0;
-    var list = this.Nodes.values().toArray();
+    var list = Array.fromIterator(this.Nodes.values());
     for (var i = 0; i != list.length; ++i){
         var x = list[i].X,y = list[i].Y;
         if (xmin > x)
@@ -162,7 +162,7 @@ tidytree.TreeLayout.prototype.GetBounds = function (){
     };
 };
 tidytree.TreeLayout.prototype.NormalizeCoordinates = function (){
-    var list = this.Nodes.values().toArray();
+    var list = Array.fromIterator(this.Nodes.values());
     var xmin = 0,ymin = 0;
     for (var i = 0; i != list.length; ++i){
         if (xmin > list[i].X)

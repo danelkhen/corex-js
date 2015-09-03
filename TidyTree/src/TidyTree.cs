@@ -1,5 +1,4 @@
-﻿using CorexJs;
-using SharpKit.JavaScript;
+﻿using SharpKit.JavaScript;
 
 namespace tidytree
 {
@@ -19,7 +18,7 @@ namespace tidytree
             update(node);
             return layout.GetBounds();
         }
-        JsDictionary<TreeNode, Point> Map;
+        JsMap<TreeNode, Point> Map;
 
         void update(TreeNode node2)
         {

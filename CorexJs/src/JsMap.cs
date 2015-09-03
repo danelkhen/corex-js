@@ -13,6 +13,15 @@ namespace SharpKit.JavaScript
         public void forEach(JsAction<T, K> cb) { }
         ///Returns a specified element from a map.
         public T get(K key) { return default(T); }
+        public T this[K key]
+        {
+            [JsMethod(Name = "get")]
+            get
+            { return default(T); }
+            [JsMethod(Name = "set")]
+            set
+            { }
+        }
         ///Returns true if the map contains a specified element.
         public bool has(K key) { return false; }
         ///Adds a new element to a map.
@@ -21,5 +30,7 @@ namespace SharpKit.JavaScript
         public JsString toString() { return null; }
         ///Returns the primitive value of the specified object.
         public object valueOf() { return null; }
+
+        public IJsIterator<T> values() { return null; }
     }
 }
