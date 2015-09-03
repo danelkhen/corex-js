@@ -2109,7 +2109,7 @@
 
 })();
 
-if (typeof (Dictionary) == "undefined") {
+(function () {
     function Dictionary() {
         this._obj = new Object();
         this.count = 0;
@@ -2140,5 +2140,4 @@ if (typeof (Dictionary) == "undefined") {
         return Object.values(this._obj);
     };
     Function.addTo(window, [Dictionary]);
-
-}
+})();

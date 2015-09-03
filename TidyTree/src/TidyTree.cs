@@ -4,9 +4,9 @@ using SharpKit.JavaScript;
 namespace tidytree
 {
     [JsType(JsMode.Prototype)]
-    class TidyTree
+    public class TidyTree
     {
-        public void layout(TreeNode node, JsNumber distance = null)
+        public Rectangle layout(TreeNode node, JsNumber distance = null)
         {
             node.Verify();
             var layout = new TreeLayout
@@ -17,6 +17,7 @@ namespace tidytree
             layout.PerformLayout();
             Map = layout.GetNodeCoordinates();
             update(node);
+            return layout.GetBounds();
         }
         JsDictionary<TreeNode, Point> Map;
 

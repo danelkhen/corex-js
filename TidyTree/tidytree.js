@@ -70,6 +70,7 @@ tidytree.TidyTree.prototype.layout = function (node, distance){
     layout.PerformLayout();
     this.Map = layout.GetNodeCoordinates();
     this.update(node);
+    return layout.GetBounds();
 };
 tidytree.TidyTree.prototype.update = function (node2){
     node2.Position = this.Map.get(node2);
