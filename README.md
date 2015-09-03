@@ -246,11 +246,21 @@ Corex UI - jQuery object extensions
 $.create(selector)
 
 // gets or appends a child element according to a selector
-.getAppend(selector, options)
+.getAppend(selector, [options])
 
 // gets a total number of children elements according to a selector, creating and appending new ones if needed, as well as removing if there are more than the total.
-.getAppendRemove(selector, total)
+.getAppendRemove(selector, total, [options])
     
 // will get/append a child element for every item in the supplied list, and invoke action(el, obj) on each element/object pair
-.getAppendRemoveForEach(selector, list, action)
+.getAppendRemoveForEach(selector, list, action, [options])
 ```
+
+options
+    total
+    list
+    action
+    storeDataItem
+    removeRemaining
+    create
+    destroy
+

@@ -49,6 +49,8 @@ function jQueryHelper() {
         var action = null;
         var storeDataItem = false;
         var removeRemaining = false;
+        var create;
+        var destroy;
         if (options != null) {
             if (options.total != null)
                 total = options.total;
@@ -60,6 +62,8 @@ function jQueryHelper() {
             action = options.action;
             storeDataItem = options.storeDataItem;
             removeRemaining = options.removeRemaining;
+            create = options.create;
+            destroy = options.destroy;
         }
         if (total == null)
             total = 1;
@@ -86,7 +90,7 @@ function jQueryHelper() {
             var selectorNode = selectorNodes[0];
             while (index < total) {
                 var dataItem = list != null ? list[index] : null;
-                var child = createElementFromSelectorNode(selectorNode);
+                var child = create ? create(dataItem, index) : createElementFromSelectorNode(selectorNode);
                 var childEl = child[0];
                 parentEl.append(childEl);
                 childEls.push(childEl);
@@ -100,6 +104,8 @@ function jQueryHelper() {
         if (removeRemaining) {
             while (childEls.length > total) {
                 var parentEl = childEls.pop();
+                if(destroy)
+                    destroy(parentEl);
                 $(parentEl).remove();
             }
         }
