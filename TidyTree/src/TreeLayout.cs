@@ -1,4 +1,5 @@
-﻿using SharpKit.Html;
+﻿using CorexJs;
+using SharpKit.Html;
 using SharpKit.JavaScript;
 
 namespace tidytree
@@ -26,7 +27,7 @@ namespace tidytree
             node2.Ancestor = node2;
             node2.Children = node.Children.select(ToTreeLayoutNode);
             node2.Children.forEach(t => t.Parent = node2);
-            Nodes.Add(node, node2);
+            Nodes.add(node, node2);
             return node2;
         }
 
@@ -40,7 +41,7 @@ namespace tidytree
         {
             if (Distance == null)
                 Distance = 10;
-            Nodes.Clear();
+            Nodes.clear();
             Tree2 = ToTreeLayoutNode(Tree);
             var treeNodes = Tree2.IterateNodesBreadth();
             var parents = treeNodes.where(x => x.Children.length > 0);
@@ -65,12 +66,12 @@ namespace tidytree
         public JsDictionary<TreeNode, Point> GetNodeCoordinates()
         {
             var dict = new JsDictionary<TreeNode, Point>();
-            if (Nodes == null || Nodes.Count == 0)
+            if (Nodes == null || Nodes.count == 0)
                 return dict;
-            foreach (var node in Nodes.Values)
+            foreach (var node in Nodes.values())
             {
                 var p = new Point { X = node.X, Y = node.Y };
-                dict.Add(node.Source, p);
+                dict.add(node.Source, p);
             }
             return dict;
         }
@@ -82,7 +83,7 @@ namespace tidytree
         public Rectangle GetBounds()
         {
             float xmin, xmax, ymin, ymax; xmin = xmax = ymin = ymax = 0;
-            var list = Nodes.Values.toArray();
+            var list = Nodes.values().toArray();
             for (int i = 0; i != list.length; ++i)
             {
                 float x = list[i].X, y = list[i].Y;
@@ -99,7 +100,7 @@ namespace tidytree
         /// </summary>
         void NormalizeCoordinates()
         {
-            var list = Nodes.Values.toArray();
+            var list = Nodes.values().toArray();
             float xmin = 0, ymin = 0;
             for (int i = 0; i != list.length; ++i)
             {

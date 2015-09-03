@@ -2109,4 +2109,36 @@
 
 })();
 
+if (typeof (Dictionary) == "undefined") {
+    function Dictionary() {
+        this._obj = new Object();
+        this.count = 0;
+        this.keyGen = Object.getHashKey;
+    };
+    Dictionary.prototype.clear = function () {
+        this._obj = new Object();
+        this.count = 0;
+    };
+    Dictionary.prototype.add = function (key, value) {
+        var k = this.keyGen(key);
+        if (this._obj.hasOwnProperty(k))
+            throw new Error();
+        this._obj[k] = value;
+        this.count++;
+    };
+    Dictionary.prototype.get = function (key) {
+        var k = this.keyGen(key);
+        if (!this._obj.hasOwnProperty(k))
+            throw new Error();
+        return this._obj[k];
+    };
+    Dictionary.prototype.set = function (key, value) {
+        var k = this.keyGen(key);
+        this._obj[k] = value;
+    };
+    Dictionary.prototype.values = function () {
+        return Object.values(this._obj);
+    };
+    Function.addTo(window, [Dictionary]);
 
+}

@@ -45,62 +45,10 @@ if (typeof($CreateDelegate)=='undefined'){
 
 if (typeof(tidytree) == "undefined")
     var tidytree = {};
-tidytree.JsDictionary = function (){
-    this.KeyGen = null;
-    this.Obj = null;
-    this.Count = 0;
-    this.Obj = new Object();
-    this.Count = 0;
-    this.KeyGen = $CreateAnonymousDelegate(this, function (k){
-        return tidytree.Extensions.GetHashKey(k);
-    });
-};
-tidytree.JsDictionary.prototype.Clear = function (){
-    this.Obj = new Object();
-    this.Count = 0;
-};
-tidytree.JsDictionary.prototype.Add = function (key, value){
-    var k = this.KeyGen(key);
-    if (this.Obj.hasOwnProperty(k))
-        throw new Error();
-    this.Obj[k] = value;
-    this.Count++;
-};
-tidytree.JsDictionary.prototype.get_Item = function (key){
-    var k = this.KeyGen(key);
-    if (!this.Obj.hasOwnProperty(k))
-        throw new Error();
-    return this.Obj[k];
-};
-tidytree.JsDictionary.prototype.get_Values = function (){
-    return Object.values(this.Obj);
-};
 tidytree.Extensions = function (){
 };
 tidytree.Extensions._hashKeyPrefix = "hashkey\0";
 tidytree.Extensions._hashKeyIndex = 0;
-tidytree.Extensions._hashKeyPrefix = "hashkey\0";
-tidytree.Extensions._hashKeyIndex = 0;
-tidytree.Extensions.GetHashKey = function (obj2){
-    var obj = obj2;
-    if (obj == undefined)
-        return "undefined";
-    if (obj == null)
-        return "null";
-    if (obj.valueOf)
-        obj = obj.valueOf();
-    var type = typeof(obj);
-    if (type == "string")
-        return obj.As();
-    if (type == "object" || type == "function"){
-        if (obj._hashKey == null){
-            obj._hashKey = tidytree.Extensions._hashKeyPrefix + tidytree.Extensions._hashKeyIndex;
-            tidytree.Extensions._hashKeyIndex++;
-        }
-        return obj._hashKey;
-    }
-    return obj.toString();
-};
 tidytree.Extensions.Aggregate = function (source, seed, func){
     var tAccumulate = seed;
     for (var $i2 = 0,$l2 = source.length,current = source[$i2]; $i2 < $l2; $i2++, current = source[$i2]){
@@ -124,7 +72,7 @@ tidytree.TidyTree.prototype.layout = function (node, distance){
     this.update(node);
 };
 tidytree.TidyTree.prototype.update = function (node2){
-    node2.Position = this.Map.get_Item(node2);
+    node2.Position = this.Map.get(node2);
     if (node2.Children != null)
         node2.Children.forEach($CreateDelegate(this, this.update));
 };
@@ -133,7 +81,7 @@ tidytree.TreeLayout = function (){
     this.Nodes = null;
     this.Distance = null;
     this.Tree = null;
-    this.Nodes = new tidytree.JsDictionary();
+    this.Nodes = new Dictionary();
 };
 tidytree.TreeLayout.prototype.ToTreeLayoutNode = function (node){
     var node2 = {
@@ -151,16 +99,16 @@ tidytree.TreeLayout.prototype.ToTreeLayoutNode = function (node){
     node2.Children.forEach($CreateAnonymousDelegate(this, function (t){
         t.Parent = node2;
     }));
-    this.Nodes.Add(node, node2);
+    this.Nodes.add(node, node2);
     return node2;
 };
 tidytree.TreeLayout.prototype.GetNode = function (node){
-    return this.Nodes.get_Item(node);
+    return this.Nodes.get(node);
 };
 tidytree.TreeLayout.prototype.PerformLayout = function (){
     if (this.Distance == null)
         this.Distance = 10;
-    this.Nodes.Clear();
+    this.Nodes.clear();
     this.Tree2 = this.ToTreeLayoutNode(this.Tree);
     var treeNodes = tidytree.LayoutTreeNodeExtensions.IterateNodesBreadth(this.Tree2);
     var parents = treeNodes.where($CreateAnonymousDelegate(this, function (x){
@@ -171,28 +119,28 @@ tidytree.TreeLayout.prototype.PerformLayout = function (){
             tidytree.LayoutTreeNodeExtensions.GetChild(treeNode, i).Number = i;
         }
     }
-    var r = this.Nodes.get_Item(this.Tree);
+    var r = this.Nodes.get(this.Tree);
     this.FirstWalk(r);
     this.SecondWalk(r, -r.Prelim);
     this.NormalizeCoordinates();
 };
 tidytree.TreeLayout.prototype.GetNodeCoordinates = function (){
-    var dict = new tidytree.JsDictionary();
-    if (this.Nodes == null || this.Nodes.Count == 0)
+    var dict = new Dictionary();
+    if (this.Nodes == null || this.Nodes.count == 0)
         return dict;
-    for (var $i4 = 0,$t4 = this.Nodes.get_Values(),$l4 = $t4.length,node = $t4[$i4]; $i4 < $l4; $i4++, node = $t4[$i4]){
+    for (var $i4 = 0,$t4 = this.Nodes.values(),$l4 = $t4.length,node = $t4[$i4]; $i4 < $l4; $i4++, node = $t4[$i4]){
         var p = {
             X: node.X,
             Y: node.Y
         };
-        dict.Add(node.Source, p);
+        dict.add(node.Source, p);
     }
     return dict;
 };
 tidytree.TreeLayout.prototype.GetBounds = function (){
     var xmin,xmax,ymin,ymax;
     xmin = xmax = ymin = ymax = 0;
-    var list = this.Nodes.get_Values().toArray();
+    var list = this.Nodes.values().toArray();
     for (var i = 0; i != list.length; ++i){
         var x = list[i].X,y = list[i].Y;
         if (xmin > x)
@@ -212,7 +160,7 @@ tidytree.TreeLayout.prototype.GetBounds = function (){
     };
 };
 tidytree.TreeLayout.prototype.NormalizeCoordinates = function (){
-    var list = this.Nodes.get_Values().toArray();
+    var list = this.Nodes.values().toArray();
     var xmin = 0,ymin = 0;
     for (var i = 0; i != list.length; ++i){
         if (xmin > list[i].X)
@@ -260,7 +208,7 @@ tidytree.TreeLayout.prototype.SecondWalk = function (v, m){
     v.Y = tidytree.LayoutTreeNodeExtensions.GetBranchLevel(this.Tree2, v) * this.Distance;
     var symbExprNode = v.Source;
     for (var $i5 = 0,$t5 = symbExprNode.Children,$l5 = $t5.length,s = $t5[$i5]; $i5 < $l5; $i5++, s = $t5[$i5]){
-        this.SecondWalk(this.Nodes.get_Item(s), m + v.Mod);
+        this.SecondWalk(this.Nodes.get(s), m + v.Mod);
     }
 };
 tidytree.TreeLayout.prototype.Apportion = function (v, defaultAncestor){
