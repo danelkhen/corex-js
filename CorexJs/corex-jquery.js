@@ -83,7 +83,7 @@ function jQueryHelper() {
                 var child = $(childEls[i]);
                 var dataItem = list[i];
                 if (storeDataItem)
-                    child.data("DataItem", dataItem);
+                    child.dataItem(dataItem);
                 if (action != null)
                     action(child, dataItem, index);
             }
@@ -100,7 +100,7 @@ function jQueryHelper() {
                 parentEl.append(childEl);
                 childEls.push(childEl);
                 if (storeDataItem)
-                    child.data("DataItem", dataItem);
+                    child.dataItem(dataItem);
                 if (action != null)
                     action(child, dataItem, index);
                 index++;
@@ -149,6 +149,12 @@ jQuery.fn.bindChildrenToList = function (selector, list, action, options) {
     options.storeDataItem = true;
     options.removeRemaining = true;
     return jQueryHelper.getOrAppendChildBySelector(this, selector, options);
+}
+
+jQuery.fn.dataItem = function (value) {
+    if(arguments.length>0)
+        return this.data("DataItem", value);
+    return this.data("DataItem");
 }
 
 //Turns a jquery object to an array of single jquery objects
