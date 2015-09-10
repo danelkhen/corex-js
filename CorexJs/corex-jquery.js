@@ -38,7 +38,7 @@ function jQueryHelper() {
 
         var classes = node.whereEq("type", "CLASS").select(function (t) { return t.value.substr(1); });
         if (classes.length > 0) {
-            if(isSvg)
+            if (isSvg)
                 el.attr("class", classes.join(" "));
             else
                 el.addClass(classes.join(" "));
@@ -152,7 +152,7 @@ jQuery.fn.bindChildrenToList = function (selector, list, action, options) {
 }
 
 jQuery.fn.dataItem = function (value) {
-    if(arguments.length>0)
+    if (arguments.length > 0)
         return this.data("DataItem", value);
     return this.data("DataItem");
 }
@@ -170,9 +170,10 @@ jQuery.fromArray$ = function (list) {
     return $(list.selectMany(function (j) { return j.toArray(); }));
 }
 
-(function () {
+function jQueryHelper2() {
     var _jQuery_fn_find = jQuery.fn.find;
-    Function.addTo(jQuery.fn, [zip, generator, find]);
+    var _jQuery_fn_children = jQuery.fn.children;
+    Function.addTo(jQuery.fn, [zip, generator, find, forEach, forEach$, children, offOn]);
     var _zippedFunctions = [ofDataItem, existing, added, removed, changed, unchanged];
 
     function zip(list1, opts) {
@@ -228,7 +229,11 @@ jQuery.fromArray$ = function (list) {
         var newMappings = existing.concat(added);
         var els = newMappings.select("el");
         var q = $(els);
+
         q._zip = { added, removed, existing, changed, unchanged, mappings };
+        q._originalSelector = this._originalSelector;
+        q._generator = this._generator;
+
         Function.addTo(q, _zippedFunctions);
         return q;
     }
@@ -258,7 +263,12 @@ jQuery.fromArray$ = function (list) {
 
     function find(selector) {
         var res = _jQuery_fn_find.apply(this, arguments);
-        res.originalSelector = selector;
+        res._originalSelector = selector;
+        return res;
+    }
+    function children(selector) {
+        var res = _jQuery_fn_children.apply(this, arguments);
+        res._originalSelector = selector;
         return res;
     }
 
@@ -274,13 +284,25 @@ jQuery.fromArray$ = function (list) {
             return this;
         }
         if (this._generator === undefined) {
-            var selector = this.originalSelector;
-            if(selector==null)
+            var selector = this._originalSelector;
+            if (selector == null)
                 throw new Error("Can't resolve selector for this jQuery object", this);
             this._generator = function () { return $.create(selector); };
         }
         return this._generator;
-
     }
 
-})();
+    function forEach(action) {
+        this.toArray().forEach(action);
+        return this;
+    }
+    function forEach$(action) {
+        this.toArray$().forEach(action);
+        return this;
+    }
+    function offOn(events, handler ) {
+        return this.off(events).on(events, handler);
+    }
+
+};
+jQueryHelper2();
