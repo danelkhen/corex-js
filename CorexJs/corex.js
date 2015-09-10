@@ -1251,10 +1251,18 @@
             ctx.failed = true;
             return;
         }
-        var value = Q.parseInt(token);
-        if (value == null) {
-            ctx.failed = true;
-            return;
+        var value;
+        if (part == "MMM") {
+            value = Date._monthNamesAbbr.indexOf(token);
+            if (value >= 0)
+                value++;
+        }
+        else {
+            var value = Q.parseInt(token);
+            if (value == null) {
+                ctx.failed = true;
+                return;
+            }
         }
         ctx.date = setter.call(ctx.date, value);
         ctx.format = ctx.format.replaceAt(index, part.length, "".padRight(part.length));
@@ -1277,6 +1285,7 @@
         var ctx = { date: date, s: s, format: format };
         Date._parsePart(ctx, "yyyy", date.year);
         Date._parsePart(ctx, "yy", date.year);
+        Date._parsePart(ctx, "MMM", date.month);
         Date._parsePart(ctx, "MM", date.month);
         Date._parsePart(ctx, "dd", date.day);
         Date._parsePart(ctx, "HH", date.hour);
