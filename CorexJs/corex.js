@@ -760,7 +760,7 @@
         return Array.forEachTwice(this, list, action);
     }
     Array.prototype.selectWith = function (list, func) {
-        return Array.selectTwice(this, list, action);
+        return Array.selectTwice(this, list, func);
     }
 
     //Produces a cartesian product of two lists, if no selector(x1, y1) is defined, will return an array of pairs [[x1,y1],[x1,y2],[x1,y3]...]

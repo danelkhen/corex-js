@@ -169,3 +169,118 @@ jQuery.fn.toArray$ = function (action) {
 jQuery.fromArray$ = function (list) {
     return $(list.selectMany(function (j) { return j.toArray(); }));
 }
+
+(function () {
+    var _jQuery_fn_find = jQuery.fn.find;
+    Function.addTo(jQuery.fn, [zip, generator, find]);
+    var _zippedFunctions = [ofDataItem, existing, added, removed, changed, unchanged];
+
+    function zip(list1, opts) {
+        var list2 = this.toArray();
+
+        var mappings = list1.selectWith(list2, function (obj, el, index) { return { obj: obj, el: el, index: index, prevObj: el == null ? null : $(el).dataItem() }; });
+        var byValue = opts != null && opts.byValue;
+        if (byValue) {
+            var mappings2 = mappings.select(function (mapping, i) {
+                if (mapping.obj == mapping.prevObj)
+                    return mapping;
+                var existing = mappings.firstEq("prevObj", mapping.obj);
+                if (existing == null)
+                    return mapping;
+                else
+                    return { obj: mapping.obj, el: existing.el, index: mapping.index, prevObj: existing.prevObj };
+            });
+            mappings = mappings2;
+        }
+
+        var added = [];
+        var removed = [];
+        var existing = [];
+        var changed = [];
+        var unchanged = [];
+        var selector = this.originalSelector;
+        var prevObject = this.prevObject;
+        var generator = this.generator();
+        mappings.forEach(function (mapping) {
+            if (mapping.el == null) {
+                mapping.el = generator(mapping.obj)[0];
+                added.push(mapping);
+                return;
+            }
+            if (mapping.obj == null) {
+                removed.push(mapping);
+                return;
+            }
+            if (mapping.prevObj != mapping.obj)
+                changed.push(mapping);
+            else
+                unchanged.push(mapping);
+            existing.push(mapping);
+        });
+
+        removed.forEach(function (mapping) { $(mapping.el).remove(); })
+
+        changed.forEach(function (mapping) { $(mapping.el).dataItem(mapping.obj); });
+        added.forEach(function (mapping) { $(mapping.el).dataItem(mapping.obj); });
+
+        added.forEach(function (mapping) { prevObject.append(mapping.el); })
+
+        var newMappings = existing.concat(added);
+        var els = newMappings.select("el");
+        var q = $(els);
+        q._zip = { added, removed, existing, changed, unchanged, mappings };
+        Function.addTo(q, _zippedFunctions);
+        return q;
+    }
+
+    function ofDataItem(obj) {
+        var mapping = _zip.mappings.firstEq("obj", obj);
+        if (mapping == null)
+            return null;
+        return $(mapping.el);
+    }
+
+    function existing() {
+        return $(this._zip.existing.select("el"));
+    }
+    function added() {
+        return $(this._zip.added.select("el"));
+    }
+    function removed() {
+        return $(this._zip.removed.select("el"));
+    }
+    function changed() {
+        return $(this._zip.changed.select("el"));
+    }
+    function unchanged() {
+        return $(this._zip.unchanged.select("el"));
+    }
+
+    function find(selector) {
+        var res = _jQuery_fn_find.apply(this, arguments);
+        res.originalSelector = selector;
+        return res;
+    }
+
+    function generator(funcOrSelector) {
+        if (arguments.length > 0) {
+            if (typeof (funcOrSelector) == "string") {
+                var selector = funcOrSelector;
+                this._generator = function () { return $.create(selector); };
+            }
+            else {
+                this._generator = funcOrSelector;
+            }
+            return this;
+        }
+        if (this._generator === undefined) {
+            var selector = this.originalSelector;
+            if(selector==null)
+                throw new Error("Can't resolve selector for this jQuery object", this);
+            this._generator = function () { return $.create(selector); };
+        }
+        return this._generator;
+
+    }
+
+})();
