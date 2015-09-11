@@ -173,26 +173,40 @@ jQuery.fromArray$ = function (list) {
 function jQueryHelper2() {
     var _jQuery_fn_find = jQuery.fn.find;
     var _jQuery_fn_children = jQuery.fn.children;
-    Function.addTo(jQuery.fn, [zip, generator, find, forEach, forEach$, children, offOn]);
+    Function.addTo(jQuery.fn, [zip, generator, find, forEach, forEach$, children, offOn, adder, remover]);
     var _zippedFunctions = [ofDataItem, existing, added, removed, changed, unchanged];
 
+    function byIndexToByValue(mappings) {
+        var mappings2 = mappings.select(function (mapping, i) {
+            if (mapping.obj == mapping.prevObj)
+                return mapping;
+            var existing = mappings.firstEq("prevObj", mapping.obj);
+            if (existing == null)
+                return mapping;
+            else
+                return { obj: mapping.obj, el: existing.el, index: mapping.index, prevObj: existing.prevObj };
+        });
+        return mappings2;
+    }
+    function adder(func) {
+        if(arguments.length==0)
+            return this._adder;
+        this._adder = func;
+        return this;
+    }
+    function remover(func) {
+        if(arguments.length==0)
+            return this._remover;
+        this._remover = func;
+        return this;
+    }
     function zip(list1, opts) {
         var list2 = this.toArray();
 
         var mappings = list1.selectWith(list2, function (obj, el, index) { return { obj: obj, el: el, index: index, prevObj: el == null ? null : $(el).dataItem() }; });
-        var byValue = opts != null && opts.byValue;
-        if (byValue) {
-            var mappings2 = mappings.select(function (mapping, i) {
-                if (mapping.obj == mapping.prevObj)
-                    return mapping;
-                var existing = mappings.firstEq("prevObj", mapping.obj);
-                if (existing == null)
-                    return mapping;
-                else
-                    return { obj: mapping.obj, el: existing.el, index: mapping.index, prevObj: existing.prevObj };
-            });
-            mappings = mappings2;
-        }
+        var byValue = opts != null && opts.joinBy == "value";
+        if (byValue)
+            mappings = byIndexToByValue(mappings);
 
         var added = [];
         var removed = [];
@@ -202,6 +216,14 @@ function jQueryHelper2() {
         var selector = this.originalSelector;
         var prevObject = this.prevObject;
         var generator = this.generator();
+
+
+        var autoAdd = opts == null || !opts.autoAdd;
+        var autoRemove = opts == null || !opts.autoRemove;
+        var adder = this._adder || function (el) { prevObject.append(el); };
+        var remover = this._remover || function (el) { el.remove(); };
+
+
         mappings.forEach(function (mapping) {
             if (mapping.el == null) {
                 mapping.el = generator(mapping.obj)[0];
@@ -219,22 +241,27 @@ function jQueryHelper2() {
             existing.push(mapping);
         });
 
-        removed.forEach(function (mapping) { $(mapping.el).remove(); })
 
         changed.forEach(function (mapping) { $(mapping.el).dataItem(mapping.obj); });
         added.forEach(function (mapping) { $(mapping.el).dataItem(mapping.obj); });
 
-        added.forEach(function (mapping) { prevObject.append(mapping.el); })
+        if (autoRemove)
+            removed.forEach(function (mapping) { remover(mapping.el); })
+
+        if (autoAdd)
+            added.forEach(function (mapping) { adder(mapping.el); })
 
         var newMappings = existing.concat(added);
         var els = newMappings.select("el");
-        var q = $(els);
-
+        
+        var q = this.pushStack(els);
         q._zip = { added, removed, existing, changed, unchanged, mappings };
         q._originalSelector = this._originalSelector;
         q._generator = this._generator;
-
+        q._adder = this._adder;
+        q._remover = this._remover;
         Function.addTo(q, _zippedFunctions);
+
         return q;
     }
 
@@ -242,23 +269,23 @@ function jQueryHelper2() {
         var mapping = _zip.mappings.firstEq("obj", obj);
         if (mapping == null)
             return null;
-        return $(mapping.el);
+        return this.pushStack([mapping.el]);
     }
 
     function existing() {
-        return $(this._zip.existing.select("el"));
+        return this.pushStack(this._zip.existing.select("el"));
     }
     function added() {
-        return $(this._zip.added.select("el"));
+        return this.pushStack(this._zip.added.select("el"));
     }
     function removed() {
-        return $(this._zip.removed.select("el"));
+        return this.pushStack(this._zip.removed.select("el"));
     }
     function changed() {
-        return $(this._zip.changed.select("el"));
+        return this.pushStack(this._zip.changed.select("el"));
     }
     function unchanged() {
-        return $(this._zip.unchanged.select("el"));
+        return this.pushStack(this._zip.unchanged.select("el"));
     }
 
     function find(selector) {
@@ -300,7 +327,7 @@ function jQueryHelper2() {
         this.toArray$().forEach(action);
         return this;
     }
-    function offOn(events, handler ) {
+    function offOn(events, handler) {
         return this.off(events).on(events, handler);
     }
 
