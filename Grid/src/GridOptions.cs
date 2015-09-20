@@ -6,6 +6,7 @@ namespace corexjs.ui.grid
     [JsType(JsMode.Json)]
     public class GridCol
     {
+        internal GridCol SourceCol { get; set; }
         public JsString Name { get; set; }
         public GridCol Def { get; set; }
         public JsArray<GridCol> Defs { get; set; }

@@ -102,6 +102,7 @@ corexjs.ui.grid.Grid.prototype.Render = function (){
 };
 corexjs.ui.grid.Grid.prototype.FinalizeCol = function (col){
     var final = Q.copy(col);
+    final.SourceCol = col;
     var defs =  [];
     if (col.Def != null)
         defs.push(col.Def);
@@ -182,7 +183,7 @@ corexjs.ui.grid.Grid.prototype.Search = function (){
     this.RenderTimer.set(100);
 };
 corexjs.ui.grid.Grid.prototype.OrderBy = function (col){
-    if (this.OrderByCol != col){
+    if (this.OrderByCol == null || this.OrderByCol.SourceCol == col.SourceCol){
         this.OrderByColClickCount = 1;
         this.OrderByCol = col;
         this.Options.OrderByDesc = false;

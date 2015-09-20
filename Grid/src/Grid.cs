@@ -90,6 +90,7 @@ namespace corexjs.ui.grid
         GridCol<T> FinalizeCol(GridCol<T> col)
         {
             var final = Q.copy(col);
+            final.SourceCol = col;
             var defs = new JsArray<GridCol>();
             if (col.Def != null)
                 defs.push(col.Def);
@@ -176,7 +177,7 @@ namespace corexjs.ui.grid
 
         void OrderBy(GridCol<T> col)
         {
-            if (OrderByCol != col)
+            if (OrderByCol == null || OrderByCol.SourceCol == col.SourceCol)
             {
                 OrderByColClickCount = 1;
                 OrderByCol = col;
