@@ -53,6 +53,7 @@ corexjs.ui.grid.Grid = function (){
     this.RenderTimer = null;
     this.TotalPages = null;
     this.OrderByColClickCount = null;
+    this.Cols = null;
     this.DataRows = null;
     this.VisibleColumns = null;
     this.HeaderRows = null;
@@ -71,6 +72,7 @@ corexjs.ui.grid.Grid = function (el, opts){
     this.RenderTimer = null;
     this.TotalPages = null;
     this.OrderByColClickCount = null;
+    this.Cols = null;
     this.DataRows = null;
     this.VisibleColumns = null;
     this.HeaderRows = null;
@@ -98,6 +100,20 @@ corexjs.ui.grid.Grid.prototype.Render = function (){
     if (this.Options.RenderFinished != null)
         this.Options.RenderFinished();
 };
+corexjs.ui.grid.Grid.prototype.FinalizeCol = function (col){
+    var final = Q.copy(col);
+    var defs =  [];
+    if (col.Def != null)
+        defs.push(col.Def);
+    if (col.Defs != null)
+        defs.addRange(col.Defs);
+    if (defs.length == 0)
+        return final;
+    defs.forEach($CreateAnonymousDelegate(this, function (def){
+        Q.copy(this.FinalizeCol(def), final);
+    }));
+    return final;
+};
 corexjs.ui.grid.Grid.prototype.Verify = function (){
     if (this.Options.Columns == null)
         this.Options.Columns =  [];
@@ -107,7 +123,8 @@ corexjs.ui.grid.Grid.prototype.Verify = function (){
         this.Options.PageSize = 20;
     if (this.Options.Items == null)
         this.Options.Items =  [];
-    this.Options.Columns.forEach($CreateAnonymousDelegate(this, function (col){
+    this.Cols = this.Options.Columns.select($CreateDelegate(this, this.FinalizeCol));
+    this.Cols.forEach($CreateAnonymousDelegate(this, function (col){
         if (col.Name == null && col.Prop != null)
             col.Name = corexjs.Utils.ItemProp$1(this.Options.Items, col.Prop);
         if (col.Getter == null && col.Prop != null)
@@ -152,7 +169,7 @@ corexjs.ui.grid.Grid.prototype.ApplyQuery = function (){
         return;
     var tokens = this.Options.Query.toLowerCase().split(" ");
     this.CurrentList = this.CurrentList.where($CreateAnonymousDelegate(this, function (obj){
-        var line = this.Options.Columns.select($CreateAnonymousDelegate(this, function (col){
+        var line = this.Cols.select($CreateAnonymousDelegate(this, function (col){
             return col.Getter(obj);
         })).join(" ").toLocaleLowerCase();
         var match = tokens.all($CreateAnonymousDelegate(this, function (token){
@@ -189,7 +206,7 @@ corexjs.ui.grid.Grid.prototype.RenderTable = function (){
     var thead = this.Table.getAppend("thead");
     var tbody = this.Table.getAppend("tbody");
     var tfoot = this.Table.getAppendRemove("tfoot", this.Options.FooterItem != null ? 1 : 0);
-    this.VisibleColumns = this.Options.Columns.where($CreateAnonymousDelegate(this, function (t){
+    this.VisibleColumns = this.Cols.where($CreateAnonymousDelegate(this, function (t){
         return t.Visible == true;
     }));
     this.HeaderRows = thead.getAppend("tr").bindChildrenToList("th", this.VisibleColumns, $CreateAnonymousDelegate(this, function (th, col){

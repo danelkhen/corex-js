@@ -3,25 +3,35 @@ using SharpKit.jQuery;
 
 namespace corexjs.ui.grid
 {
-
     [JsType(JsMode.Json)]
-    public class GridCol<T>
+    public class GridCol
     {
         public JsString Name { get; set; }
-        public JsNativeFunc<T, object> Prop { get; set; }
+        public GridCol Def { get; set; }
+        public JsArray<GridCol> Defs { get; set; }
+        public JsNativeFunc<object, object> Prop { get; set; }
         public JsString Title { get; set; }
-        public JsFunc<T, object> Getter { get; set; }
-        public JsFunc<T, T, JsNumber> Comparer { get; set; }
+        public JsFunc<object, object> Getter { get; set; }
+        public JsFunc<object, object, JsNumber> Comparer { get; set; }
         public JsBoolean Visible { get; set; }
         public JsFunc<object, JsString> Format { get; set; }
         public JsFunc<object, JsString> ClassFunc { get; set; }
         public JsString Class { get; set; }
         public JsNumber Width { get; set; }
-//        public CssStyleDeclaration Css { get; set; }
+        public JsAction<GridCol, object, jQuery> RenderCell { get; set; }
+        public JsAction<GridCol, jQuery> RenderHeaderCell { get; set; }
+    }
 
-        public JsAction<GridCol<T>, T, jQuery> RenderCell  { get; set; }
+    [JsType(JsMode.Json)]
+    public class GridCol<T> : GridCol
+    {
+        public new JsNativeFunc<T, object> Prop { get; set; }
+        public new JsFunc<T, object> Getter { get; set; }
+        public new JsFunc<T, T, JsNumber> Comparer { get; set; }
 
-        public JsAction<GridCol<T>, jQuery> RenderHeaderCell { get; set; }
+        public new JsAction<GridCol<T>, T, jQuery> RenderCell  { get; set; }
+
+        public new JsAction<GridCol<T>, jQuery> RenderHeaderCell { get; set; }
     }
     [JsType(JsMode.Json)]
     public class GridCol<T, V> : GridCol<T>

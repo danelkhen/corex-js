@@ -85,6 +85,21 @@ namespace corexjs.ui.grid
                 Options.RenderFinished();
         }
 
+        JsArray<GridCol<T>> Cols;
+
+        GridCol<T> FinalizeCol(GridCol<T> col)
+        {
+            var final = Q.copy(col);
+            var defs = new JsArray<GridCol>();
+            if (col.Def != null)
+                defs.push(col.Def);
+            if (col.Defs != null)
+                defs.addRange(col.Defs);
+            if (defs.length == 0)
+                return final;
+            defs.forEach(def => Q.copy(FinalizeCol(def.As<GridCol<T>>()), final));
+            return final;
+        }
         void Verify()
         {
             if (Options.Columns == null)
@@ -96,7 +111,8 @@ namespace corexjs.ui.grid
             if (Options.Items == null)
                 Options.Items = new JsArray<T>();
 
-            Options.Columns.forEach(col =>
+            Cols = Options.Columns.select(FinalizeCol);
+            Cols.forEach(col =>
             {
                 if (col.Name == null && col.Prop != null)
                     col.Name = Options.Items.ItemProp(col.Prop);
@@ -148,7 +164,7 @@ namespace corexjs.ui.grid
             var tokens = Options.Query.toLowerCase().split(' ');
             CurrentList = CurrentList.where(obj =>
             {
-                var line = Options.Columns.select(col => col.Getter(obj)).join(" ").toLocaleLowerCase();
+                var line = Cols.select(col => col.Getter(obj)).join(" ").toLocaleLowerCase();
                 var match = tokens.all(token => line.contains(token));
                 return match;
             });
@@ -196,7 +212,7 @@ namespace corexjs.ui.grid
             var tbody = Table.getAppend("tbody");
             var tfoot = Table.getAppendRemove("tfoot", Options.FooterItem != null ? 1 : 0);
 
-            VisibleColumns = Options.Columns.where(t => t.Visible == true);
+            VisibleColumns = Cols.where(t => t.Visible == true);
             HeaderRows = thead.getAppend("tr").bindChildrenToList("th", VisibleColumns, (th, col) =>
             {
                 RenderHeaderCell(col, th);
