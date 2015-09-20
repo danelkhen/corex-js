@@ -48,6 +48,14 @@ namespace corexjs
         {
             throw new NotImplementedException();
         }
+        public JsDateEx addYears(int p)
+        {
+            throw new NotImplementedException();
+        }
+        public JsDateEx addMonths(int p)
+        {
+            throw new NotImplementedException();
+        }
 
         public bool equals(JsDateEx x)
         {

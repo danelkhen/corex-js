@@ -281,7 +281,7 @@ corexjs.ui.grid.Grid.prototype.RenderHeaderCell = function (col, th){
     var classes =  [];
     if (col.Class != null)
         classes.push(col.Class);
-    if (col == this.OrderByCol){
+    if (this.OrderByCol != null && this.OrderByCol.SourceCol == col.SourceCol){
         classes.push("OrderBy");
         if (!this.Options.OrderByDesc)
             classes.push("Asc");

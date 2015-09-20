@@ -301,7 +301,7 @@ namespace corexjs.ui.grid
             var classes = new JsArray<JsString>();
             if (col.Class != null)
                 classes.push(col.Class);
-            if (col == OrderByCol)
+            if (OrderByCol!=null && OrderByCol.SourceCol == col.SourceCol)
             {
                 classes.push("OrderBy");
                 if (!Options.OrderByDesc)

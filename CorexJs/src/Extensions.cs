@@ -52,6 +52,10 @@ namespace SharpKit.JavaScript
         public static JsNumber round(this JsNumber x, double precision) { return null; }
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static JsString removeDoubleWhitespace(this JsString s) { return null; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static JsString padLeft(this JsString s, JsNumber totalWidth, JsString paddingChar) { return null; }
+        [JsMethod(ExtensionImplementedInInstance = true)]
+        public static JsString padLeft(this JsString s, JsNumber totalWidth) { return null; }
 
         [JsMethod(ExtensionImplementedInInstance = true)]
         public static void mapAsyncParallel<T, R>(this JsArray<T> list, JsAction<T, JsAction<R>> action, JsAction<JsArray<R>> finalCallback) { }
