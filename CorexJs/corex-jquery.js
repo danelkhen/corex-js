@@ -170,6 +170,11 @@ jQuery.fromArray$ = function (list) {
     return $(list.selectMany(function (j) { return j.toArray(); }));
 }
 
+// $.when(promises) with a list of actions instead of dynamic params
+jQuery.whenAll = function (list) {
+    jQuery.when.apply(jQuery, list);
+}
+
 function jQueryHelper2() {
     var _jQuery_fn_find = jQuery.fn.find;
     var _jQuery_fn_children = jQuery.fn.children;
