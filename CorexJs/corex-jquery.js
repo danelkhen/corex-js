@@ -172,7 +172,7 @@ jQuery.fromArray$ = function (list) {
 
 // $.when(promises) with a list of actions instead of dynamic params
 jQuery.whenAll = function (list) {
-    jQuery.when.apply(jQuery, list);
+    return jQuery.when.apply(jQuery, list);
 }
 
 function jQueryHelper2() {
