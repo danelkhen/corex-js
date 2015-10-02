@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>RFOpedia</title>
+</head>
+<body>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+    <script type="text/javascript" src="../libs/corex/corex.js"></script>
+    <script type="text/javascript" src="../libs/corex/amp.js"></script>
+    <script src="test.js"></script>
+    <script>
+        $(main);
+    </script>
+
+    <div style="display:none" id="templates">
+        <myform>
+            <label>name:</label><input value="{t.name}" onchange="{t.name=e.target.value}" />
+            <button onclick="{alert(t.name)}">ccc</button>
+        </myform>
+    </div>
+
+</body>
+</html>

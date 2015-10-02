@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>RFOpedia</title>
+</head>
+<body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.js"></script>
+
+    <script src="/CorexJs/corex.js"></script>
+    <script src="/CorexJs/corex-jquery.js"></script>
+    <script src="../amp.js"></script>
+    <script src="test.js"></script>
+    <script>
+        $(main);
+    </script>
+
+    <div style="display:none" id="templates">
+        <myform onready="{console.log(e)}">
+            <!--<label>name:</label><input value="{t.name}" oninput="{t.name=e.target.value}{$('#name').text(t.name)}" />
+            <label id="name" class="name"></label>-->
+            <div>{["a","b"].select(t=>$.create('input').datepicker()[0])}</div>
+            <div>{$(el).children("input").zip(t)}</div>
+            <input each="{t}" />
+            <div>{$(el).getAppend("hr", {total:10})}</div>
+            <input onready="{$(e.target).datepicker()}" />
+            <!--<button>ccc</button>-->
+        </myform>
+    </div>
+
+</body>
+</html>

@@ -2,5 +2,6 @@
 *.ide
 *.suo
 *.user
+/packages/
 bin
 obj
