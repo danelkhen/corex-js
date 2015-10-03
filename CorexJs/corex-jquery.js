@@ -223,8 +223,8 @@ function jQueryHelper2() {
         var generator = this.generator();
 
 
-        var autoAdd = opts == null || !opts.autoAdd;
-        var autoRemove = opts == null || !opts.autoRemove;
+        var autoAdd = opts == null || opts.autoAdd || prevObject!=null;
+        var autoRemove = opts == null || opts.autoRemove || true;
         var adder = this._adder || function (el) { prevObject.append(el); };
         var remover = this._remover || function (el) { el.remove(); };
 

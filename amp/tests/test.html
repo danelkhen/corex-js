@@ -21,17 +21,11 @@
     </script>
 
     <div style="display:none" id="templates">
-        <myform onready="{console.log(e)}">
-            <!--<label>name:</label><input value="{t.name}" oninput="{t.name=e.target.value}{$('#name').text(t.name)}" />
-            <label id="name" class="name"></label>-->
-            <div>{["a","b"].select(t=>$.create('input').datepicker()[0])}</div>
-            <div>{$(el).children("input").zip(t)}</div>
-            <input each="{t}" />
-            <div>{$(el).getAppend("hr", {total:10})}</div>
-            <input onready="{$(e.target).datepicker()}" />
-            <!--<button>ccc</button>-->
+        <myform>
+            <div each="{t}"><input value="{t.name}" /></div>
         </myform>
     </div>
 
+    <div></div>
 </body>
 </html>

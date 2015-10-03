@@ -8,7 +8,7 @@ function Amp(_config) {
     var _compiler = new AmpExpressionCompiler(_this);
     var _builder = new AmpBuilder(_this);
 
-    Function.addTo(_this, [getTemplates, loadTemplates, processHash, monitorHash, mount, getTemplateEl]);
+    Function.addTo(_this, [getTemplates, loadTemplates, processHash, monitorHash, mount, getTemplateEl, ]);
     Object.defineProperties(_this, {
         _templates: { get: function () { return _templates; } },
         _compiler: { get: function () { return _compiler; } },
@@ -60,7 +60,7 @@ function AmpBuilder(_amp) {
     if (this == window || this == null)
         return new AmpBuilder();
     var _this = this;
-    Function.addTo(_this, [build, create]);
+    Function.addTo(_this, [build, create, update]);
 
     var _attributeProcessors = {
         "amp-tag": processAtt_ampTag,
@@ -95,7 +95,15 @@ function AmpBuilder(_amp) {
         ctx.el = el;
         //var ctx = { tmplEl: tmplEl, el: el };
         var res = process(ctx);
+        $(ctx.el).data("ctx", ctx);
         //triggerReady(ctx.el);
+        return ctx.el;
+    }
+    function update(el, ctx) {
+        if (ctx == null)
+            ctx = $(el).data("ctx");
+        ctx.__isUpdate = true;
+        process(ctx);
         return ctx.el;
     }
 
@@ -186,6 +194,12 @@ function AmpBuilder(_amp) {
         return null;
     }
 
+    function replaceTag(el, newTagName) {
+        var div = document.createElement("DIV");
+        Array.from(el.attributes).forEach(function (att) { div.setAttribute(att.name, att.value); });
+        Array.from(el.childNodes).forEach(function (ch) { div.appendChild(ch); });
+        return div;
+    }
 
     // attribute value handler can return: null, "skipNextAttributesAndChildren"
     // generates element according to amp-tag, returns undef if no tags exist, null or element if exists as result
@@ -199,23 +213,27 @@ function AmpBuilder(_amp) {
             return null;
         ctx.el.removeAttribute("amp-tag");
         var tmplEl2 = getTemplateEl(ampTag);
-        var el2 = $(tmplEl2).clone()[0];
-        var div = document.createElement("DIV");
-        Array.from(el2.attributes).forEach(function (att) { div.setAttribute(att.name, att.value); });
-        Array.from(el2.childNodes).forEach(function (ch) { div.appendChild(ch); });
-        el2 = div;
 
-        ctx.el = el2;
+        var el2;
+        if (ctx.__isUpdate) {
+            el2 = ctx.el;
+        }
+        else {
+            el2 = $(tmplEl2).clone()[0];
+            el2 = replaceTag(el2, "div");
+            ctx.el = el2;
+        }
         var res = processNextAttributes(ctx, att, atts);
         if (res == "skipNextAttributesAndChildren")
             return res;
 
-        $(el).replaceWith(el2);
+        if (!ctx.__isUpdate)
+            $(el).replaceWith(el2);
+
         var ctx2 = shallowCopy(ctx);
         ctx2.rootEl = el2;
         ctx2.el = el2;
         ctx2.tmplEl = tmplEl2;
-
 
         var res2 = processAttributes(ctx2);
         ctx.el = ctx2.el;
@@ -266,11 +284,24 @@ function AmpBuilder(_amp) {
         if (list == null)
             list = [];
 
-        var itemTmpl = el; //assuming the el is a clone of tmplEl
-        itemTmpl.removeAttribute("each");
-        ctx.itemTmpl = itemTmpl;
-        ctx.el = null;
-        var itemEls = list.select(function (obj, i) {
+        var itemTmpl = $(tmplEl).data("itemTmpl");
+        if (itemTmpl == null) {
+            itemTmpl = $(tmplEl).clone().removeAttr("each")[0]; // using tmplEl.clone().removeAttr('each') as template, and tmplEl in ctx to retrace created elements
+            ctx.itemTmpl = tmplEl;
+            $(tmplEl).data("itemTmpl", itemTmpl);
+        }
+        var itemEls = [];
+        if (ctx.__isUpdate) {
+            itemEls = $(el).parent().children().toArray().where(function (ch) {
+                var ctx = $(ch).data("ctx");
+                if (ctx == null)
+                    return false;
+                if (ctx.tmplEl == itemTmpl)
+                    return true;
+                return false;
+            });
+        }
+        var itemEls2 = $(itemEls).generator(function (obj) {
             var itemEl = $(itemTmpl).clone()[0];
             var ctx2 = shallowCopy(ctx);
             ctx2.el = itemEl;
@@ -278,10 +309,32 @@ function AmpBuilder(_amp) {
             ctx2.parent = ctx;
             ctx2.t = obj;
             process(ctx2);
-            return ctx2.el;
-        });
-        $(el).replaceWith(itemEls);
-        ctx.itemEls = itemEls;
+            return $(ctx2.el).data("ctx", ctx2);
+            //return ctx2.el;
+        }).zip(list, { autoAdd: false });
+
+        ctx.el = null;
+        //itemEls = list.select(function (obj, i) {
+        //    var itemEl = $(tmplEl).clone().removeAttr("each")[0];
+        //    var ctx2 = shallowCopy(ctx);
+        //    ctx2.el = itemEl;
+        //    ctx2.tmplEl = tmplEl;
+        //    ctx2.parent = ctx;
+        //    ctx2.t = obj;
+        //    process(ctx2);
+        //    $(ctx2.el).data("ctx", ctx2);
+        //    return ctx2.el;
+        //});
+
+        if (ctx.__isUpdate) {
+            //itemEls2.added().forEach(function(ch){
+                
+            //});
+            $(el).parent().append(itemEls2);//.replaceWith(itemEls2);
+        }
+        else
+            $(el).replaceWith(itemEls2);
+        ctx.itemEls = itemEls2.toArray();
         //$(el).parent().append($(itemEls));
         return "skipNextAttributesAndChildren";
     }
