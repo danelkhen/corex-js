@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="tests\test1\test.txt" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -78,6 +79,8 @@
     <Content Include="amp.js" />
     <Content Include="tests\test.html" />
     <Content Include="tests\test.js" />
+    <Content Include="tests\test1\test.html" />
+    <Content Include="tests\test1\test.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

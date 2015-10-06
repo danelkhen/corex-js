@@ -1,0 +1,8 @@
+﻿div()
+    invisible()
+        label ( {text: prm.name } )
+        input( { css: { backgroundColor: "red" } } )
+    invisible()
+        label ( {text: prm.name } )
+        input( { css: { backgroundColor: "red" } } )
+
