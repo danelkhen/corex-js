@@ -19,7 +19,7 @@
     }
 
     function isValidIdentifier(s) {
-        return /[a-zA-Z_]+[a-zA-Z0-9]*/.test(s);
+        return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
     }
     function compileWithContext(expr, ctx) {
         //TODO: verify all keys are legit vars
@@ -38,20 +38,42 @@
     function generate(_nodes) {
         var tabSize = "    ";
 
-        function processNodes(nodes, tab) {
+        function processNodes(nodes, tab, parent) {
             if (nodes.length == 0) {
                 return "[]";
             }
             //return "t => [\n"+tab + nodes.select(function(node){return tab+process(node, tab+tabSize)+",\n"+tab;}).join("") + "]";
-            return "[\n" + tab + tabSize + nodes.select(function (node) { return tab + process(node, tab + tabSize); }).join(",\n") + "\n" + tab + tabSize + "]";
+            return "[\n" + tab + tabSize + nodes.select(function (node) { return tab + process(node, tab + tabSize, parent); }).join(",\n") + "\n" + tab + tabSize + "]";
         }
-        function processNode(node, tab) {
-            return "t => " + node.text;
+        function isFunction(s) {
+            return s.startsWith("function(") || s.startsWith("function ");
         }
-        function process(node, tab) {
-            return "{func:" + processNode(node, tab) + ", childNodes:" + processNodes(node.children, tab) + "}";
+        function isArrowFunction(s) {
+            return s.contains("=>"); //TODO: implement
         }
-        var s = processNodes(_nodes, tabSize);
+        function process(node, tab, parent) {
+            if (node.argNames === undefined) {
+                node.argNames = Function.parseArrowFunctionArgNames(node.text);
+                if (node.argNames == null)
+                    node.argNames = Function.parseArgNames(node.text);
+                if (node.argNames != null)
+                    node.isFunction = true;
+            }
+            if (!node.isFunction && parent != null && parent.argNames != null)
+                node.argNames = parent.argNames;
+
+            var x;
+            if (node.isFunction)
+                x = node.text;
+            else if (node.argNames != null)
+                x = "("+node.argNames.join(", ")+") => "+node.text;
+            else 
+                x = "() => " + node.text;
+
+            var s = "{func:" + x + ", childNodes:" + processNodes(node.children, tab, node) + "}";
+            return s;
+        }
+        var s = processNodes(_nodes, tabSize, null);
         return s;
     }
 
@@ -114,3 +136,45 @@
 
     }
 }
+
+(function () {
+    var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
+    var FN_ARG_SPLIT = /,/;
+    var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+    var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    Function.parseArgNames = function (s) {
+        var list = [];
+        fnText = s.toString().replace(STRIP_COMMENTS, '');
+        argDecl = fnText.match(FN_ARGS);
+        if (argDecl == null)
+            return null;
+        argDecl[1].split(FN_ARG_SPLIT).forEach(function (arg) {
+            arg.replace(FN_ARG, function (all, underscore, name) {
+                list.push(name);
+            });
+        });
+        return list;
+    }
+    function isValidIdentifier(s) {
+        return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
+    }
+
+    Function.parseArrowFunctionArgNames = function (s) {
+        var index = s.indexOf("=>");
+        if (index <= 0)
+            return null;
+        var sub = s.substr(0, index).trim();
+        if (sub.startsWith("(") && sub.endsWith(")")) {
+            var sub2 = sub.substr(1, sub.length - 2).trim();
+            if (sub2 == "")
+                return [];
+            var tokens = sub2.split(',').selectInvoke("trim");
+            if (tokens.all(isValidIdentifier))
+                return tokens;
+            return null;
+        }
+        if (isValidIdentifier(sub))
+            return [sub];
+        return null;
+    }
+})();
