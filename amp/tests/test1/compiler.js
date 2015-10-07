@@ -6,6 +6,9 @@
         var lines = markup.lines();
         var nodes = parse(lines);
         var code = generate(nodes);
+        console.log(markup);
+        console.log(code);
+
         var func = compileWithContext(code, ctx);
         var compiledNodes = func(ctx);
         return compiledNodes;

@@ -6,3 +6,4 @@
         repeater(t.phones)
             div()
                 input ( { val: t.number } )
+                a( { attr: { href: "http://"+t.number+".com" , text:"hello"} } )
