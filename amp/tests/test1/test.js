@@ -7,12 +7,13 @@ function create(selector, opts) {
             el = el[key](opts[key]);
         });
     }
-    var base = el.append;
-    el.append = function (children) {
-        children.forEach(function (t) { return base(t); });
-        return this;
+    return {
+        set:function(children){
+            var list = children.selectInvoke();
+            el.append(list);
+            return el[0];
+        }
     }
-    return el;
 }
 function input(opts) {
     return create("input", opts);
@@ -43,9 +44,9 @@ function main() {
 
         var x = parse(lines);
         console.log(x);
-        var y = x.select(generate);
-        console.log(y);
-        var func = y.select(compile)[0];
+        //var y = x.select(generate);
+        //console.log(y);
+        var func = x.select(compile)[0];
         console.log(func);
         var res = func({ name: "shooki" });
         console.log(res);
@@ -53,18 +54,22 @@ function main() {
     });
 }
 
-function compile(s) {
-    var func = new Function("prm", "var res = " + s + ";\nreturn res;");
+function compileExp(s) {
+    var func = new Function("t","return "+s+";");
     return func;
 }
-function generate(node) {
-    var sb = [];
-    function process(node) {
-        sb.push(node.text);
-        sb.push(".append([" + node.children.select(generate).join(",") + "])");
-    }
-    process(node);
-    return sb.join("");
+function compile(node) {
+    node.compiled = compileExp(node.text);
+    node.children.forEach(compile);
+    return function () {
+        runCompiled(node);
+    };
+}
+
+function runCompiled(node){
+    var res = node.compiled();
+    var res2 = res.set(node.children.select("compiled"));
+    return res2;
 }
 
 function parse(_lines) {
@@ -116,6 +121,21 @@ function(){
 
 function invisible(){
   return { append: function(children){return children;} };
+}
+
+
+function compile(s) {
+    var func = new Function("prm", "var res = " + s + ";\nreturn res;");
+    return func;
+}
+function generate(node) {
+    var sb = [];
+    function process(node) {
+        sb.push(node.text);
+        sb.push(".append([" + node.children.select(generate).join(",") + "])");
+    }
+    process(node);
+    return sb.join("");
 }
 
 */

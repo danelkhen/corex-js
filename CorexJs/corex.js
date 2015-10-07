@@ -594,6 +594,8 @@
         return this.map(func);
     }
     Array.prototype.selectInvoke = function (name) {
+        if(arguments.length==0)
+            return this.map(function (t) { return t(); });
         return this.map(function (t) { return t[name](); });
     }
     Array.prototype.joinWith = function (list2, keySelector1, keySelector2, resultSelector) {
