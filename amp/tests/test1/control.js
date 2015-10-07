@@ -3,6 +3,7 @@
     Function.addTo(_this, [create, input, label, div, invisible, repeater]);
 
     function create(selector, opts) {
+        console.log("creating: ", selector, opts);
         var el = $.create(selector);
         if (opts) {
             Object.keys(opts).forEach(function (key) {
@@ -10,11 +11,12 @@
             });
         }
         var el2 = el[0];
-        return {
-            setChildren: function (children) {
-                return HierarchyUtils.setChildren(el2, children);
-            }
-        }
+        return el2;
+        //return {
+        //    setChildren: function (children) {
+        //        return HierarchyUtils.setChildren(el2, children);
+        //    }
+        //}
     }
     function input(opts) {
         return create("input", opts);
@@ -26,11 +28,12 @@
         return create("div", opts);
     }
     function invisible(opts) {
-        return {
-            setChildren: function (children) {
-                return children;
-            }
-        };
+        return null;
+        //return {
+        //    setChildren: function (children) {
+        //        return children;
+        //    }
+        //};
     }
     function repeater(list, opts) {
         return {

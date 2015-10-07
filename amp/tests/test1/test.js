@@ -9,26 +9,35 @@ function main() {
 }
 function main3() {
     var markup = _res;
-    var compiler = new HierarchyCompiler();
+    var processor = createProcessor(markup);
 
-    var ctx = new HierarchyControl();
-    var nodes = compiler.build(markup, ctx);
-    
-    var processor = new HierarchyProcessor({nodes:nodes, cache:true, el:document.body}).process;
-    
     var data = [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }];
-    processor(data);
-
+    var els = processor(data);
+    HierarchyUtils.setChildren($("body")[0], els);
     $("input").css({ backgroundColor: "pink" });
+
     window.setTimeout(function () {
-        processor(data);
+        var els = processor(data);
+        HierarchyUtils.setChildren($("body")[0], els);
         window.setTimeout(function () {
             var data = [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }];
-            processor(data);
-            console.log(document.body.innerHTML);
+            var els = processor(data);
+            HierarchyUtils.setChildren($("body")[0], els);
         }, 1000);
     }, 1000);
 }
+
+function createProcessor(markup, ctx) {
+    var compiler = new HierarchyCompiler();
+    if(ctx==null)
+        ctx = new HierarchyControl();
+
+    var nodes = compiler.build(markup, ctx);
+
+    var processor = new HierarchyProcessor({ nodes: nodes, cache: true,  });
+    return processor.process;
+}
+
 
 /*
 hello(world)

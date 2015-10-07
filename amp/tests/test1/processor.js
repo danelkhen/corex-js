@@ -31,7 +31,10 @@ function HierarchyProcessor(_opts) {
         _nodes = _opts.nodes;
         _cache = _opts.cache;
         _rootEl = _opts.rootEl;
-        _root = { func: function (t) { return existing(document.body); }, childNodes: _nodes };
+        if (_rootEl != null)
+            _root = { func: function (t) { return existing(_rootEl); }, childNodes: _nodes };
+        else
+            _root = { func: function (t) { return { setChildren: function (children) { return children; } } }, childNodes: _nodes };
         if (_cache)
             addCaching(_root);
     }
@@ -99,6 +102,10 @@ function HierarchyProcessor(_opts) {
         else if (parent.setChildren) {
             var children = processChildNodes(node, data);
             res = parent.setChildren(children);
+        }
+        else {
+            var children = processChildNodes(node, data);
+            res = HierarchyUtils.setChildren(parent, children);
         }
         return res;
     }
