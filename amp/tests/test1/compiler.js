@@ -5,6 +5,8 @@
     function build(markup, ctx) {
         var lines = markup.lines();
         var nodes = parse(lines);
+        nodes = analyze(nodes);
+        console.log(nodes);
         var code = generate(nodes);
         console.log(markup);
         console.log(code);
@@ -34,46 +36,52 @@
         return func;
     }
 
-
-    function generate(_nodes) {
-        var tabSize = "    ";
-
-        function processNodes(nodes, tab, parent) {
-            if (nodes.length == 0) {
-                return "[]";
-            }
-            //return "t => [\n"+tab + nodes.select(function(node){return tab+process(node, tab+tabSize)+",\n"+tab;}).join("") + "]";
-            return "[\n" + tab + tabSize + nodes.select(function (node) { return tab + process(node, tab + tabSize, parent); }).join(",\n") + "\n" + tab + tabSize + "]";
-        }
-        function isFunction(s) {
-            return s.startsWith("function(") || s.startsWith("function ");
-        }
-        function isArrowFunction(s) {
-            return s.contains("=>"); //TODO: implement
-        }
-        function process(node, tab, parent) {
+    function analyze(nodes, parent) {
+        nodes.forEach(function (node) {
             if (node.argNames === undefined) {
                 node.argNames = Function.parseArrowFunctionArgNames(node.text);
                 if (node.argNames == null)
                     node.argNames = Function.parseArgNames(node.text);
                 if (node.argNames != null)
-                    node.isFunction = true;
+                    node.type = "FunctionExpression";
             }
-            if (!node.isFunction && parent != null && parent.argNames != null)
+            if (node.type == null && parent != null && parent.argNames != null) {
                 node.argNames = parent.argNames;
+                node.type = "ScopedExpression"
+            }
+            if (node.type == null)
+                node.type = "Expression";
+            analyze(node.children, node);
+        });
+        return nodes;
+    }
 
+    function generate(_nodes) {
+        var tabSize = "    ";
+        var sb = [];
+        var tab = "";
+
+        function processNode(node) {
             var x;
-            if (node.isFunction)
+            if (node.type == "FunctionExpression")
                 x = node.text;
-            else if (node.argNames != null)
-                x = "("+node.argNames.join(", ")+") => "+node.text;
-            else 
+            else if (node.type == "ScopedExpression")
+                x = "(" + node.argNames.join(", ") + ") => " + node.text;
+            else //Expression
                 x = "() => " + node.text;
 
-            var s = "{func:" + x + ", childNodes:" + processNodes(node.children, tab, node) + "}";
-            return s;
+
+            sb.push("{func:" + x + ", childNodes: [");
+            node.children.forEachJoin(processNode, function(){sb.push(",\n");});
+            sb.push("]}");
         }
-        var s = processNodes(_nodes, tabSize, null);
+        //function processNodes(nodes, tab, parent){
+        //    var children = node.children.select(function (child) { return processNode(child, tab + tabSize, node); });
+        //}
+        sb.push("[");
+        _nodes.forEachJoin(processNode, function(){sb.push(",\n");});
+        sb.push("]");
+        var s = sb.join("");
         return s;
     }
 

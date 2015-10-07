@@ -1,6 +1,6 @@
-﻿contacts=>div()
+﻿contacts => div()
     repeater(contacts)
-        contact=>div()
+        contact => div()
             label ( { text: contact.name } )
             input ( { val: contact.name } )
             repeater(contact.phones)
