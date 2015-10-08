@@ -12,19 +12,19 @@ function main3() {
     var processor = createProcessor(markup);
 
     var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
-    var els = processor(data);
-    HierarchyUtils.setChildren($("body")[0], els);
+    var el = processor(data);
+    $("body")[0].appendChild(el);
     $("input").css({ backgroundColor: "pink" });
-    var els = processor(data);
-    HierarchyUtils.setChildren($("body")[0], els);
+    el = processor(data);
+    $("body")[0].appendChild(el);
 
     window.setTimeout(function () {
-        var els = processor(data);
-        HierarchyUtils.setChildren($("body")[0], els);
+        el = processor(data);
+        $("body")[0].appendChild(el);
         window.setTimeout(function () {
             var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }]};
-            var els = processor(data);
-            HierarchyUtils.setChildren($("body")[0], els);
+            el = processor(data);
+            $("body")[0].appendChild(el);
         }, 1000);
     }, 1000);
 }

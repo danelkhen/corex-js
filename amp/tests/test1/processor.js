@@ -32,11 +32,13 @@ function HierarchyProcessor(_opts) {
         _cache = _opts.cache;
         _rootEl = _opts.rootEl;
         if (_rootEl != null)
-            _root = { func: function (t) { return existing(_rootEl); }, childNodes: _nodes };
+            _root = function(){ return { func: function (t) { return existing(_rootEl); }, childNodes: _nodes }; };
+        else if(_nodes.length==1)
+            _root = _nodes[0];
         else
             _root = { func: function (t) { return { setChildren: function (children) { return children; } } }, childNodes: _nodes };
-        if (_cache)
-            addCaching(_root);
+        //if (_cache)
+        //    addCaching(_root);
     }
 
     function process(data) {
@@ -62,6 +64,8 @@ function HierarchyProcessor(_opts) {
 
 
     function cached1(func) {
+        if(typeof(func)!="function")
+            throw new Error();
         var map = new Map();
         return function (prm) {
             if (map.has(prm))
@@ -73,8 +77,11 @@ function HierarchyProcessor(_opts) {
     }
 
     function addCaching(node) {
+        if(node._cached)
+            return;
         node.func = cached1(node.func);
-        node.childNodes.forEach(addCaching);
+        //node.childNodes.forEach(addCaching);
+        node._cached = true;
     }
 
 
@@ -90,8 +97,17 @@ function HierarchyProcessor(_opts) {
         return childEls;
     }
 
-    function processNode(node, data) {
-        var parent = node.func(data);
+    function processNode(nodeFactory, data) {
+        if(_opts.cache) {
+             if(nodeFactory._cachedBy == null)
+                nodeFactory._cachedBy = cached1(nodeFactory);
+            nodeFactory = nodeFactory._cachedBy;
+        }
+        var node = nodeFactory(data);
+        if(_opts.cache) {
+            addCaching(node);
+        }
+        var parent = node.func();
         var res;
         if (parent == null) {
             res = null;

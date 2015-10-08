@@ -38,8 +38,8 @@
 
     function parseFunctionText(s) {
         var info = FunctionHelper.parseArgsAndBody(node.text);
-        if(info==null){
-        
+        if (info == null) {
+
         }
         if (args == null) {
             args = Function.parseArgNames(node.text);
@@ -52,12 +52,12 @@
         nodes.forEach(function (node) {
             if (node.funcInfo === undefined) {
                 node.funcInfo = FunctionHelper.parseArgsAndBody(node.text);
-                if(node.funcInfo!=null)
+                if (node.funcInfo != null)
                     node.type = "FunctionExpression";
             }
             if (node.type == null && parent != null && parent.funcInfo != null) {
-                node.funcInfo = {argNames:parent.funcInfo.argNames};
-                node.type = "ScopedExpression"
+                //node.funcInfo = { argNames: parent.funcInfo.argNames };
+                node.type = "ScopedExpression";
             }
             if (node.type == null)
                 node.type = "Expression";
@@ -74,18 +74,18 @@
         function processNode(node) {
             var x;
             if (node.type == "FunctionExpression")
-                x = node.text;
+                x = "() => " + node.funcInfo.body;
             else if (node.type == "ScopedExpression")
-                x = "(" + node.funcInfo.argNames.join(", ") + ") => " + node.text;
+                x = "() => " + node.text;
             else //Expression
                 x = "() => " + node.text;
 
-            if (node.type == "FunctionExpression") {
-
-            }
-            sb.push("{func:" + x + ", childNodes: [");
+            var args = node.funcInfo == null ? [] : node.funcInfo.argNames;
+            sb.push("function(" + args.join(", ") + "){\n");
+            sb.push("return {func:" + x + ", childNodes: [");
             node.children.forEachJoin(processNode, function () { sb.push(",\n"); });
-            sb.push("]}");
+            sb.push("]};\n");
+            sb.push("}\n");
         }
         //function processNodes(nodes, tab, parent){
         //    var children = node.children.select(function (child) { return processNode(child, tab + tabSize, node); });
@@ -175,7 +175,7 @@ function FunctionHelper() {
     var FN_ARG_SPLIT = /,/;
     var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
     var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-    function parseArgNames (s) {
+    function parseArgNames(s) {
         var list = [];
         fnText = s.toString().replace(STRIP_COMMENTS, '');
         argDecl = fnText.match(FN_ARGS);
@@ -192,7 +192,7 @@ function FunctionHelper() {
         return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
     }
 
-    function parseArrowFunctionArgNames (s) {
+    function parseArrowFunctionArgNames(s) {
         var index = s.indexOf("=>");
         if (index <= 0)
             return null;
