@@ -11,16 +11,18 @@ function main3() {
     var markup = _res;
     var processor = createProcessor(markup);
 
-    var data = [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }];
+    var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
     var els = processor(data);
     HierarchyUtils.setChildren($("body")[0], els);
     $("input").css({ backgroundColor: "pink" });
+    var els = processor(data);
+    HierarchyUtils.setChildren($("body")[0], els);
 
     window.setTimeout(function () {
         var els = processor(data);
         HierarchyUtils.setChildren($("body")[0], els);
         window.setTimeout(function () {
-            var data = [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }];
+            var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }]};
             var els = processor(data);
             HierarchyUtils.setChildren($("body")[0], els);
         }, 1000);

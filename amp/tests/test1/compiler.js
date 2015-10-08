@@ -36,17 +36,27 @@
         return func;
     }
 
+    function parseFunctionText(s) {
+        var info = FunctionHelper.parseArgsAndBody(node.text);
+        if(info==null){
+        
+        }
+        if (args == null) {
+            args = Function.parseArgNames(node.text);
+        }
+        if (args != null) {
+        }
+
+    }
     function analyze(nodes, parent) {
         nodes.forEach(function (node) {
-            if (node.argNames === undefined) {
-                node.argNames = Function.parseArrowFunctionArgNames(node.text);
-                if (node.argNames == null)
-                    node.argNames = Function.parseArgNames(node.text);
-                if (node.argNames != null)
+            if (node.funcInfo === undefined) {
+                node.funcInfo = FunctionHelper.parseArgsAndBody(node.text);
+                if(node.funcInfo!=null)
                     node.type = "FunctionExpression";
             }
-            if (node.type == null && parent != null && parent.argNames != null) {
-                node.argNames = parent.argNames;
+            if (node.type == null && parent != null && parent.funcInfo != null) {
+                node.funcInfo = {argNames:parent.funcInfo.argNames};
                 node.type = "ScopedExpression"
             }
             if (node.type == null)
@@ -66,20 +76,22 @@
             if (node.type == "FunctionExpression")
                 x = node.text;
             else if (node.type == "ScopedExpression")
-                x = "(" + node.argNames.join(", ") + ") => " + node.text;
+                x = "(" + node.funcInfo.argNames.join(", ") + ") => " + node.text;
             else //Expression
                 x = "() => " + node.text;
 
+            if (node.type == "FunctionExpression") {
 
+            }
             sb.push("{func:" + x + ", childNodes: [");
-            node.children.forEachJoin(processNode, function(){sb.push(",\n");});
+            node.children.forEachJoin(processNode, function () { sb.push(",\n"); });
             sb.push("]}");
         }
         //function processNodes(nodes, tab, parent){
         //    var children = node.children.select(function (child) { return processNode(child, tab + tabSize, node); });
         //}
         sb.push("[");
-        _nodes.forEachJoin(processNode, function(){sb.push(",\n");});
+        _nodes.forEachJoin(processNode, function () { sb.push(",\n"); });
         sb.push("]");
         var s = sb.join("");
         return s;
@@ -145,12 +157,25 @@
     }
 }
 
-(function () {
+function FunctionHelper() {
+    Function.addTo(FunctionHelper, [parseArgsAndBody]);
+    function parseArgsAndBody(s) {
+        var args = parseArrowFunctionArgNames(s);
+        if (args != null) {
+            var body = s.substr(s.indexOf("=>") + 2);
+            return { body: body, argNames: args, type: "ArrowFunction" };
+        }
+        args = parseArgNames(s);
+        if (args == null)
+            return null;
+        var body = s.substr(s.indexOf(")") + 1);
+        return { body: body, argNames: args, type: "ArrowFunction" };
+    }
     var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
     var FN_ARG_SPLIT = /,/;
     var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
     var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-    Function.parseArgNames = function (s) {
+    function parseArgNames (s) {
         var list = [];
         fnText = s.toString().replace(STRIP_COMMENTS, '');
         argDecl = fnText.match(FN_ARGS);
@@ -167,7 +192,7 @@
         return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
     }
 
-    Function.parseArrowFunctionArgNames = function (s) {
+    function parseArrowFunctionArgNames (s) {
         var index = s.indexOf("=>");
         if (index <= 0)
             return null;
@@ -185,4 +210,5 @@
             return [sub];
         return null;
     }
-})();
+}
+FunctionHelper();

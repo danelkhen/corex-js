@@ -92,9 +92,9 @@ function HierarchyProcessor(_opts) {
 
     function processNode(node, data) {
         var parent = node.func(data);
-        var res = parent;
+        var res;
         if (parent == null) {
-            res = processChildNodes(node, data);
+            res = null;
         }
         else if (parent.setTemplate) {
             res = parent.setTemplate(function (t) { return processChildNodes(node, t); });
