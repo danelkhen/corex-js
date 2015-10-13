@@ -1835,7 +1835,10 @@
             }
         }
         else if (type == "function") {
-            sb.push(obj.toString());
+            var s = obj.toString();
+            // if (s.startsWith("function anonymous("))
+            //    s = "function "+s.substr("function anonymous".length);
+            sb.push(s);
         }
         else {
             sb.push(JSON.stringify(obj));

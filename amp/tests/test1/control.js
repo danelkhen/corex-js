@@ -52,7 +52,8 @@
                         }
                         return c;
                     });
-                    var results = cloned.select(child=>child.process());
+                    node.realChildren = cloned;
+                    var results = cloned.select(child=>child.process())
                     //var children = templateFunc(obj);
                     return results;
                 });
