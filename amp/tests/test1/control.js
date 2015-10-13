@@ -32,17 +32,29 @@
     }
     function invisible(opts) {
         return {
-            setChildren: function (children) {
-                return children;
+            processChildren: function (node) {
+                return node.children.selectMany(child=>child.process());
             }
-        }
+        };
     }
+
     function repeater(list, opts) {
+        var map = new Map();
         return {
-            setTemplate: function (templateFunc) {
+            processChildren: function (node) {
                 return list.selectMany(function (obj) {
-                    var children = templateFunc(obj);
-                    return children;
+                    var cloned = node.children.select(child=> {
+                        var c = map.get(obj);
+                        if (c == null) {
+                            c = child.clone();
+                            c.bindPrms(obj);
+                            map.set(obj, c);
+                        }
+                        return c;
+                    });
+                    var results = cloned.select(child=>child.process());
+                    //var children = templateFunc(obj);
+                    return results;
                 });
             }
         };

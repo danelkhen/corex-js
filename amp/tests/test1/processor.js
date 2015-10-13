@@ -20,6 +20,100 @@
     }
 }
 HierarchyUtils();
+$.fn.setChildNodes = function (childNodes) {
+    HierarchyUtils.setChildren(this[0], childNodes);
+    return this;
+}
+Element.prototype.setChildNodes = function(childNodes){
+    HierarchyUtils.setChildren(this, childNodes);
+}
+
+function HNode(_node) {
+    if (this == null || this == window)
+        return new HNode(_node);
+    var _this = this;
+    var _children = _node.children.select(t=>new HNode(t));
+    var _ctx = _node.ctx;
+    var _prms, _lastRes, _lastCtx;
+    var _func = _node.func;
+    if (_node.funcInfo != null)
+        _prms = _node.funcInfo.argNames.toArray();
+    else
+        _prms = [];
+
+    Object.defineProperties(_this, {
+        children: { get: function () { return _children; } },
+        ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
+        prms: { get: function () { return _prms; } },
+    });
+
+    Function.addTo(_this, [process, bindPrms, clone]);
+
+    function clone() {
+        var cloned = new HNode(_node);
+        cloned.ctx = shallowCopy(_ctx);
+        return cloned;
+    }
+
+    function bindPrms() {
+        var values = Array.from(arguments);
+        values.forEach((value, i) => _ctx[_prms[i]] = value);
+    }
+
+    function canReuseLastRes() {
+        if (_lastCtx == null)
+            return false;
+        var lastKeys = Object.keys(_lastCtx);
+        var keys = Object.keys(_ctx);
+        if (lastKeys.length != keys.length)
+            return false;
+        lastKeys = lastKeys.orderBy(t=>t);
+        keys = lastKeys.orderBy(t=>t);
+        if (!lastKeys.itemsEqual(keys))
+            return false;
+        if (!keys.all(key => _lastCtx[key] == _ctx[key]))
+            return false;
+        return true;
+    }
+
+    function invoke() {
+        if (canReuseLastRes())
+            return _lastRes;
+        var res = _func(_ctx);
+        _lastRes = res;
+        _lastCtx = shallowCopy(_ctx);
+        return res;
+    }
+
+    function process() {
+        var res = invoke();
+        _children.forEach(t=>shallowCopy(_ctx, t.ctx));
+        if (res == null)
+            return res;
+        if (res.processChildren) {
+            return res.processChildren(_this);
+        }
+        var childNodes = _children.select(t=>t.process());
+        res.setChildNodes(flattenResults(childNodes));
+        return res;
+    }
+
+    function flattenResults(results) {
+        var list = [];
+        results.forEach(function (res) {
+            if (res instanceof Array)
+                list.addRange(res);
+            else
+                list.add(res);
+        });
+        return list;
+    }
+
+    function shallowCopy(src, dest) {
+        return $.extend(dest || {}, src);
+    }
+
+}
 
 function HierarchyProcessor(_opts) {
     var _this = this;
@@ -28,21 +122,24 @@ function HierarchyProcessor(_opts) {
     main();
     var _nodes, _cache, _rootEl, _root;
     function main() {
-        _nodes = _opts.nodes;
+        _nodes = _opts.nodes.select(HNode);
+        _root = _nodes[0];
         _cache = _opts.cache;
-        _rootEl = _opts.rootEl;
-        if (_rootEl != null)
-            _root = function(){ return { func: function (t) { return existing(_rootEl); }, childNodes: _nodes }; };
-        else if(_nodes.length==1)
-            _root = _nodes[0];
-        else
-            _root = { func: function (t) { return { setChildren: function (children) { return children; } } }, childNodes: _nodes };
-        //if (_cache)
-        //    addCaching(_root);
+        //_rootEl = _opts.rootEl;
+        //if (_rootEl != null)
+        //    _root = function () { return { func: function (t) { return existing(_rootEl); }, childNodes: _nodes }; };
+        //else if (_nodes.length == 1)
+        //    _root = _nodes[0];
+        //else
+        //    _root = { func: function (t) { return { setChildren: function (children) { return children; } } }, childNodes: _nodes };
+        ////if (_cache)
+        ////    addCaching(_root);
     }
 
     function process(data) {
-        return processNode(_root, data);
+        _root.ctx.data = data;
+        return _root.process();
+        //return processNode(_root);
     }
 
 
@@ -64,7 +161,7 @@ function HierarchyProcessor(_opts) {
 
 
     function cached1(func) {
-        if(typeof(func)!="function")
+        if (typeof (func) != "function")
             throw new Error();
         var map = new Map();
         return function (prm) {
@@ -77,7 +174,7 @@ function HierarchyProcessor(_opts) {
     }
 
     function addCaching(node) {
-        if(node._cached)
+        if (node._cached)
             return;
         node.func = cached1(node.func);
         //node.childNodes.forEach(addCaching);
@@ -85,10 +182,10 @@ function HierarchyProcessor(_opts) {
     }
 
 
-    function processChildNodes(node, data) {
+    function processChildNodes(node) {
         var childEls = [];
-        node.childNodes.forEach(function (child) {
-            var ch = processNode(child, data);
+        node.children.forEach(function (child) {
+            var ch = processNode(child);
             if (ch instanceof Array)
                 childEls.addRange(ch);
             else
@@ -97,30 +194,32 @@ function HierarchyProcessor(_opts) {
         return childEls;
     }
 
-    function processNode(nodeFactory, data) {
-        if(_opts.cache) {
-             if(nodeFactory._cachedBy == null)
-                nodeFactory._cachedBy = cached1(nodeFactory);
-            nodeFactory = nodeFactory._cachedBy;
-        }
-        var node = nodeFactory(data);
-        if(_opts.cache) {
+    function processNode(node) {
+        if (_opts.cache) {
             addCaching(node);
         }
-        var parent = node.func();
+        var parent = node.func(node.ctx);
         var res;
         if (parent == null) {
             res = null;
         }
         else if (parent.setTemplate) {
-            res = parent.setTemplate(function (t) { return processChildNodes(node, t); });
+            res = parent.setTemplate(function (t) {
+                node.children.forEach(function (child) {
+                    if (child.funcInfo != null)
+                        child.ctx[child.funcInfo.argNames[0]] = t;
+                });
+                return processChildNodes(node);
+            });
         }
         else if (parent.setChildren) {
-            var children = processChildNodes(node, data);
+            node.children.forEach(t=>t.ctx = node.ctx);
+            var children = processChildNodes(node);
             res = parent.setChildren(children);
         }
         else {
-            var children = processChildNodes(node, data);
+            node.children.forEach(t=>t.ctx = node.ctx);
+            var children = processChildNodes(node);
             res = HierarchyUtils.setChildren(parent, children);
         }
         return res;

@@ -11,32 +11,33 @@ function main3() {
     var markup = _res;
     var processor = createProcessor(markup);
 
-    var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
+    var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
     var el = processor(data);
     $("body")[0].appendChild(el);
     $("input").css({ backgroundColor: "pink" });
-    el = processor(data);
-    $("body")[0].appendChild(el);
+
 
     window.setTimeout(function () {
         el = processor(data);
-        $("body")[0].appendChild(el);
+        $("body").setChildNodes([el]);
+        //el = processor(data);
+        //$("body")[0].appendChild(el);
         window.setTimeout(function () {
             var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }]};
             el = processor(data);
-            $("body")[0].appendChild(el);
+            $("body").setChildNodes([el]);
         }, 1000);
     }, 1000);
 }
 
 function createProcessor(markup, ctx) {
     var compiler = new HierarchyCompiler();
-    if(ctx==null)
+    if (ctx == null)
         ctx = new HierarchyControl();
 
     var nodes = compiler.build(markup, ctx);
 
-    var processor = new HierarchyProcessor({ nodes: nodes, cache: true,  });
+    var processor = new HierarchyProcessor({ nodes: nodes, cache: false, });
     return processor.process;
 }
 

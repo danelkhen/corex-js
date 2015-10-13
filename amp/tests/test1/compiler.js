@@ -80,6 +80,7 @@
     }
 
     function generate(_nodes) {
+        return Q.stringifyFormatted(_nodes);
         var tabSize = "    ";
         var sb = [];
         var tab = "";
