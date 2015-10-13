@@ -1,4 +1,4 @@
-﻿data => div()
+﻿(ctl,data) => div()
     contacts => repeater(data.contacts)
         contact => div()
             label ( { text: contact.name } )

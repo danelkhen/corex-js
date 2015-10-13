@@ -32,9 +32,10 @@ function HNode(_node) {
     if (this == null || this == window)
         return new HNode(_node);
     var _this = this;
-    var _children = _node.children.select(t=>new HNode(t));
+    _this._children = _node.children.select(t=>new HNode(t));
+
     var _ctx = _node.ctx;
-    var _prms, _lastRes, _lastCtx;
+    var _prms, _lastCtx;
     var _func = _node.func;
     if (_node.funcInfo != null)
         _prms = _node.funcInfo.argNames.toArray();
@@ -42,9 +43,11 @@ function HNode(_node) {
         _prms = [];
 
     Object.defineProperties(_this, {
-        children: { get: function () { return _children; } },
+        children: { get: function () { return _this._children; } },
         ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
         prms: { get: function () { return _prms; } },
+        lastRes: { get: function () { return _this._lastRes; } },
+        lastCtx: { get: function () { return _lastCtx; } },
     });
 
     Function.addTo(_this, [process, bindPrms, clone]);
@@ -58,6 +61,7 @@ function HNode(_node) {
     function bindPrms() {
         var values = Array.from(arguments);
         values.forEach((value, i) => _ctx[_prms[i]] = value);
+        return _this;
     }
 
     function canReuseLastRes() {
@@ -78,22 +82,24 @@ function HNode(_node) {
 
     function invoke() {
         if (canReuseLastRes())
-            return _lastRes;
+            return _this._lastRes;
         var res = _func(_ctx);
-        _lastRes = res;
+        _this._lastRes = res;
         _lastCtx = shallowCopy(_ctx);
         return res;
     }
 
     function process() {
         var res = invoke();
-        _children.forEach(t=>shallowCopy(_ctx, t.ctx));
+        _this._children.forEach(t=>shallowCopy(_ctx, t.ctx));
         if (res == null)
             return res;
         if (res.processChildren) {
-            return res.processChildren(_this);
+            var childrenRes = res.processChildren(_this);
+            _this.lastChildrenRes = childrenRes;
+            return childrenRes;
         }
-        var childNodes = _children.select(t=>t.process());
+        var childNodes = _this._children.select(t=>t.process());
         res.setChildNodes(flattenResults(childNodes));
         return res;
     }

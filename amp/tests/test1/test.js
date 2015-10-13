@@ -9,33 +9,38 @@ function main() {
 }
 function main3() {
     var markup = _res;
-    var processor = createProcessor(markup);
+    var node = compile(markup);
+    console.log(node);
 
     var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
-    var el = processor(data);
+    var el = node.bindPrms({}, data).process();
     $("body")[0].appendChild(el);
     $("input").css({ backgroundColor: "pink" });
 
 
-    window.setTimeout(function () {
-        el = processor(data);
-        $("body").setChildNodes([el]);
-        //el = processor(data);
-        //$("body")[0].appendChild(el);
-        window.setTimeout(function () {
-            var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }]};
-            el = processor(data);
-            $("body").setChildNodes([el]);
-        }, 1000);
-    }, 1000);
+    //window.setTimeout(function () {
+    //    el = processor(data);
+    //    $("body").setChildNodes([el]);
+    //    //el = processor(data);
+    //    //$("body")[0].appendChild(el);
+    //    window.setTimeout(function () {
+    //        var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }]};
+    //        el = processor(data);
+    //        $("body").setChildNodes([el]);
+    //    }, 1000);
+    //}, 1000);
 }
 
-function createProcessor(markup, ctx) {
+function compile(markup, globalCtx, ctl) {
     var compiler = new HierarchyCompiler();
-    if (ctx == null)
-        ctx = new HierarchyControl();
+    if (globalCtx == null) {
+        globalCtx = new HierarchyControl();
+    }
+    if(ctl!=null)
+        globalCtx.ctl = ctl;
 
-    var nodes = compiler.build(markup, ctx);
+    var nodes = compiler.build(markup, globalCtx);
+    return new HNode(nodes[0]);
 
     var processor = new HierarchyProcessor({ nodes: nodes, cache: false, });
     return processor.process;

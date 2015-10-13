@@ -2,7 +2,7 @@
     var _this = this;
     Function.addTo(_this, [compile, compileWithContext, generate, parse, build]);
 
-    function build(markup, ctx) {
+    function build(markup, globalCtx) {
         var lines = markup.lines();
         var nodes = parse(lines);
         nodes = analyze(nodes);
@@ -11,8 +11,8 @@
         console.log(markup);
         console.log(code);
 
-        var func = compileWithContext(code, ctx);
-        var compiledNodes = func(ctx);
+        var func = compileWithContext(code, globalCtx);
+        var compiledNodes = func(globalCtx);
         return compiledNodes;
     }
     function compile(ctx, exp) {
