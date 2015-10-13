@@ -23,16 +23,19 @@
     function isValidIdentifier(s) {
         return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
     }
-    function compileWithContext(expr, ctx) {
+    function compileWithContext(expr, ctx, oneWay) {
         //TODO: verify all keys are legit vars
         var keys = Object.keys(ctx).where(isValidIdentifier);
         var code = [];
         if (keys.length > 0)
             code.push("var " + keys.select(function (key) { return key + "=__ctx." + key }).join(",") + ";");
         code.push("var __res = " + expr + ";");
-        code.push(keys.select(function (key) { return "__ctx." + key + "=" + key + ";" }).join("\n"));
+        if(!oneWay)
+            code.push(keys.select(function (key) { return "__ctx." + key + "=" + key + ";" }).join("\n"));
         code.push("return __res;");
-        var func = new Function("__ctx", code.join("\n"));
+        var code2 = code.join("\n");
+        console.log(code2);
+        var func = new Function("__ctx", code2);
         return func;
     }
 
@@ -80,7 +83,8 @@
     }
 
     function generate(_nodes) {
-        return Q.stringifyFormatted(_nodes);
+        var code = Q.stringifyFormatted(_nodes);
+        return code;
         var tabSize = "    ";
         var sb = [];
         var tab = "";
