@@ -18,17 +18,17 @@ function main3() {
     $("input").css({ backgroundColor: "pink" });
 
 
-    //window.setTimeout(function () {
-    //    el = processor(data);
-    //    $("body").setChildNodes([el]);
-    //    //el = processor(data);
-    //    //$("body")[0].appendChild(el);
-    //    window.setTimeout(function () {
-    //        var data = {contacts:[{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }]};
-    //        el = processor(data);
-    //        $("body").setChildNodes([el]);
-    //    }, 1000);
-    //}, 1000);
+    window.setTimeout(function () {
+        el = node.process();
+        $("body").setChildNodes([el]);
+        window.setTimeout(function () {
+            data.contacts.removeAt(0);
+            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+            //var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
+            el = node.process();
+            $("body").setChildNodes([el]);
+        }, 1000);
+    }, 1000);
 }
 
 function compile(markup, globalCtx, ctl) {
@@ -36,7 +36,7 @@ function compile(markup, globalCtx, ctl) {
     if (globalCtx == null) {
         globalCtx = new HierarchyControl();
     }
-    if(ctl!=null)
+    if (ctl != null)
         globalCtx.ctl = ctl;
 
     var nodes = compiler.build(markup, globalCtx);

@@ -46,8 +46,6 @@ function HNode(_node) {
         children: { get: function () { return _this._children; } },
         ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
         prms: { get: function () { return _prms; } },
-        lastRes: { get: function () { return _this._lastRes; } },
-        lastCtx: { get: function () { return _lastCtx; } },
     });
 
     Function.addTo(_this, [process, bindPrms, clone]);
