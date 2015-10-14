@@ -1,4 +1,5 @@
-﻿(ctl, data) => el.verify('div')
+﻿(ctl,data) => el.verify('div')
+    el.external("test2", data.contacts[0].name)
     el.verify('h1').text("contacts")
     el.repeater(data.contacts)
         contact => el.verify('div.contact')

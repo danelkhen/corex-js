@@ -1,23 +1,33 @@
 ﻿"use strict"
 
-var _res;
+var _templates = {};
 function main() {
     $.get("test.txt").done(function (res) {
-        _res = res;
-        window.setTimeout(main3, 0);
+        _templates["test"] = res;
+        $.get("test2.txt").done(function (res) {
+            _templates["test2"] = res;
+            window.setTimeout(main3, 0);
+        });
     });
 }
-function main3() {
-    var markup = _res;
+
+function loadTemplate(name) {
+    var markup = _templates[name];
     var node = compile(markup);
+    return node;
+}
+function main3() {
+
+    var node = loadTemplate("test");
     console.log(node);
 
     var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
     var data = { contacts: [{ name: "shooki" }, { name: "booki" }, { name: "mooki" }] };
-    var el = node.bindPrms({}, data).process();
+    var ctl = {};
+    var el = node.bindPrms(ctl, data).process();
     $("body").append(el);
     $("input").css({ backgroundColor: "pink" });
-
+    $(".ggg").css({ backgroundColor: "red" });
 
     window.setTimeout(function () {
         el = node.process();
