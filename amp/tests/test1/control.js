@@ -12,13 +12,30 @@
         _htmlTags.forEach(function (tag) {
             if (_this[tag] != null)
                 return;
-            var func = create.bind(this, tag);
+            var func = function (el, opts) { return verify(el, tag, opts); };
             var funcName = tag;
             if (funcName == "var")
                 funcName = "var_";
 
             _this[funcName] = func;
         });
+    }
+    function verify(existing, selector, opts) {
+        var el;
+        if (existing != null) {
+            el = $(existing);
+            if (!el.is(selector))
+                el = null;
+        }
+        if (el == null)
+            el = $.create(selector);
+        if (opts) {
+            Object.keys(opts).forEach(function (key) {
+                el = el[key](opts[key]);
+            });
+        }
+        var el2 = el[0];
+        return el2;
     }
     function create(selector, opts) {
         var el = $.create(selector);
@@ -38,25 +55,37 @@
         };
     }
 
-    function repeater(list, opts) {
-        var map = new Map();
+
+    function cloneNodes(nodes) {
+        return nodes.select(t=>t.clone);
+    }
+    function repeater(res, list, opts) {
+        var map = res.__map;
+        if (map == null) {
+            map = new Map();
+        }
         return {
+            __map: map,
             processChildren: function (node) {
-                return list.selectMany(function (obj) {
-                    var cloned = node.children.select(child=> {
-                        var c = map.get(obj);
-                        if (c == null) {
-                            c = child.clone();
-                            c.bindPrms(obj);
-                            map.set(obj, c);
-                        }
-                        return c;
-                    });
-                    node.realChildren = cloned;
-                    var results = cloned.select(child=>child.process())
-                    //var children = templateFunc(obj);
-                    return results;
-                });
+                if (list == null)
+                    list = [];
+
+                var template = function (obj, i) {
+                    var cloned = map.get(obj);
+                    if (cloned == null) {
+                        cloned = node.children.select(t=>t.clone());
+                        cloned.forEach(t=>t.bindPrms(obj));
+                        map.set(obj, cloned);
+                    }
+                    console.log("before: ", cloned.select("ctx").select("res").exceptNulls().select(0));
+                    var x = cloned.selectMany(child=>child.process().toArray());
+                    console.log("after: ", cloned.select("ctx").select("res").select(0));
+                    $(x).addClass("rpt-" + i);
+                    return x;
+                }
+                var res2 = list.selectMany(template);
+                var res3 = $(res2);
+                return res3;
             }
         };
     }

@@ -59,7 +59,7 @@
 
     function analyze(nodes, parent) {
         nodes.forEach(function (node) {
-            node.ctx = parent==null ? {} : Q.copy(parent.ctx);
+            node.ctx = parent==null ? {res:null} : Q.copy(parent.ctx);
             if (node.funcInfo === undefined) {
                 node.funcInfo = FunctionHelper.parseArgsAndBody(node.text);
                 if (node.funcInfo != null) {

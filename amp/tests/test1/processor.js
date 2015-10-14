@@ -21,9 +21,87 @@
 }
 HierarchyUtils();
 $.fn.setChildNodes = function (childNodes) {
+    if (!(childNodes instanceof Array))
+        childNodes = childNodes.toArray();
     HierarchyUtils.setChildren(this[0], childNodes);
     return this;
 }
+$.fn.verify = function (selector) {
+    if (!this.is(selector))
+        return $.create(selector);
+    if (selector == "label")
+        console.log(this[0]);
+    return this;
+}
+
+//$.fn.verify2 = function(list, create) {
+//    var childEls = this.toArray();
+//    var total = null;
+//    var list = null;
+//    var action = null;
+//    var storeDataItem = false;
+//    var removeRemaining = false;
+//    var create;
+//    var destroy;
+//    if (options != null) {
+//        if (options.total != null)
+//            total = options.total;
+//        if (options.list != null) {
+//            list = options.list;
+//            if (total == null)
+//                total = list.length;
+//        }
+//        action = options.action;
+//        storeDataItem = options.storeDataItem;
+//        removeRemaining = options.removeRemaining;
+//        create = options.create;
+//        destroy = options.destroy;
+//    }
+//    if (total == null)
+//        total = 1;
+
+//    var index = childEls.length;
+
+//    if (action != null || storeDataItem) {
+//        var min = Math.min(index, total);
+//        if (list == null)
+//            list = [];
+//        for (var i = 0; i < min; i++) {
+//            var child = $(childEls[i]);
+//            var dataItem = list[i];
+//            if (storeDataItem)
+//                child.dataItem(dataItem);
+//            if (action != null)
+//                action(child, dataItem, index);
+//        }
+//    }
+//    if (index < total) {
+//        var selectorNode = selectorNodes[0];
+//        while (index < total) {
+//            var dataItem = list != null ? list[index] : null;
+//            var child = create(dataItem, index);
+//            var childEl = child[0];
+//            //parentEl.append(childEl);
+//            childEls.push(childEl);
+//            if (storeDataItem)
+//                child.dataItem(dataItem);
+//            if (action != null)
+//                action(child, dataItem, index);
+//            index++;
+//        }
+//    }
+//    if (removeRemaining) {
+//        while (childEls.length > total) {
+//            var parentEl = childEls.pop();
+//            if (destroy)
+//                destroy(parentEl);
+//            $(parentEl).remove();
+//        }
+//    }
+//    return $(childEls);
+//}
+
+
 Node.prototype.setChildNodes = function (childNodes) {
     HierarchyUtils.setChildren(this, childNodes);
 }
@@ -79,26 +157,40 @@ function HNode(_node) {
     }
 
     function invoke() {
-        if (canReuseLastRes())
-            return _this._lastRes;
+        //if (canReuseLastRes())
+        //    return _this._lastRes;
+        if (_lastCtx == null)
+            _ctx.res = $();
+
         var res = _func(_ctx);
         _this._lastRes = res;
+        _ctx.res = res;
         _lastCtx = shallowCopy(_ctx);
         return res;
     }
 
+    function tunnelCtx() {
+        var ctx = shallowCopy(_ctx);
+        delete ctx.res;
+        _this._children.forEach(t=>shallowCopy(ctx, t.ctx));
+    }
     function process() {
+        console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
         var res = invoke();
-        _this._children.forEach(t=>shallowCopy(_ctx, t.ctx));
+        tunnelCtx();
         if (res == null)
             return res;
         if (res.processChildren) {
             var childrenRes = res.processChildren(_this);
+            //_ctx.res = childrenRes;
             _this.lastChildrenRes = childrenRes;
             return childrenRes;
         }
-        var childNodes = _this._children.select(t=>t.process());
-        res.setChildNodes(flattenResults(childNodes));
+        else if (_this._children.length > 0) {
+            var childNodes = _this._children.select(t=>t.process());
+            var childNodes2 = flattenResults(childNodes);
+            res.setChildNodes(childNodes2);
+        }
         return res;
     }
 
@@ -106,7 +198,9 @@ function HNode(_node) {
         var list = [];
         results.forEach(function (res) {
             if (res instanceof Array)
-                list.addRange(res);
+                list.addRange(flattenResults(res));
+            else if (res instanceof jQuery)
+                list.addRange(res.toArray());
             else
                 list.add(res);
         });
@@ -118,6 +212,7 @@ function HNode(_node) {
     }
 
 }
+
 
 //function HierarchyProcessor(_opts) {
 //    var _this = this;

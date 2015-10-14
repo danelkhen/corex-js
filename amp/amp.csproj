@@ -70,6 +70,7 @@
     <Content Include="tests\test1\control.js" />
     <Content Include="tests\test1\processor.js" />
     <Content Include="tests\test1\compiler.js" />
+    <Content Include="tests\test1\test.css" />
     <Content Include="tests\test1\test.txt" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
