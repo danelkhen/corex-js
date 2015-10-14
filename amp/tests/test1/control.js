@@ -60,34 +60,35 @@
         return nodes.select(t=>t.clone);
     }
     function repeater(res, list, opts) {
-        var map = res.__map;
+        var node = res.node;
+        var map = node.__map;
         if (map == null) {
             map = new Map();
+            node.__map = map;
         }
-        return {
-            __map: map,
-            processChildren: function (node) {
-                if (list == null)
-                    list = [];
+        node.childrenProcessed = true;
+        if (list == null)
+            list = [];
 
-                var template = function (obj, i) {
-                    var cloned = map.get(obj);
-                    if (cloned == null) {
-                        cloned = node.children.select(t=>t.clone());
-                        cloned.forEach(t=>t.bindPrms(obj));
-                        map.set(obj, cloned);
-                    }
-                    console.log("before: ", cloned.select("ctx").select("res").exceptNulls().select(0));
-                    var x = cloned.selectMany(child=>child.process().toArray());
-                    console.log("after: ", cloned.select("ctx").select("res").select(0));
-                    $(x).addClass("rpt-" + i);
-                    return x;
-                }
-                var res2 = list.selectMany(template);
-                var res3 = $(res2);
-                return res3;
+        var template = function (obj, i) {
+            var cloned = map.get(obj);
+            if (cloned == null) {
+                cloned = node.children.select(t=>t.clone());
+                cloned.forEach(t=>t.bindPrms(obj));
+                map.set(obj, cloned);
             }
-        };
+            else {
+                console.log("already exists!", cloned);
+            }
+            console.log("before: ", cloned.select("ctx").select("res").exceptNulls().select(0));
+            var x = cloned.selectMany(child=>child.process().toArray());
+            console.log("after: ", cloned.select("ctx").select("res").select(0));
+            $(x).addClass("rpt-" + i);
+            return x;
+        }
+        var res2 = list.selectMany(template);
+        var res3 = $(res2);
+        return res3;
     }
     function changeContext(newContext) {
         return {

@@ -30,7 +30,7 @@ $.fn.verify = function (selector) {
     if (!this.is(selector))
         return $.create(selector);
     if (selector == "label")
-        console.log(this[0]);
+        console.log("already created!", this[0]);
     return this;
 }
 
@@ -112,7 +112,8 @@ function HNode(_node) {
     var _this = this;
     _this._children = _node.children.select(t=>new HNode(t));
     _this._text = _node.text;
-    var _ctx = _node.ctx;
+    var _childrenProcessed;
+    var _ctx = shallowCopy(_node.ctx);
     var _prms, _lastCtx;
     var _func = _node.func;
     if (_node.funcInfo != null)
@@ -124,6 +125,7 @@ function HNode(_node) {
         children: { get: function () { return _this._children; } },
         ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
         prms: { get: function () { return _prms; } },
+        childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
     });
 
     Function.addTo(_this, [process, bindPrms, clone]);
@@ -131,6 +133,8 @@ function HNode(_node) {
     function clone() {
         var cloned = new HNode(_node);
         cloned.ctx = shallowCopy(_ctx);
+        cloned.ctx.res = null;
+        cloned.text += "{clone}";
         return cloned;
     }
 
@@ -156,12 +160,14 @@ function HNode(_node) {
         return true;
     }
 
+
     function invoke() {
         //if (canReuseLastRes())
         //    return _this._lastRes;
-        if (_lastCtx == null)
+        if (_ctx.res == null)//_lastCtx 
             _ctx.res = $();
-
+        _ctx.res.node = _this;
+        _childrenProcessed = false;
         var res = _func(_ctx);
         _this._lastRes = res;
         _ctx.res = res;
@@ -180,8 +186,8 @@ function HNode(_node) {
         tunnelCtx();
         if (res == null)
             return res;
-        if (res.processChildren) {
-            var childrenRes = res.processChildren(_this);
+        if (_childrenProcessed) {
+            var childrenRes = res;//.processChildren(_this);
             //_ctx.res = childrenRes;
             _this.lastChildrenRes = childrenRes;
             return childrenRes;
