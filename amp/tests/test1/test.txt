@@ -2,5 +2,6 @@
     el.verify('h1').text("contacts")
     el.repeater(data.contacts)
         contact => el.verify('div.contact')
-            el.verify("label").text(contact.name)
-            el.verify("input").val(contact.name)
+            el.columnar()
+                el.verify("label").text(contact.name)
+                el.verify("input").val(contact.name)

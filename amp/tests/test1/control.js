@@ -1,6 +1,6 @@
 ﻿function HierarchyControl() {
     var _this = this;
-    Function.addTo(_this, [create, invisible, repeater, changeContext]);
+    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar]);
 
     var _htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "legend", "li", "link", "main", "map", "mark", "menu", "menuitem", "meta", "meter", "nav", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"];
     //["!--...--","!DOCTYPE ",
@@ -88,6 +88,19 @@
         var res3 = $(res2);
         return res3;
     }
+
+    function columnar(el) {
+        var node = el.node;
+        node.childrenProcessed = true;
+        node.tunnelCtx();
+        var children = node.children.select(t=>t.process());
+        el = el.verify(".row");
+        el.getAppendRemoveForEach(".col-md-4", children, function(div, child){
+            div.append(child);
+        });
+        return el;
+    }
+
     function changeContext(newContext) {
         return {
             setTemplate: function (templateFunc) {
@@ -101,4 +114,8 @@
 var _hierarchyControl = new HierarchyControl();
 $.fn.repeater = function (list, opts) {
     return _hierarchyControl.repeater(this, list, opts);
+}
+
+$.fn.columnar = function () {
+    return _hierarchyControl.columnar(this);
 }

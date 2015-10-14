@@ -128,7 +128,7 @@ function HNode(_node) {
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
     });
 
-    Function.addTo(_this, [process, bindPrms, clone]);
+    Function.addTo(_this, [process, bindPrms, clone, tunnelCtx]);
 
     function clone() {
         var cloned = new HNode(_node);
