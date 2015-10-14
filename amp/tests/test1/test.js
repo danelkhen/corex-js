@@ -26,6 +26,8 @@ function main3() {
             data.contacts.removeAt(0);
             data.contacts[0].name = "gggggggggggggggg";
             data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
             //var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
             el = node.process();
             $("body").setChildNodes(el);

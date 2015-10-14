@@ -80,9 +80,7 @@
             else {
                 console.log("already exists!", cloned);
             }
-            console.log("before: ", cloned.select("ctx").select("res").exceptNulls().select(0));
             var x = cloned.selectMany(child=>child.process().toArray());
-            console.log("after: ", cloned.select("ctx").select("res").select(0));
             $(x).addClass("rpt-" + i);
             return x;
         }
@@ -99,4 +97,8 @@
         }
     }
 
+}
+var _hierarchyControl = new HierarchyControl();
+$.fn.repeater = function (list, opts) {
+    return _hierarchyControl.repeater(this, list, opts);
 }

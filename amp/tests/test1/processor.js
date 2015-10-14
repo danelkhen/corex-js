@@ -133,8 +133,8 @@ function HNode(_node) {
     function clone() {
         var cloned = new HNode(_node);
         cloned.ctx = shallowCopy(_ctx);
-        cloned.ctx.res = null;
-        cloned.text += "{clone}";
+        cloned.ctx.el = null; //TODO: clone the res? keep the res?
+        cloned.isClone = true;
         return cloned;
     }
 
@@ -164,20 +164,20 @@ function HNode(_node) {
     function invoke() {
         //if (canReuseLastRes())
         //    return _this._lastRes;
-        if (_ctx.res == null)//_lastCtx 
-            _ctx.res = $();
-        _ctx.res.node = _this;
+        if (_ctx.el == null)//_lastCtx 
+            _ctx.el = $();
+        _ctx.el.node = _this;
         _childrenProcessed = false;
-        var res = _func(_ctx);
-        _this._lastRes = res;
-        _ctx.res = res;
+        var el = _func(_ctx);
+        _this._lastRes = el;
+        _ctx.el = el;
         _lastCtx = shallowCopy(_ctx);
-        return res;
+        return el;
     }
 
     function tunnelCtx() {
         var ctx = shallowCopy(_ctx);
-        delete ctx.res;
+        delete ctx.el;
         _this._children.forEach(t=>shallowCopy(ctx, t.ctx));
     }
     function process() {
