@@ -1,1 +1,2 @@
-﻿t=>el.verify("div.ggg").text("HELLLLLLLLLLLLLLLLO "+t)
+﻿t=>el.verify("div.ggg")
+    "HELLLLLLLLLLLLLLLLO "+t
