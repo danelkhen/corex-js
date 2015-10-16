@@ -29,8 +29,6 @@ $.fn.setChildNodes = function (childNodes) {
 $.fn.verify = function (selector) {
     if (!this.is(selector))
         return $.create(selector);
-    if (selector == "label")
-        console.log("already created!", this[0]);
     return this;
 }
 
@@ -181,7 +179,7 @@ function HNode(_node) {
         _this._children.forEach(t=>shallowCopy(ctx, t.ctx));
     }
     function process() {
-        console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
+        //console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
         var res = invoke();
         tunnelCtx();
         if (res == null)
@@ -194,19 +192,21 @@ function HNode(_node) {
         }
         else if (_this._children.length > 0) {
             var childNodes = _this._children.select(t=>t.process());
-            var childNodes2 = flattenResults(childNodes);
+            var childNodes2 = toNodes(childNodes);
             res.setChildNodes(childNodes2);
         }
         return res;
     }
 
-    function flattenResults(results) {
+    function toNodes(results) {
         var list = [];
         results.forEach(function (res) {
             if (res instanceof Array)
-                list.addRange(flattenResults(res));
+                list.addRange(toNodes(res));
             else if (res instanceof jQuery)
                 list.addRange(res.toArray());
+            else if (typeof(res)=="string")
+                list.add(document.createTextNode(res));
             else
                 list.add(res);
         });

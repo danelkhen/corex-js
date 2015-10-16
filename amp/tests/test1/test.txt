@@ -6,3 +6,4 @@
             el.columnar()
                 el.verify("label").text(contact.name)
                 el.verify("input").val(contact.name)
+                $("#test").clone().removeAttr("id")

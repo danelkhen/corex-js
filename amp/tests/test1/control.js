@@ -78,7 +78,7 @@
                 map.set(obj, cloned);
             }
             else {
-                console.log("already exists!", cloned);
+                //console.log("already exists!", cloned);
             }
             var x = cloned.selectMany(child=>child.process().toArray());
             $(x).addClass("rpt-" + i);

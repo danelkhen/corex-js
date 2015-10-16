@@ -6,10 +6,10 @@
         var lines = markup.lines();
         var nodes = parse(lines);
         nodes = analyze(nodes);
-        console.log(nodes);
+        //console.log(nodes);
         var code = generate(nodes);
-        console.log(markup);
-        console.log(code);
+        //console.log(markup);
+        //console.log(code);
 
         var func = compileWithContext(code, globalCtx);
         var compiledNodes = func(globalCtx);
@@ -34,7 +34,6 @@
             code.push(keys.select(function (key) { return "__ctx." + key + "=" + key + ";" }).join("\n"));
         code.push("return __res;");
         var code2 = code.join("\n");
-        console.log(code2);
         var func = new Function("__ctx", code2);
         return func;
     }
