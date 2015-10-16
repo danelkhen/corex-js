@@ -514,20 +514,12 @@
     Array.prototype.orderByDescending = function (selector, desc) {
         return this.orderBy(selector, true);
     }
-    Array.prototype.sortBy = function (selector, desc) {
+    Array.prototype.sortBy = function (selector, desc, comparer) {
         var compareFunc;
-        if (selector instanceof Array) {
-            var pairs = selector;
-            var funcs = pairs.map(function (pair) {
-                if (pair instanceof Array)
-                    return createSortFuncFromCompareFunc(pair[0], pair[1]);
-                return createCompareFuncFromSelector(pair);
-            });
-            compareFunc = combineCompareFuncs(funcs);
-        }
-        else {
-            compareFunc = createCompareFuncFromSelector(selector, desc);
-        }
+        if(arguments.length==1 && selector instanceof Array)
+            compareFunc = ComparerHelper.createCombined(selector);
+        else
+            compareFunc = ComparerHelper.create(selector, desc, comparer);
         this.sort(compareFunc);
         return this;
     }
@@ -594,7 +586,7 @@
         return this.map(func);
     }
     Array.prototype.selectInvoke = function (name) {
-        if(arguments.length==0)
+        if (arguments.length == 0)
             return this.map(function (t) { return t(); });
         return this.map(function (t) { return t[name](); });
     }
@@ -2164,3 +2156,60 @@
     };
     Function.addTo(window, [Dictionary]);
 })();
+
+function ComparerHelper() {
+    Function.addTo(ComparerHelper, [combine, create, createCombined]);
+    function combine(comparers) {
+        var func = function MultiComparer(x, y) {
+            for (var i = 0; i < comparers.length; i++) {
+                var comparer = comparers[i];
+                var diff = comparer(x, y);
+                if (diff != 0)
+                    return diff;
+            }
+            return 0;
+        };
+        func.comparers = comparers;
+        return func;
+    }
+    function _default(x, y){
+        if(x>y)
+            return 1;
+        if(x<y)
+            return -1;
+        return 0;
+    }
+    //createCombined( [ "name", ["size", true], ["custom", false, customComparer] ] )
+    function createCombined(list) {
+        var comparers = list.select(function(item){
+            if(item instanceof Array)
+                return create.apply(this, item);
+            return create(item);
+        });
+        var combined = combine(comparers);
+        return combined;
+    }
+    function create(selector, desc, comparer) {
+        var selectorFunc = Q.createSelectorFunction(selector);
+        if(comparer==null)
+            comparer = _default;
+        if (desc) {
+            var func = function DescendingComparer(x, y) {
+                var x1 = selectorFunc(x);
+                var y1 = selectorFunc(y);
+                var diff = comparer(x1, y1);
+                diff *= -1;
+                return diff;
+            };
+            return func;
+        }
+        var func = function AscendingComparer(x, y) {
+            var x1 = selectorFunc(x);
+            var y1 = selectorFunc(y);
+            var diff = comparer(x1, y1);
+            return diff;
+        };
+        return func;
+    }
+}
+ComparerHelper();

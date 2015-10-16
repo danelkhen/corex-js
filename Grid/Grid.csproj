@@ -45,6 +45,7 @@
     <Compile Include="src\Grid.cs" />
     <Compile Include="src\GridOptions.cs" />
     <Compile Include="src\Plugin.cs" />
+    <Compile Include="src\temp.cs" />
     <Compile Include="src\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
