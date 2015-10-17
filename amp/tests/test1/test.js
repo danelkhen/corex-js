@@ -207,3 +207,17 @@ function compile2(exp) {
 
 
 */
+
+//var funcs = {
+//    doSomething: function (arg) {
+//        console.log(this, arg);
+//    }
+//}
+
+//function test10() {
+//    console.log(this);
+//    var doSomething = funcs.doSomething.bind(this);
+//    doSomething("ggg");
+//}
+
+//test10.call("77777");

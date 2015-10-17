@@ -11,6 +11,7 @@
         //console.log(markup);
         //console.log(code);
 
+
         var func = compileWithContext(code, globalCtx);
         var compiledNodes = func(globalCtx);
         return compiledNodes;
