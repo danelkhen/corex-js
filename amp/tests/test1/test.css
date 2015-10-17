@@ -1,5 +1,34 @@
-﻿.contact,.phone{
-    border:solid 1px red;
-    padding:5px;
-    margin:5px;
+﻿.contact, .phone {
+    border: solid 1px red;
+    padding: 5px;
+    margin: 5px;
+}
+
+html, body {
+    height: 100%;
+    overflow:hidden;
+    padding:0;
+    margin:0;
+}
+
+.sidebar {
+    height: 100%;
+    float:left;
+    width: 225px;
+    background-color: #221a1a;
+    color: white;
+}
+.sidebar2 {
+    height:100%;
+    position:fixed;
+}
+
+.sidebarwrapper {
+    height: 100%;
+}
+
+.sidebarcontent {
+    overflow-y:scroll;
+    height:100%;
+    overflow-x:hidden;
 }

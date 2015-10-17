@@ -108,6 +108,8 @@
 
     function external(el, ctl, data) {
         var node = el.node;
+        node.childrenProcessed = true;
+        node.tunnelCtx();
         var externalNode = el.externalNode;
         if (externalNode == null) {
             var node = el.node;
@@ -118,7 +120,6 @@
             externalNode.bindPrms(data);
         externalNode.ctx._content = node.children;
         var el2 = externalNode.process();
-        node.childrenProcessed = true;
         el2.externalNode = externalNode;
         return el2;
     }

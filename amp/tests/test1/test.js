@@ -6,7 +6,10 @@ function main() {
         _templates["test"] = res;
         $.get("test2.txt").done(function (res) {
             _templates["test2"] = res;
-            window.setTimeout(main3, 0);
+            $.get("sidebar.txt").done(function (res) {
+                _templates["sidebar"] = res;
+                window.setTimeout(main3, 0);
+            });
         });
     });
 }
@@ -17,7 +20,7 @@ function loadTemplate(name) {
     return node;
 }
 function main3() {
-    var total = 1;
+    var total = 20;
     var ctl = {};
     var el;
     var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
