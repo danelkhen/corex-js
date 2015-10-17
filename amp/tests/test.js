@@ -3,6 +3,7 @@ function debug() {
     debugger;
 }
 function main() {
+    return;
     //if(this==window||this==null)
     //    return new main();
     var _amp = new Amp();
