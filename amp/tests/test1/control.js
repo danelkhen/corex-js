@@ -1,6 +1,6 @@
 ﻿function HierarchyControl() {
     var _this = this;
-    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content]);
+    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content, vertical]);
 
     var _htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "legend", "li", "link", "main", "map", "mark", "menu", "menuitem", "meta", "meter", "nav", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"];
     //["!--...--","!DOCTYPE ",
@@ -144,11 +144,15 @@
         var node = el.node;
         node.childrenProcessed = true;
         node.tunnelCtx();
-        var children = node.children.select(t=>t.process());
-        el = el.verify(".table");
-        var tr = el.getAppend("tr").getAppend("td");
-        el.getAppendRemoveForEach(".col-md-4", children, function (div, child) {
-            div.append(child);
+        if (node.children.length == 0)
+            return el.empty();
+        el = el.verify("table.vertical");
+        var tbl = el;
+        var tbody = tbl.getAppend("tbody");
+        var children2 = node.children.select(t=>t.process());
+        tbody.getAppendRemoveForEach("tr", children2, function (tr, child) {
+            var td = tr.getAppend("td");
+            td.setChildNodes(toNodes([child]));
         });
         return el;
     }

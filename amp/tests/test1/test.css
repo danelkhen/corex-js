@@ -6,21 +6,22 @@
 
 html, body {
     height: 100%;
-    overflow:hidden;
-    padding:0;
-    margin:0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
 }
 
 .sidebar {
     height: 100%;
-    float:left;
+    float: left;
     width: 225px;
     background-color: #221a1a;
     color: white;
 }
+
 .sidebar2 {
-    height:100%;
-    position:fixed;
+    height: 100%;
+    position: fixed;
 }
 
 .sidebarwrapper {
@@ -28,7 +29,23 @@ html, body {
 }
 
 .sidebarcontent {
-    overflow-y:scroll;
+    overflow-y: scroll;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+table.vertical {
+    width: 100%;
     height:100%;
-    overflow-x:hidden;
+    table-layout:fixed;
+}
+table.vertical > tbody > tr:last-child {
+    height:100%;
+}
+
+table.vertical > tbody > tr > td {
+    vertical-align:top;
+}
+table.vertical > tbody > tr > td {
+    vertical-align:top;
 }

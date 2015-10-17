@@ -31,6 +31,22 @@ $.fn.verify = function (selector) {
         return $.create(selector);
     return this;
 }
+function toNodes(results) {
+    var list = [];
+    results.forEach(function (res) {
+        if (res == null)
+            return;
+        if (res instanceof Array)
+            list.addRange(toNodes(res));
+        else if (res instanceof jQuery)
+            list.addRange(res.toArray());
+        else if (typeof (res) == "string")
+            list.add(document.createTextNode(res));
+        else
+            list.add(res);
+    });
+    return list;
+}
 
 //$.fn.verify2 = function(list, create) {
 //    var childEls = this.toArray();
@@ -202,22 +218,6 @@ function HNode(_node) {
         return res;
     }
 
-    function toNodes(results) {
-        var list = [];
-        results.forEach(function (res) {
-            if (res == null)
-                return;
-            if (res instanceof Array)
-                list.addRange(toNodes(res));
-            else if (res instanceof jQuery)
-                list.addRange(res.toArray());
-            else if (typeof(res)=="string")
-                list.add(document.createTextNode(res));
-            else
-                list.add(res);
-        });
-        return list;
-    }
 
     function shallowCopy(src, dest) {
         return $.extend(dest || {}, src);
