@@ -1,5 +1,6 @@
 ﻿(ctl,data) => el.verify('div')
-    el.external("test2", data.contacts[0].name)
+    el.external("test2")
+        el.verify("div").text("content under external 2222")
     el.verify('h1').text("contacts")
     $("#test").clone().removeAttr("id")
     el.repeater(data.contacts)

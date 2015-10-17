@@ -160,6 +160,8 @@ function HNode(_node) {
 
 
     function invoke() {
+        if (_node.type == "Comment")
+            return el;
         //if (canReuseLastRes())
         //    return _this._lastRes;
         if (_ctx.el == null)//_lastCtx 
@@ -179,6 +181,8 @@ function HNode(_node) {
         _this._children.forEach(t=>shallowCopy(ctx, t.ctx));
     }
     function process() {
+        if (_node.type == "Comment")
+            return null;
         //console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
         var res = invoke();
         tunnelCtx();
@@ -201,6 +205,8 @@ function HNode(_node) {
     function toNodes(results) {
         var list = [];
         results.forEach(function (res) {
+            if (res == null)
+                return;
             if (res instanceof Array)
                 list.addRange(toNodes(res));
             else if (res instanceof jQuery)

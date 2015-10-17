@@ -55,26 +55,39 @@
         
 
     */
+    function shallowCopy(src, dest) {
+        return $.extend(dest || {}, src);
+    }
 
     function analyze(nodes, parent) {
         nodes.forEach(function (node) {
-            node.ctx = parent==null ? {el:null} : Q.copy(parent.ctx);
-            if (node.funcInfo === undefined) {
-                node.funcInfo = FunctionHelper.parseArgsAndBody(node.text);
-                if (node.funcInfo != null) {
-                    node.type = "FunctionExpression";
-                    node.funcInfo.argNames.forEach(function (name) { node.ctx[name] = null; });
-                    node.func = compileWithContext(node.funcInfo.body, node.ctx);
+            if (parent == null) {
+                node.ctx = { el: null };
+            }
+            else {
+                node.ctx = shallowCopy(parent.ctx);
+            }
+            if (node.text.startsWith("//") || (parent!=null && parent.type=="Comment")) {
+                node.type = "Comment";
+            }
+            else {
+                if (node.funcInfo === undefined) {
+                    node.funcInfo = FunctionHelper.parseArgsAndBody(node.text);
+                    if (node.funcInfo != null) {
+                        node.type = "FunctionExpression";
+                        node.funcInfo.argNames.forEach(function (name) { node.ctx[name] = null; });
+                        node.func = compileWithContext(node.funcInfo.body, node.ctx);
+                    }
                 }
-            }
-            if (node.type == null && parent != null && parent.funcInfo != null) {
-                //node.funcInfo = { argNames: parent.funcInfo.argNames };
-                node.type = "ScopedExpression";
-                node.func = compileWithContext(node.text, node.ctx);
-            }
-            if (node.type == null) {
-                node.type = "Expression";
-                node.func = compileWithContext(node.text, node.ctx);
+                if (node.type == null && parent != null && parent.funcInfo != null) {
+                    //node.funcInfo = { argNames: parent.funcInfo.argNames };
+                    node.type = "ScopedExpression";
+                    node.func = compileWithContext(node.text, node.ctx);
+                }
+                if (node.type == null) {
+                    node.type = "Expression";
+                    node.func = compileWithContext(node.text, node.ctx);
+                }
             }
             analyze(node.children, node);
         });

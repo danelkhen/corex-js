@@ -17,7 +17,7 @@ function loadTemplate(name) {
     return node;
 }
 function main3() {
-    var total = 1000;
+    var total = 1;
     var ctl = {};
     var el;
     var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
