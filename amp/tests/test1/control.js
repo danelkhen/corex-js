@@ -140,6 +140,19 @@
         return el;
     }
 
+    function vertical(el) {
+        var node = el.node;
+        node.childrenProcessed = true;
+        node.tunnelCtx();
+        var children = node.children.select(t=>t.process());
+        el = el.verify(".table");
+        var tr = el.getAppend("tr").getAppend("td");
+        el.getAppendRemoveForEach(".col-md-4", children, function (div, child) {
+            div.append(child);
+        });
+        return el;
+    }
+
     function changeContext(newContext) {
         return {
             setTemplate: function (templateFunc) {
