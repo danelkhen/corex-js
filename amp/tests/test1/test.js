@@ -33,29 +33,29 @@ function main3() {
         node.bindPrms(ctl, data);
     });
     time(function () {
-        el = node.process();
-        $("body").append(el);
+        //el = node.process();
+        $("body").setChildNodes(node.process().toChildNodes());
         //$("input").css({ backgroundColor: "pink" });
-        //$(".ggg").css({ backgroundColor: "red" });
+        //$("div").css({ backgroundColor: "red" });
     });
-    window.setTimeout(function () {
-        time(function () {
-            el = node.process();
-            $("body").setChildNodes(el);
-        });
-        window.setTimeout(function () {
-            time(function () {
-                data.contacts.removeAt(0);
-                data.contacts[0].name = "gggggggggggggggg";
-                data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
-                data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
-                data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
-                //var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
-                el = node.process();
-                $("body").setChildNodes(el);
-            });
-        }, 1000);
-    }, 1000);
+    //window.setTimeout(function () {
+    //    time(function () {
+    //        el = node.process();
+    //        $("body").setChildNodes(el);
+    //    });
+    //    window.setTimeout(function () {
+    //        time(function () {
+    //            data.contacts.removeAt(0);
+    //            data.contacts[0].name = "gggggggggggggggg";
+    //            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+    //            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+    //            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+    //            //var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
+    //            el = node.process();
+    //            $("body").setChildNodes(el);
+    //        });
+    //    }, 1000);
+    //}, 1000);
 }
 function time(action) {
     var start = new Date();

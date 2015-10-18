@@ -13,11 +13,14 @@ html, body {
 }
 
 .sidebar {
-    height: 100%;
-    float: left;
-    width: 225px;
+    position:fixed;
     background-color: #221a1a;
     color: white;
+    background-color:#333;
+    width:50px;
+}
+.sidebar.expanded {
+    width:200px;
 }
 
 .sidebar2 {
