@@ -1,6 +1,6 @@
 ﻿function HierarchyControl() {
     var _this = this;
-    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content, vertical]);
+    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content, vertical, horizontal]);
 
     var _htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "legend", "li", "link", "main", "map", "mark", "menu", "menuitem", "meta", "meter", "nav", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"];
     //["!--...--","!DOCTYPE ",
@@ -146,16 +146,64 @@
         node.tunnelCtx();
         if (node.children.length == 0)
             return el.empty();
-        el = el.verify("table.vertical");
+        el = el.verify("table.layout.vertical");
         var tbl = el;
         var tbody = tbl.getAppend("tbody");
-        var children2 = node.children.select(t=>t.process());
-        tbody.getAppendRemoveForEach("tr", children2, function (tr, child) {
+        var results = node.children.select(t=>t.process());
+        tbody.getAppendRemoveForEach("tr", results, function (tr, res) {
             var td = tr.getAppend("td");
-            td.setChildNodes(toNodes([child]));
+            var childNodes = $(res).toChildNodes();
+            var height = childNodes.data("layout-height");
+            if (height == null)
+                height = childNodes.data("layout-size");
+            if (height != null)
+                td.css({ height: height });
+            td.setChildNodes(childNodes);
         });
         return el;
     }
+
+    function horizontal(el) {
+        var node = el.node;
+        node.childrenProcessed = true;
+        node.tunnelCtx();
+        if (node.children.length == 0)
+            return el.empty();
+        el = el.verify("table.layout.horizontal");
+        var tbl = el;
+        var tr = tbl.getAppend("tbody").getAppend("tr");
+        var results = node.children.select(t=>t.process());
+        tr.getAppendRemoveForEach("td", results, function (td, res) {
+            var childNodes = $(res).toChildNodes();
+            var width = childNodes.data("layout-width");
+            if (width == null)
+                width = childNodes.data("layout-size");
+            if (width != null)
+                td.css({ width: width });
+            td.setChildNodes(childNodes);
+        });
+        return el;
+    }
+
+    //function vertical(el) {
+    //    var node = el.node;
+    //    node.childrenProcessed = true;
+    //    node.tunnelCtx();
+    //    //if (node.children.length == 0)
+    //    //    return el.empty();
+    //    el = el.verify("div.vertical");
+    //    //var tbl = el;
+    //    //var tbody = tbl.getAppend("tbody");
+    //    var children2 = node.children.select(t=>t.process());
+    //    //children2.forEach(t=>t.addClass())
+    //    el.setChildNodes(toNodes(children2));
+
+    //    //tbody.getAppendRemoveForEach("tr", children2, function (tr, child) {
+    //    //    var td = tr.getAppend("td");
+    //    //    td.setChildNodes(toNodes([child]));
+    //    //});
+    //    return el;
+    //}
 
     function changeContext(newContext) {
         return {

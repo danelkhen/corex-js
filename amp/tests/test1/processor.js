@@ -31,21 +31,26 @@ $.fn.verify = function (selector) {
         return $.create(selector);
     return this;
 }
+$.fn.toChildNodes = function () {
+    return this.pushStack(toNodes(this));
+}
 function toNodes(results) {
     var list = [];
-    results.forEach(function (res) {
-        if (res == null)
-            return;
-        if (res instanceof Array)
-            list.addRange(toNodes(res));
-        else if (res instanceof jQuery)
-            list.addRange(res.toArray());
-        else if (typeof (res) == "string")
-            list.add(document.createTextNode(res));
-        else
-            list.add(res);
-    });
+    _addNodes(results, list);
     return list;
+    return list;
+}
+function _addNodes(res, list) {
+    if (res == null)
+        return;
+    if (res instanceof Array)
+        res.forEach(t=>_addNodes(t, list));
+    else if (res instanceof jQuery)
+        list.addRange(res.toArray());
+    else if (typeof (res) == "string")
+        list.add(document.createTextNode(res));
+    else
+        list.add(res);
 }
 
 //$.fn.verify2 = function(list, create) {

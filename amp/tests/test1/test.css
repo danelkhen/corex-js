@@ -6,7 +6,7 @@
 
 html, body {
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
     padding: 0;
     margin: 0;
 }
@@ -34,18 +34,20 @@ html, body {
     overflow-x: hidden;
 }
 
-table.vertical {
+table.layout{
     width: 100%;
     height:100%;
     table-layout:fixed;
+    border-spacing:0;
 }
-table.vertical > tbody > tr:last-child {
-    height:100%;
+table.layout > tbody > tr > td {
+    vertical-align:top;
+    padding:0;
 }
 
-table.vertical > tbody > tr > td {
-    vertical-align:top;
+table.layout.horizontal > tbody > tr > td > :only-child{
+    height:100%;
 }
-table.vertical > tbody > tr > td {
-    vertical-align:top;
+table.layout.vertical > tbody > tr > td > :only-child{
+    height:100%;
 }
