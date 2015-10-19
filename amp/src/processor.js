@@ -144,6 +144,7 @@ function HNode(_node) {
         children: { get: function () { return _this._children; } },
         ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
         prms: { get: function () { return _prms; } },
+        lastRes: { get: function () { return _lastRes; } },
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
     });
 
@@ -188,8 +189,9 @@ function HNode(_node) {
         if (_ctx.el == null)//_lastCtx 
             _ctx.el = $();
         _ctx.el.node = _this;
+        _ctx.node = _this;
         _childrenProcessed = false;
-        var el = _func(_ctx);
+        var el = _func.call(_this, _ctx);
         _this._lastRes = el;
         _ctx.el = el;
         _lastCtx = shallowCopy(_ctx);

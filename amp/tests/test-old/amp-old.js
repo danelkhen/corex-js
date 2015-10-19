@@ -328,7 +328,7 @@ function AmpBuilder(_amp) {
 
         if (ctx.__isUpdate) {
             //itemEls2.added().forEach(function(ch){
-                
+
             //});
             $(el).parent().append(itemEls2);//.replaceWith(itemEls2);
         }

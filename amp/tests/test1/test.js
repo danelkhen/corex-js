@@ -1,17 +1,22 @@
 ﻿"use strict"
 
 var _templates = {};
+
 function main() {
-    $.get("test.txt").done(function (res) {
-        _templates["test"] = res;
-        $.get("test2.txt").done(function (res) {
-            _templates["test2"] = res;
-            $.get("sidebar.txt").done(function (res) {
-                _templates["sidebar"] = res;
-                window.setTimeout(main3, 0);
-            });
-        });
-    });
+    var func = test;
+    var x = FunctionHelper.parseArgsAndBody(func.toString());
+    _templates[func.name] = x.body;
+    main3();
+    //$.get("test.txt").done(function (res) {
+    //    _templates["test"] = res;
+    //    $.get("test2.txt").done(function (res) {
+    //        _templates["test2"] = res;
+    //        $.get("sidebar.txt").done(function (res) {
+    //            _templates["sidebar"] = res;
+    //            window.setTimeout(main3, 0);
+    //        });
+    //    });
+    //});
 }
 
 function loadTemplate(name) {
@@ -34,7 +39,8 @@ function main3() {
     });
     time(function () {
         //el = node.process();
-        $("body").setChildNodes(node.process().toChildNodes());
+        //$("body").setChildNodes(node.process().toChildNodes());
+        node.process();
         //$("input").css({ backgroundColor: "pink" });
         //$("div").css({ backgroundColor: "red" });
     });

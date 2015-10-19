@@ -67,9 +67,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <Content Include="tests\test1\control.js" />
-    <Content Include="tests\test1\processor.js" />
-    <Content Include="tests\test1\compiler.js" />
+    <Content Include="tests\test-old\amp-old.js" />
+    <Content Include="src\control.js" />
+    <Content Include="src\processor.js" />
+    <Content Include="src\compiler.js" />
     <Content Include="tests\test1\sidebar.txt" />
     <Content Include="tests\test1\test2.txt" />
     <Content Include="tests\test1\test.css" />
@@ -82,9 +83,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="amp.js" />
-    <Content Include="tests\test.html" />
-    <Content Include="tests\test.js" />
+    <Content Include="tests\test-old\test.html" />
+    <Content Include="tests\test-old\test.js" />
     <Content Include="tests\test1\test.html" />
     <Content Include="tests\test1\test.js" />
     <Content Include="Web.config" />

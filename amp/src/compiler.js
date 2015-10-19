@@ -199,7 +199,7 @@ function FunctionHelper() {
         args = parseArgNames(s);
         if (args == null)
             return null;
-        var body = s.substr(s.indexOf(")") + 1);
+        var body = s.substring(s.indexOf("{") + 1, s.lastIndexOf("}")-1);
         return { body: body, argNames: args, type: "ArrowFunction" };
     }
     var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
