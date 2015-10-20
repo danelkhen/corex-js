@@ -1,6 +1,6 @@
 ﻿function HierarchyCompiler() {
     var _this = this;
-    Function.addTo(_this, [compile, compileWithContext, generate, parse, build]);
+    Function.addTo(_this, [compile, compileWithContext, generate, parse, build, compileGenFunc]);
 
     var _globalCtx;
     function build(markup, globalCtx) {
@@ -8,21 +8,18 @@
         var lines = markup.lines();
         var nodes = parse(lines);
         nodes = analyze(nodes);
-        //console.log(nodes);
-        var code = generate(nodes);
-        //console.log(markup);
+        console.log(nodes);
+        return nodes;
+        ////console.log(nodes);
+        //var code = generate(nodes);
+        ////console.log(markup);
 
-
-        var func = compileWithContext(code, globalCtx);
-        console.log(func);
-        var compiledNodes = func(globalCtx);
-        _globalCtx = null;
-        return compiledNodes;
+        //var func = compileWithContext(code, globalCtx);
+        //console.log(func);
+        //var compiledNodes = func(globalCtx);
+        //_globalCtx = null;
+        //return compiledNodes;
     }
-    //function compile(ctx, exp) {
-    //    var func = new Function("t", "var res = " + exp + ";\nreturn res;");
-    //    return func;
-    //}
 
     function isValidIdentifier(s) {
         return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
@@ -34,47 +31,30 @@
         if (keys.length > 0)
             code.push("var " + keys.select(function (key) { return key + "=__ctx." + key }).join(",") + ";");
         code.push("var __res = " + expr + ";");
-        if(!oneWay)
+        if (!oneWay)
             code.push(keys.select(function (key) { return "__ctx." + key + "=" + key + ";" }).join("\n"));
         code.push("return __res;");
         var code2 = code.join("\n");
         var func = createFunc(["__ctx"], code2);
         return func;
     }
-    function createFunc(prmNames, body){
+    function createFunc(prmNames, body) {
         var func = Function.applyNew(prmNames.concat(body));
         func.prmNames = prmNames;
         func.body = body;
-        func._stringified = "function("+prmNames.join(",")+"){\n"+body+"\n}\n";
-        func.toString = function() {
+        func._stringified = "function(" + prmNames.join(",") + "){\n" + body + "\n}\n";
+        func.toString = function () {
             return this._stringified;
         }
         return func;
     }
 
-    function parseFunctionText(s) {
-        var info = FunctionHelper.parse(node.text);
-        if (info == null) {
-
-        }
-        if (args == null) {
-            args = Function.parseArgNames(node.text);
-        }
-        if (args != null) {
-        }
-
-    }
-
-    /*
-        
-
-    */
     function shallowCopy(src, dest) {
         return $.extend(dest || {}, src);
     }
 
-    function compileNodeFunc(body, ctx){
-        return compileWithContext(compileWithContext(body, ctx).toString(), _globalCtx);
+    function compileGenFunc(body, ctx, globalCtx) {
+        return compileWithContext(compileWithContext(body, ctx).toString(), globalCtx);
     }
 
     function analyze(nodes, parent) {
@@ -87,27 +67,32 @@
                 node.ctx = shallowCopy(parent.ctx);
                 node.globalCtx = parent.globalCtx;
             }
-            if (node.text.startsWith("//") || (parent!=null && parent.type=="Comment")) {
+            if (node.text.startsWith("//") || (parent != null && parent.type == "Comment")) {
                 node.type = "Comment";
             }
             else {
-                if (node.funcInfo === undefined) {
-                    node.funcInfo = FunctionHelper.parse(node.text);
-                    if (node.funcInfo != null) {
-                        node.type = "FunctionExpression";
-                        node.funcInfo.argNames.forEach(function (name) { node.ctx[name] = null; });
-                        node.funcGen = compileNodeFunc(node.funcInfo.body, node.ctx);
-                    }
+                var parsed = FunctionHelper.parse(node.text);
+                if (parsed != null) {
+                    node.funcBody = parsed.body;
+                    node.funcPrms = parsed.prms;
+                    node.funcName = parsed.name;
+                    node.funcType = parsed.type;
+                    node.funcPrms.forEach(function (name) { node.ctx[name] = null; });
+                    //node.funcGen = compileNodeFunc(node.funcInfo.body, node.ctx);
                 }
-                if (node.type == null && parent != null && parent.funcInfo != null) {
-                    //node.funcInfo = { argNames: parent.funcInfo.argNames };
-                    node.type = "ScopedExpression";
-                    node.funcGen = compileNodeFunc(node.text, node.ctx);
+                else {
+                    node.funcBody = node.text;
+                    node.funcPrms = [];
                 }
-                if (node.type == null) {
-                    node.type = "Expression";
-                    node.funcGen = compileNodeFunc(node.text, node.ctx);
-                }
+                //if (node.type == null && parent != null && parent.funcInfo != null) {
+                //    //node.funcInfo = { argNames: parent.funcInfo.argNames };
+                //    node.type = "ScopedExpression";
+                //    node.funcGen = compileNodeFunc(node.text, node.ctx);
+                //}
+                //if (node.type == null) {
+                //    node.type = "Expression";
+                //    node.funcGen = compileNodeFunc(node.text, node.ctx);
+                //}
             }
             analyze(node.children, node);
         });
@@ -117,34 +102,6 @@
     function generate(_nodes) {
         var code = Q.stringifyFormatted(_nodes);
         return code;
-        //var tabSize = "    ";
-        //var sb = [];
-        //var tab = "";
-
-        //function processNode(node) {
-        //    var x;
-        //    if (node.type == "FunctionExpression")
-        //        x = "() => " + node.funcInfo.body;
-        //    else if (node.type == "ScopedExpression")
-        //        x = "() => " + node.text;
-        //    else //Expression
-        //        x = "() => " + node.text;
-
-        //    var args = node.funcInfo == null ? [] : node.funcInfo.argNames;
-        //    sb.push("function(" + args.join(", ") + "){\n");
-        //    sb.push("return {func:" + x + ", childNodes: [");
-        //    node.children.forEachJoin(processNode, function () { sb.push(",\n"); });
-        //    sb.push("]};\n");
-        //    sb.push("}\n");
-        //}
-        ////function processNodes(nodes, tab, parent){
-        ////    var children = node.children.select(function (child) { return processNode(child, tab + tabSize, node); });
-        ////}
-        //sb.push("[");
-        //_nodes.forEachJoin(processNode, function () { sb.push(",\n"); });
-        //sb.push("]");
-        //var s = sb.join("");
-        //return s;
     }
 
 
@@ -152,19 +109,7 @@
         var func = new Function("t", "return " + s + ";");
         return func;
     }
-    function compileNode(node) {
-        node.compiled = compileExp(node.text);
-        node.children.forEach(compileNode);
-        return function () {
-            runCompiled(node);
-        };
-    }
 
-    function runCompiled(node) {
-        var res = node.compiled();
-        var res2 = res.set(node.children.select("compiled"));
-        return res2;
-    }
 
     function parse(_lines) {
         var stack = [{ children: [], tab: -1 }];
@@ -210,24 +155,24 @@
 function FunctionHelper() {
     Function.addTo(FunctionHelper, [parse]);
     function parse(s) {
-        var args = parseArrowFunctionArgNames(s);
-        if (args != null) {
+        var prms = parseArrowFunctionArgNames(s);
+        if (prms != null) {
             var body = s.substr(s.indexOf("=>") + 2);
-            return { body: body, argNames: args, type: "ArrowFunction" };
+            return { body: body, prms: prms, type: "ArrowFunction", name: null };
         }
-        args = parseArgNames(s);
-        if (args == null)
+        prms = parsePrms(s);
+        if (prms == null)
             return null;
-        var body = s.substring(s.indexOf("{") + 1, s.lastIndexOf("}")-1);
+        var body = s.substring(s.indexOf("{") + 1, s.lastIndexOf("}") - 1);
         var name = s.substringBetween("function ", "(").trim();
-        var type = name=="" ? "AnonymousFunction" : "NamedFunction";
-        return { body: body, argNames: args, type: type, name:name };
+        var type = name == "" ? "AnonymousFunction" : "NamedFunction";
+        return { body: body, prms: prms, type: type, name: name };
     }
     var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
     var FN_ARG_SPLIT = /,/;
     var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
     var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-    function parseArgNames(s) {
+    function parsePrms(s) {
         var list = [];
         fnText = s.toString().replace(STRIP_COMMENTS, '');
         argDecl = fnText.match(FN_ARGS);

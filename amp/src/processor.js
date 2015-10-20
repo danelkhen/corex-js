@@ -1,4 +1,146 @@
-﻿function HierarchyUtils() {
+﻿
+function HNode(_node) {
+    if (this == null || this == window)
+        return new HNode(_node);
+    var _this = this;
+    if (_node == null)
+        _node = {};
+    if (_node.children != null)
+        _this._children = _node.children.select(t=>new HNode(t));
+    _this._text = _node.text;
+    var _childrenProcessed;
+    var _ctx = shallowCopy(_node.ctx);
+    var _prms, _lastCtx;
+    var _globalCtx = _node.globalCtx;
+    var _localCtx;
+    var _funcGen = _node.funcGen;
+    var _prms = _node.funcPrms;
+    var _func = _node.func;
+    if (_func == null) {
+        if (_funcGen == null && _node.funcBody) {
+            var compiler = new HierarchyCompiler();
+            _funcGen = compiler.compileGenFunc(_node.funcBody, _ctx, _globalCtx);
+        }
+        if (_funcGen != null) {
+            localizeGlobalCtx();
+            _func = _funcGen(_globalCtx);
+        }
+    }
+    //if (_func == null && _node.funcGen != null)
+    //    _func = _node.funcGen.call(this, _localCtx);
+    //if (_node.funcInfo != null)
+    //    _prms = _node.funcInfo.argNames.toArray();
+    //else
+    //    _prms = _node.prms || [];
+
+    Object.defineProperties(_this, {
+        children: { get: function () { return _this._children; }, set: function (value) { _this._children = value; } },
+        ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
+        prms: { get: function () { return _prms; }, set: function (value) { _prms = value; } },
+        lastRes: { get: function () { return _lastRes; } },
+        func: { get: function () { return _func; }, set: function (value) { _func = value; } },
+        childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
+    });
+
+    Function.addTo(_this, [process, bindPrms, clone, tunnelCtx]);
+
+    function localizeGlobalCtx() {
+        if (_globalCtx == null)
+            return;
+        _localCtx = {};
+        Object.keys(_globalCtx).forEach(key=> {
+            var value = _globalCtx[key];
+            if (typeof (value) == "function")
+                value = value.bind(_this);
+            _localCtx[key] = value;
+        });
+    }
+
+    function clone() {
+        var cloned = new HNode(_node);
+        cloned.ctx = shallowCopy(_ctx);
+        cloned.ctx.el = null; //TODO: clone the res? keep the res?
+        cloned.isClone = true;
+        return cloned;
+    }
+
+    function bindPrms() {
+        var values = Array.from(arguments);
+        values.forEach((value, i) => _ctx[_prms[i]] = value);
+        return _this;
+    }
+
+    function canReuseLastRes() {
+        if (_lastCtx == null)
+            return false;
+        var lastKeys = Object.keys(_lastCtx);
+        var keys = Object.keys(_ctx);
+        if (lastKeys.length != keys.length)
+            return false;
+        lastKeys = lastKeys.orderBy(t => t);
+        keys = lastKeys.orderBy(t => t);
+        if (!lastKeys.itemsEqual(keys))
+            return false;
+        if (!keys.all(key => _lastCtx[key] == _ctx[key]))
+            return false;
+        return true;
+    }
+
+
+    function invoke() {
+        if (_node.type == "Comment")
+            return el;
+        //if (canReuseLastRes())
+        //    return _this._lastRes;
+        if (_ctx.el == null)//_lastCtx 
+            _ctx.el = $();
+        _ctx.el.node = _this;
+        _ctx.node = _this;
+        _childrenProcessed = false;
+        var el = _func.call(_this, _ctx);
+        _this._lastRes = el;
+        _ctx.el = el;
+        _lastCtx = shallowCopy(_ctx);
+        return el;
+    }
+
+    function tunnelCtx() {
+        var ctx = shallowCopy(_ctx);
+        delete ctx.el;
+        _this._children.forEach(t=>shallowCopy(ctx, t.ctx));
+    }
+    function process() {
+        if (_node.type == "Comment")
+            return null;
+        //console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
+        var res = invoke();
+        tunnelCtx();
+        if (res == null)
+            return res;
+        if (_childrenProcessed) {
+            var childrenRes = res;//.processChildren(_this);
+            //_ctx.res = childrenRes;
+            _this.lastChildrenRes = childrenRes;
+            return childrenRes;
+        }
+        else if (_this._children.length > 0) {
+            var childNodes = _this._children.select(t=>t.process());
+            var childNodes2 = toNodes(childNodes);
+            res.setChildNodes(childNodes2);
+        }
+        return res;
+    }
+
+
+    function shallowCopy(src, dest) {
+        return $.extend(dest || {}, src);
+    }
+
+}
+
+
+
+function HierarchyUtils() {
     Function.addTo(HierarchyUtils, [setChildren]);
     function setChildren(el, childElements) {
         childElements.forEach(function (childEl, index) {
@@ -125,133 +267,6 @@ Node.prototype.setChildNodes = function (childNodes) {
     HierarchyUtils.setChildren(this, childNodes);
 }
 
-function HNode(_node) {
-    if (this == null || this == window)
-        return new HNode(_node);
-    var _this = this;
-    if (_node == null)
-        _node = {};
-    if (_node.children != null)
-        _this._children = _node.children.select(t=>new HNode(t));
-    _this._text = _node.text;
-    var _childrenProcessed;
-    var _ctx = shallowCopy(_node.ctx);
-    var _prms, _lastCtx;
-    var _globalCtx = _node.globalCtx;
-    var _localCtx;
-    localizeGlobalCtx();
-    var _func = _node.func;
-    if (_func == null && _node.funcGen != null)
-        _func = _node.funcGen.call(this, _localCtx);
-    if (_node.funcInfo != null)
-        _prms = _node.funcInfo.argNames.toArray();
-    else
-        _prms = _node.prms || [];
-
-    Object.defineProperties(_this, {
-        children: { get: function () { return _this._children; }, set: function (value) { _this._children = value; } },
-        ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
-        prms: { get: function () { return _prms; }, set: function (value) { _prms = value; }  },
-        lastRes: { get: function () { return _lastRes; } },
-        func: { get: function () { return _func; }, set: function (value) { _func = value; } },
-        childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
-    });
-
-    Function.addTo(_this, [process, bindPrms, clone, tunnelCtx]);
-
-    function localizeGlobalCtx() {
-        if (_globalCtx == null)
-            return;
-        _localCtx = {};
-        Object.keys(_globalCtx).forEach(key=> {
-            var value = _globalCtx[key];
-            if (typeof (value) == "function")
-                value = value.bind(_this);
-            _localCtx[key] = value;
-        });
-    }
-
-    function clone() {
-        var cloned = new HNode(_node);
-        cloned.ctx = shallowCopy(_ctx);
-        cloned.ctx.el = null; //TODO: clone the res? keep the res?
-        cloned.isClone = true;
-        return cloned;
-    }
-
-    function bindPrms() {
-        var values = Array.from(arguments);
-        values.forEach((value, i) => _ctx[_prms[i]] = value);
-        return _this;
-    }
-
-    function canReuseLastRes() {
-        if (_lastCtx == null)
-            return false;
-        var lastKeys = Object.keys(_lastCtx);
-        var keys = Object.keys(_ctx);
-        if (lastKeys.length != keys.length)
-            return false;
-        lastKeys = lastKeys.orderBy(t => t);
-        keys = lastKeys.orderBy(t => t);
-        if (!lastKeys.itemsEqual(keys))
-            return false;
-        if (!keys.all(key => _lastCtx[key] == _ctx[key]))
-            return false;
-        return true;
-    }
-
-
-    function invoke() {
-        if (_node.type == "Comment")
-            return el;
-        //if (canReuseLastRes())
-        //    return _this._lastRes;
-        if (_ctx.el == null)//_lastCtx 
-            _ctx.el = $();
-        _ctx.el.node = _this;
-        _ctx.node = _this;
-        _childrenProcessed = false;
-        var el = _func.call(_this, _ctx);
-        _this._lastRes = el;
-        _ctx.el = el;
-        _lastCtx = shallowCopy(_ctx);
-        return el;
-    }
-
-    function tunnelCtx() {
-        var ctx = shallowCopy(_ctx);
-        delete ctx.el;
-        _this._children.forEach(t=>shallowCopy(ctx, t.ctx));
-    }
-    function process() {
-        if (_node.type == "Comment")
-            return null;
-        //console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
-        var res = invoke();
-        tunnelCtx();
-        if (res == null)
-            return res;
-        if (_childrenProcessed) {
-            var childrenRes = res;//.processChildren(_this);
-            //_ctx.res = childrenRes;
-            _this.lastChildrenRes = childrenRes;
-            return childrenRes;
-        }
-        else if (_this._children.length > 0) {
-            var childNodes = _this._children.select(t=>t.process());
-            var childNodes2 = toNodes(childNodes);
-            res.setChildNodes(childNodes2);
-        }
-        return res;
-    }
-
-
-    function shallowCopy(src, dest) {
-        return $.extend(dest || {}, src);
-    }
-
-}
 
 
 //function HierarchyProcessor(_opts) {
