@@ -58,6 +58,7 @@
         return nodes.select(t=>t.clone);
     }
     function repeater(el, list, opts) {
+        console.log("repeater this=", this);
         var node = el.node;
         var map = node.__map;
         if (map == null) {

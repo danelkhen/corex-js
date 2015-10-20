@@ -69,6 +69,7 @@ function compile(markup, root) {
     if (root.globalCtx == null)
         root.globalCtx = new HControl();
     var nodes = compiler.build(markup, root.globalCtx);
+    root.prms = nodes.select("funcInfo").exceptNulls().selectMany(t=>t.argNames || []).distinct();
     var root2 = new HNode(root);
     if (root2.func == null)
         root2.func = (ctx) => {
