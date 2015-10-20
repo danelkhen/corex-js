@@ -2,24 +2,27 @@
     var _this = this;
     Function.addTo(_this, [compile, compileWithContext, generate, parse, build]);
 
+    var _globalCtx;
     function build(markup, globalCtx) {
+        _globalCtx = globalCtx;
         var lines = markup.lines();
         var nodes = parse(lines);
         nodes = analyze(nodes);
         //console.log(nodes);
         var code = generate(nodes);
         //console.log(markup);
-        //console.log(code);
 
 
         var func = compileWithContext(code, globalCtx);
+        console.log(func);
         var compiledNodes = func(globalCtx);
+        _globalCtx = null;
         return compiledNodes;
     }
-    function compile(ctx, exp) {
-        var func = new Function("t", "var res = " + exp + ";\nreturn res;");
-        return func;
-    }
+    //function compile(ctx, exp) {
+    //    var func = new Function("t", "var res = " + exp + ";\nreturn res;");
+    //    return func;
+    //}
 
     function isValidIdentifier(s) {
         return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
@@ -35,12 +38,22 @@
             code.push(keys.select(function (key) { return "__ctx." + key + "=" + key + ";" }).join("\n"));
         code.push("return __res;");
         var code2 = code.join("\n");
-        var func = new Function("__ctx", code2);
+        var func = createFunc(["__ctx"], code2);
+        return func;
+    }
+    function createFunc(prmNames, body){
+        var func = Function.applyNew(prmNames.concat(body));
+        func.prmNames = prmNames;
+        func.body = body;
+        func._stringified = "function("+prmNames.join(",")+"){\n"+body+"\n}\n";
+        func.toString = function() {
+            return this._stringified;
+        }
         return func;
     }
 
     function parseFunctionText(s) {
-        var info = FunctionHelper.parseArgsAndBody(node.text);
+        var info = FunctionHelper.parse(node.text);
         if (info == null) {
 
         }
@@ -60,34 +73,40 @@
         return $.extend(dest || {}, src);
     }
 
+    function compileNodeFunc(body, ctx){
+        return compileWithContext(compileWithContext(body, ctx).toString(), _globalCtx);
+    }
+
     function analyze(nodes, parent) {
         nodes.forEach(function (node) {
             if (parent == null) {
                 node.ctx = { el: null };
+                node.globalCtx = _globalCtx;
             }
             else {
                 node.ctx = shallowCopy(parent.ctx);
+                node.globalCtx = parent.globalCtx;
             }
             if (node.text.startsWith("//") || (parent!=null && parent.type=="Comment")) {
                 node.type = "Comment";
             }
             else {
                 if (node.funcInfo === undefined) {
-                    node.funcInfo = FunctionHelper.parseArgsAndBody(node.text);
+                    node.funcInfo = FunctionHelper.parse(node.text);
                     if (node.funcInfo != null) {
                         node.type = "FunctionExpression";
                         node.funcInfo.argNames.forEach(function (name) { node.ctx[name] = null; });
-                        node.func = compileWithContext(node.funcInfo.body, node.ctx);
+                        node.funcGen = compileNodeFunc(node.funcInfo.body, node.ctx);
                     }
                 }
                 if (node.type == null && parent != null && parent.funcInfo != null) {
                     //node.funcInfo = { argNames: parent.funcInfo.argNames };
                     node.type = "ScopedExpression";
-                    node.func = compileWithContext(node.text, node.ctx);
+                    node.funcGen = compileNodeFunc(node.text, node.ctx);
                 }
                 if (node.type == null) {
                     node.type = "Expression";
-                    node.func = compileWithContext(node.text, node.ctx);
+                    node.funcGen = compileNodeFunc(node.text, node.ctx);
                 }
             }
             analyze(node.children, node);
@@ -98,34 +117,34 @@
     function generate(_nodes) {
         var code = Q.stringifyFormatted(_nodes);
         return code;
-        var tabSize = "    ";
-        var sb = [];
-        var tab = "";
+        //var tabSize = "    ";
+        //var sb = [];
+        //var tab = "";
 
-        function processNode(node) {
-            var x;
-            if (node.type == "FunctionExpression")
-                x = "() => " + node.funcInfo.body;
-            else if (node.type == "ScopedExpression")
-                x = "() => " + node.text;
-            else //Expression
-                x = "() => " + node.text;
+        //function processNode(node) {
+        //    var x;
+        //    if (node.type == "FunctionExpression")
+        //        x = "() => " + node.funcInfo.body;
+        //    else if (node.type == "ScopedExpression")
+        //        x = "() => " + node.text;
+        //    else //Expression
+        //        x = "() => " + node.text;
 
-            var args = node.funcInfo == null ? [] : node.funcInfo.argNames;
-            sb.push("function(" + args.join(", ") + "){\n");
-            sb.push("return {func:" + x + ", childNodes: [");
-            node.children.forEachJoin(processNode, function () { sb.push(",\n"); });
-            sb.push("]};\n");
-            sb.push("}\n");
-        }
-        //function processNodes(nodes, tab, parent){
-        //    var children = node.children.select(function (child) { return processNode(child, tab + tabSize, node); });
+        //    var args = node.funcInfo == null ? [] : node.funcInfo.argNames;
+        //    sb.push("function(" + args.join(", ") + "){\n");
+        //    sb.push("return {func:" + x + ", childNodes: [");
+        //    node.children.forEachJoin(processNode, function () { sb.push(",\n"); });
+        //    sb.push("]};\n");
+        //    sb.push("}\n");
         //}
-        sb.push("[");
-        _nodes.forEachJoin(processNode, function () { sb.push(",\n"); });
-        sb.push("]");
-        var s = sb.join("");
-        return s;
+        ////function processNodes(nodes, tab, parent){
+        ////    var children = node.children.select(function (child) { return processNode(child, tab + tabSize, node); });
+        ////}
+        //sb.push("[");
+        //_nodes.forEachJoin(processNode, function () { sb.push(",\n"); });
+        //sb.push("]");
+        //var s = sb.join("");
+        //return s;
     }
 
 
@@ -189,8 +208,8 @@
 }
 
 function FunctionHelper() {
-    Function.addTo(FunctionHelper, [parseArgsAndBody]);
-    function parseArgsAndBody(s) {
+    Function.addTo(FunctionHelper, [parse]);
+    function parse(s) {
         var args = parseArrowFunctionArgNames(s);
         if (args != null) {
             var body = s.substr(s.indexOf("=>") + 2);
@@ -200,7 +219,9 @@ function FunctionHelper() {
         if (args == null)
             return null;
         var body = s.substring(s.indexOf("{") + 1, s.lastIndexOf("}")-1);
-        return { body: body, argNames: args, type: "ArrowFunction" };
+        var name = s.substringBetween("function ", "(").trim();
+        var type = name=="" ? "AnonymousFunction" : "NamedFunction";
+        return { body: body, argNames: args, type: type, name:name };
     }
     var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
     var FN_ARG_SPLIT = /,/;

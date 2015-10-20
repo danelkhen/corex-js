@@ -129,26 +129,40 @@ function HNode(_node) {
     if (this == null || this == window)
         return new HNode(_node);
     var _this = this;
-    _this._children = _node.children.select(t=>new HNode(t));
+    if (_node == null)
+        _node = {};
+    if (_node.children != null)
+        _this._children = _node.children.select(t=>new HNode(t));
     _this._text = _node.text;
     var _childrenProcessed;
     var _ctx = shallowCopy(_node.ctx);
     var _prms, _lastCtx;
+
     var _func = _node.func;
+    if (_func == null && _node.funcGen != null)
+        _func = _node.funcGen.call(this, _node.globalCtx);
     if (_node.funcInfo != null)
         _prms = _node.funcInfo.argNames.toArray();
     else
         _prms = [];
 
     Object.defineProperties(_this, {
-        children: { get: function () { return _this._children; } },
+        children: { get: function () { return _this._children; }, set: function (value) { _this._children = value; } },
         ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
         prms: { get: function () { return _prms; } },
         lastRes: { get: function () { return _lastRes; } },
+        func: { get: function () { return _func; }, set: function (value) { _func = value; } },
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
     });
 
     Function.addTo(_this, [process, bindPrms, clone, tunnelCtx]);
+
+    //function localizeGlobalCtx(){
+    //    if(_ctx.global==null)
+    //        return;
+    //    var obj = _ctx.global;
+
+    //}
 
     function clone() {
         var cloned = new HNode(_node);

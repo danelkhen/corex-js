@@ -1,4 +1,4 @@
-﻿function HierarchyControl() {
+﻿function HControl() {
     var _this = this;
     Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content, vertical, horizontal]);
 
@@ -47,12 +47,10 @@
         var el2 = el[0];
         return el2;
     }
-    function invisible(opts) {
-        return {
-            processChildren: function (node) {
-                return node.children.selectMany(child=>child.process());
-            }
-        };
+    function invisible(node) {
+        node.tunnelCtx();
+        node.childrenProcessed = true;
+        return node.children.select(child=>child.process());
     }
 
 
@@ -215,14 +213,14 @@
     }
 
 }
-var _hierarchyControl = new HierarchyControl();
-$.fn.repeater = function (list, opts) {
-    return _hierarchyControl.repeater(this, list, opts);
-}
+//var _hierarchyControl = new HierarchyControl();
+//$.fn.repeater = function (list, opts) {
+//    return _hierarchyControl.repeater(this, list, opts);
+//}
 
-$.fn.columnar = function () {
-    return _hierarchyControl.columnar(this);
-}
-$.fn.external = function (name, data) {
-    return _hierarchyControl.external(this, name, data);
-}
+//$.fn.columnar = function () {
+//    return _hierarchyControl.columnar(this);
+//}
+//$.fn.external = function (name, data) {
+//    return _hierarchyControl.external(this, name, data);
+//}
