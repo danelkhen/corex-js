@@ -3,10 +3,10 @@ function HierarchyCompiler() {
     var _this = this;
     Function.addTo(_this, [compile, compileWithContext, generate, parse, parseLines, compileGenFunc]);
 
-    function parse(markup) {
+    function parse(markup, parent) {
         var lines = markup.lines();
         var nodes = parseLines(lines);
-        nodes = analyze(nodes);
+        nodes = analyze(nodes, parent);
         //console.log(nodes);
         return nodes;
     }

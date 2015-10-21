@@ -96,7 +96,7 @@ function HControl(node) {
             var cloned = map.get(obj);
             if (cloned == null) {
                 cloned = node.children.select(t=>t.clone());
-                cloned.forEach(t=>t.bindPrms(obj));
+                cloned.forEach(t=>t.bindArgs([obj]));
                 map.set(obj, cloned);
             }
             else {
@@ -126,7 +126,7 @@ function HControl(node) {
 
         var template = function (obj, i) {
             cloned = node.children.select(t=>t.clone());
-            cloned.forEach(t=>t.bindPrms(obj));
+            cloned.forEach(t=>t.bindArgs([obj]));
             var x = cloned.selectMany(child=>child.process().toArray());
             return x;
         }

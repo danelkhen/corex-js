@@ -18,7 +18,7 @@ function HNode(_node, _parent, _root) {
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
     });
 
-    Function.addTo(_this, [process, bindPrms, clone, tunnelCtx]);
+    Function.addTo(_this, [process, bindArgs, clone, tunnelCtx, invoke]);
     main();
 
     function main() {
@@ -49,6 +49,11 @@ function HNode(_node, _parent, _root) {
             _children = _node.children.select(t=>new HNode(t, _this, _root));
     }
 
+    function invoke(args) {
+        bindArgs(args);
+        var res = process();
+        return res;
+    }
 
     function clone() {
         var cloned = new HNode(_this, _parent, _root);
@@ -58,9 +63,8 @@ function HNode(_node, _parent, _root) {
         return cloned;
     }
 
-    function bindPrms() {
-        var values = Array.from(arguments);
-        values.forEach((value, i) => _ctx[_funcPrms[i]] = value);
+    function bindArgs(args) {
+        args.forEach((arg, i) => _ctx[_funcPrms[i]] = arg);
         return _this;
     }
 
@@ -118,7 +122,7 @@ function HNode(_node, _parent, _root) {
             return childrenRes;
         }
         else if (_children.length > 0) {
-            var childResults= _children.select(t=>t.process());
+            var childResults = _children.select(t=>t.process());
             _nodeProcessor.setChildResults(res, childResults);
         }
         return res;
@@ -297,14 +301,14 @@ function HNode(_node, _parent, _root) {
 //        return res;
 //    }
 //}
-    //function localizeGlobalCtx() {
-    //    if (_globalCtx == null)
-    //        return;
-    //    _localCtx = {};
-    //    Object.keys(_globalCtx).forEach(key=> {
-    //        var value = _globalCtx[key];
-    //        if (typeof (value) == "function")
-    //            value = value.bind(_this);
-    //        _localCtx[key] = value;
-    //    });
-    //}
+//function localizeGlobalCtx() {
+//    if (_globalCtx == null)
+//        return;
+//    _localCtx = {};
+//    Object.keys(_globalCtx).forEach(key=> {
+//        var value = _globalCtx[key];
+//        if (typeof (value) == "function")
+//            value = value.bind(_this);
+//        _localCtx[key] = value;
+//    });
+//}

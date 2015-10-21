@@ -3,8 +3,8 @@
 var _templates = {};
 
 function main() {
-    compileFakeFunction(test);
-    compileFakeFunction(test2);
+    //compileFakeFunction(test);
+    //compileFakeFunction(test2);
     main3();
     //.process();
     //var func = test2;
@@ -19,19 +19,6 @@ function loadTemplate(name) {
     return node;
 }
 
-function compileFakeFunction(func) {
-    if (func.compiledNode != null)
-        return func.compiledNode;
-    var funcInfo = FunctionHelper.parse(func.toString());
-    var node = compile(funcInfo.body, { funcPrms: funcInfo.prms });
-    func.compiledNode = node;
-    func.compiledFunc = function () {
-        func.compiledNode.bindPrms.apply(this, arguments);
-        var res = func.compiledNode.process();
-        return res;
-    }
-    return func.compiledNode;
-}
 function main3() {
     var total = 20;
     var el;
@@ -39,6 +26,8 @@ function main3() {
     for (var i = 0; i < total; i++) {
         data.contacts.push(Q.copy(data.contacts[0]));
     }
+    test2.callAmp();
+    return;
     var node;
     console.log("compile");
     time(function () {
@@ -46,7 +35,7 @@ function main3() {
     });
     console.log("bind");
     time(function () {
-        node.bindPrms(data);
+        node.bindArgs([data]);
     });
     console.log("Process");
     time(function () {
@@ -90,7 +79,7 @@ function shallowCopy(src, dest) {
 
 function compile(markup, root) {
     var compiler = new HierarchyCompiler();
-    var nodes = compiler.parse(markup);
+    var nodes = compiler.parse(markup, root);
     if (root == null && nodes.length == 1) {
         root = nodes[0];
     }
@@ -118,6 +107,38 @@ function compile(markup, root) {
     return root2;
 }
 
+Function.prototype.callAmp = function(varargs) {
+    var node = compileFakeFunction(this);
+    node.bindArgs(Array.from(arguments));
+    var res = node.process();
+    return res;
+}
+Function.prototype.applyAmp = function(args) {
+    var node = compileFakeFunction(this);
+    node.bindArgs(args);
+    var res = node.process();
+    return res;
+}
+
+Function.prototype.toAmp = function(){
+    return toAmpFunction(this);
+}
+function toAmpFunction(fakeFunc){
+    if (fakeFunc.compiledNode != null)
+        return fakeFunc.compiledNode.toFunction();
+    var node = compileFakeFunction(fakeFunc);
+    return node.toFunction();
+}
+function compileFakeFunction(func) {
+    if (func.compiledNode != null)
+        return func.compiledNode;
+    var funcInfo = FunctionHelper.parse(func.toString());
+    var ctx = {};
+    funcInfo.prms.forEach(prm => ctx[prm] = null);
+    var node = compile(funcInfo.body, { funcPrms: funcInfo.prms, ctx: ctx});
+    func.compiledNode = node;
+    return func.compiledNode;
+}
 
 
 /*
