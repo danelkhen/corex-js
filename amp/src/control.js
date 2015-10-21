@@ -43,7 +43,8 @@ function HControl(node) {
         if (opts) {
             Object.keys(opts).forEach(function (key) {
                 if (key.startsWith("on")) {
-                    el.on(key.substr(2) + ".hcontrol", opts[key])
+                    var name = key.substr(2) + ".hcontrol";
+                    el.off(name).on(name, opts[key]);
                 }
                 else {
                     var func = el[key];
@@ -80,7 +81,6 @@ function HControl(node) {
         return nodes.select(t=>t.clone);
     }
     function repeater(list, opts) {
-        console.log("repeater this=", this);
         var node = _node;
         var el = _node.lastRes || $();
         var map = node.__map;
@@ -112,6 +112,12 @@ function HControl(node) {
         return res3;
     }
 
+
+    function _if(condition){
+        if(!condition)
+            _node.childrenProcessed = true;
+    }
+
     function repeater2(el, list, opts) {
         var node = el.node;
         node.childrenProcessed = true;
@@ -129,26 +135,26 @@ function HControl(node) {
         return res3;
     }
 
-    function external(el, ctl, data) {
-        var node = el.node;
+    function external(ctl, data) {
+        var node = _node;
         node.childrenProcessed = true;
         node.tunnelCtx();
-        var externalNode = el.externalNode;
+        var externalNode = node.externalNode;
         if (externalNode == null) {
-            var node = el.node;
-            externalNode = loadTemplate(ctl);
-            externalNode.el = el;
+            externalNode = compileFakeFunction(ctl);// loadTemplate(ctl);
+            node.externalNode = externalNode;
+            //externalNode.el = el;
         }
         if (data != null)
             externalNode.bindPrms(data);
         externalNode.ctx._content = node.children;
         var el2 = externalNode.process();
-        el2.externalNode = externalNode;
+        //el2.externalNode = externalNode;
         return el2;
     }
 
-    function content(el) {
-        return el.node.ctx._content.selectMany(t=>t.process());
+    function content() {
+        return _node.ctx._content.selectMany(t=>t.process());
     }
 
     function columnar(el) {
@@ -222,10 +228,10 @@ function HControl(node) {
         }
     }
 
-    function setChildResults(parentRes, childResults){
+    function setChildResults(parentRes, childResults) {
         var parentEl2 = $(parentRes).toChildNodes()[0];
         var childNodes2 = $(childResults).toChildNodes();
-         HierarchyUtils.setChildren(parentEl2, childNodes2);
+        HierarchyUtils.setChildren(parentEl2, childNodes2);
     }
 }
 

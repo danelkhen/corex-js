@@ -3,16 +3,34 @@
 var _templates = {};
 
 function main() {
-    var func = test2;
-    var x = FunctionHelper.parse(func.toString());
-    _templates[func.name] = x.body;
+    compileFakeFunction(test);
+    compileFakeFunction(test2);
     main3();
+    //.process();
+    //var func = test2;
+    //var x = FunctionHelper.parse(func.toString());
+    //_templates[func.name] = x.body;
+    //main3();
 }
 
 function loadTemplate(name) {
     var markup = _templates[name];
     var node = compile(markup);//, { func:() => document.body, ctx: new HControl() }
     return node;
+}
+
+function compileFakeFunction(func) {
+    if (func.compiledNode != null)
+        return func.compiledNode;
+    var funcInfo = FunctionHelper.parse(func.toString());
+    var node = compile(funcInfo.body, { funcPrms: funcInfo.prms });
+    func.compiledNode = node;
+    func.compiledFunc = function () {
+        func.compiledNode.bindPrms.apply(this, arguments);
+        var res = func.compiledNode.process();
+        return res;
+    }
+    return func.compiledNode;
 }
 function main3() {
     var total = 20;
@@ -22,10 +40,15 @@ function main3() {
         data.contacts.push(Q.copy(data.contacts[0]));
     }
     var node;
+    console.log("compile");
     time(function () {
-        node = loadTemplate("test2");
+        node = compileFakeFunction(test2);
+    });
+    console.log("bind");
+    time(function () {
         node.bindPrms(data);
     });
+    console.log("Process");
     time(function () {
         //el = node.process();
         //$("body").setChildNodes(node.process().toChildNodes());
@@ -33,7 +56,9 @@ function main3() {
         //$("input").css({ backgroundColor: "pink" });
         //$("div").css({ backgroundColor: "red" });
     });
+    //$("div").css({backgroundColor:"red"})
     window.setTimeout(function () {
+        console.log("Process again");
         time(function () {
             node.process();
             //$("body").setChildNodes(el);
@@ -59,6 +84,10 @@ function time(action) {
     console.log(end.valueOf() - start.valueOf() + "ms");
 }
 
+function shallowCopy(src, dest) {
+    return $.extend(dest || {}, src);
+}
+
 function compile(markup, root) {
     var compiler = new HierarchyCompiler();
     var nodes = compiler.parse(markup);
@@ -68,9 +97,12 @@ function compile(markup, root) {
     else {
         if (root == null)
             root = {};
-        if (root.ctx == null)
+        if (root.ctx == null) {
             root.ctx = {};
-        root.funcPrms = nodes.selectMany("funcPrms").distinct();
+            nodes.forEach(node => shallowCopy(node.ctx, root.ctx));
+        }
+        if (root.funcPrms == null)
+            root.funcPrms = nodes.selectMany("funcPrms").distinct();
         root.children = nodes;
         if (root.func == null)
             root.func = ctx => {

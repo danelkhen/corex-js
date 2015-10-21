@@ -16,19 +16,22 @@
 </head>
 <body>
     <script>
-function test() {
-document.body
-    input()
+function test(name) {
+    input({val:"hello "+name});
 }
-function test2() {
-data =>  document.body
+function pretty() {
+    div({css:{border:"solid 1px black"}});
+        content()
+}
+function test2(data) {
+document.body
     vertical()
         horizontal().data("layout-size", "30px")
             input({ css: { width: "100%" }, data: { "layout-size": "100%" } })
             button({text:"search", css:{width:"100%"}, data:{"layout-size": "200px"}})
         horizontal().data("layout-size", "100%")
             div( { className: "sidebar", data: {"layout-size": "50px" } } )
-                button({text:"X", onclick: e => $(e.target).parent().toggleClass("expanded")})
+                button({text:"X", onclick: e => $(e.target).parent().toggleClass("expanded") })
                 div( { text:"aaa" } )
                 div( { text:"aaa" } )
                 div( { text:"aaa" } )
@@ -40,7 +43,10 @@ data =>  document.body
                 div( { text:"aaa" } )
                 div( { text:"aaa" } )
             div( {className: "content", text:"ggg", data:{"layout-size": "100%"} })
-                repeater(Array.generateNumbers(1, 100))
+                test.compiledFunc("shooki")
+                external(pretty)
+                    input({val:"yey!"});
+                repeater(Array.generateNumbers(1, 1000))
                     t => div({text:"aaa"+t})
 }
     </script>

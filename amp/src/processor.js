@@ -1,16 +1,19 @@
 ﻿"use strict"
-function HNode(_node, _root) {
+function HNode(_node, _parent, _root) {
     if (this == null || this == window)
         return new HNode(_node, root);
     var _this = this;
     var _text, _childrenProcessed, _ctx, _funcPrms, _lastCtx, _funcGen, _func, _children, _nodeProcessorGen, _nodeProcessor, _lastRes;
 
     Object.defineProperties(_this, {
+        parent: { get: function () { return _parent; }, set: function (value) { _parent = value; } },
         children: { get: function () { return _children; }, set: function (value) { _children = value; } },
         ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
         funcPrms: { get: function () { return _funcPrms; }, set: function (value) { _funcPrms = value; } },
         lastRes: { get: function () { return _lastRes; } },
         func: { get: function () { return _func; }, set: function (value) { _func = value; } },
+        funcGen: { get: function () { return _funcGen; }, set: function (value) { _funcGen = value; } },
+        nodeProcessor: { get: function () { return _nodeProcessor; }, set: function (value) { _nodeProcessor = value; } },
         nodeProcessorGen: { get: function () { return _nodeProcessorGen; }, set: function (value) { _nodeProcessorGen = value; } },
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
     });
@@ -31,6 +34,7 @@ function HNode(_node, _root) {
         _func = _node.func;
         _nodeProcessor = _nodeProcessorGen(_this);
         if (_func == null) {
+            //console.log("compiling", _text);
             if (_funcGen == null && _node.funcBody) {
                 var compiler = new HierarchyCompiler();
                 _funcGen = compiler.compileGenFunc(_node.funcBody, _ctx, _nodeProcessor);
@@ -42,12 +46,12 @@ function HNode(_node, _root) {
         }
 
         if (_node.children != null)
-            _children = _node.children.select(t=>new HNode(t, _root));
+            _children = _node.children.select(t=>new HNode(t, _this, _root));
     }
 
 
     function clone() {
-        var cloned = new HNode(_node, _root);
+        var cloned = new HNode(_this, _parent, _root);
         cloned.ctx = shallowCopy(_ctx);
         cloned.ctx.el = null; //TODO: clone the res? keep the res?
         cloned.isClone = true;

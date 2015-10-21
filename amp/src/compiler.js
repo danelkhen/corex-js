@@ -7,7 +7,7 @@ function HierarchyCompiler() {
         var lines = markup.lines();
         var nodes = parseLines(lines);
         nodes = analyze(nodes);
-        console.log(nodes);
+        //console.log(nodes);
         return nodes;
     }
 
