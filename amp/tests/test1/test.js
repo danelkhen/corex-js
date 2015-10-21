@@ -33,24 +33,24 @@ function main3() {
         //$("input").css({ backgroundColor: "pink" });
         //$("div").css({ backgroundColor: "red" });
     });
-    //window.setTimeout(function () {
-    //    time(function () {
-    //        el = node.process();
-    //        $("body").setChildNodes(el);
-    //    });
-    //    window.setTimeout(function () {
-    //        time(function () {
-    //            data.contacts.removeAt(0);
-    //            data.contacts[0].name = "gggggggggggggggg";
-    //            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
-    //            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
-    //            data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
-    //            //var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
-    //            el = node.process();
-    //            $("body").setChildNodes(el);
-    //        });
-    //    }, 1000);
-    //}, 1000);
+    window.setTimeout(function () {
+        time(function () {
+            node.process();
+            //$("body").setChildNodes(el);
+        });
+        //window.setTimeout(function () {
+        //    time(function () {
+        //        data.contacts.removeAt(0);
+        //        data.contacts[0].name = "gggggggggggggggg";
+        //        data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+        //        data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+        //        data.contacts.push({ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] });
+        //        //var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
+        //        el = node.process();
+        //        $("body").setChildNodes(el);
+        //    });
+        //}, 1000);
+    }, 1000);
 }
 function time(action) {
     var start = new Date();
@@ -61,23 +61,27 @@ function time(action) {
 
 function compile(markup, root) {
     var compiler = new HierarchyCompiler();
-    if (root == null)
-        root = {};
-    if (root.ctx == null)
-        root.ctx = {};
+    var nodes = compiler.parse(markup);
+    if (root == null && nodes.length == 1) {
+        root = nodes[0];
+    }
+    else {
+        if (root == null)
+            root = {};
+        if (root.ctx == null)
+            root.ctx = {};
+        root.funcPrms = nodes.selectMany("funcPrms").distinct();
+        root.children = nodes;
+        if (root.func == null)
+            root.func = ctx => {
+                ctx.node.tunnelCtx();
+                ctx.node.childrenProcessed = true;
+                return ctx.node.children.select(t=>t.process());
+            };
+    }
     if (root.nodeProcessorGen == null)
         root.nodeProcessorGen = node => new HControl(node);
-    var nodes = compiler.parse(markup);
-    root.funcPrms = nodes.selectMany("funcPrms").distinct();
-    root.children = nodes;
     var root2 = new HNode(root);
-    if (root2.func == null)
-        root2.func = (ctx) => {
-            console.log("virtual root, ctx=", ctx);
-            root2.tunnelCtx();
-            root2.childrenProcessed = true;
-            return root2.children.select(t=>t.process());
-        };
     //root2.children = nodes.select(t=>new HNode(t));
     return root2;
 }

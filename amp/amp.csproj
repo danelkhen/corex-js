@@ -72,6 +72,7 @@
     <Content Include="src\processor.js" />
     <Content Include="src\compiler.js" />
     <Content Include="tests\test1\sidebar.txt" />
+    <Content Include="tests\test1\test.amp.js" />
     <Content Include="tests\test1\test2.txt" />
     <Content Include="tests\test1\test.css" />
     <Content Include="tests\test1\test.txt" />
