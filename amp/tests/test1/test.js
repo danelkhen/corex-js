@@ -3,21 +3,9 @@
 var _templates = {};
 
 function main() {
-    //compileFakeFunction(test);
-    //compileFakeFunction(test2);
     main3();
-    //.process();
-    //var func = test2;
-    //var x = FunctionHelper.parse(func.toString());
-    //_templates[func.name] = x.body;
-    //main3();
 }
 
-function loadTemplate(name) {
-    var markup = _templates[name];
-    var node = compile(markup);//, { func:() => document.body, ctx: new HControl() }
-    return node;
-}
 
 function main3() {
     var total = 20;
@@ -26,7 +14,7 @@ function main3() {
     for (var i = 0; i < total; i++) {
         data.contacts.push(Q.copy(data.contacts[0]));
     }
-    test2.callAmp();
+    test2.callAmp(data);
     return;
     var node;
     console.log("compile");

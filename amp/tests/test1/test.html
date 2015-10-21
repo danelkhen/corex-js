@@ -46,8 +46,8 @@ document.body
                 test.callAmp("shooki")
                 external(pretty)
                     input({val:"yey!"});
-                repeater(Array.generateNumbers(1, 1000))
-                    t => div({text:"aaa"+t})
+                repeater(data.contacts)
+                    t => div({text:"hello "+t.name})
 }
     </script>
 </body>
