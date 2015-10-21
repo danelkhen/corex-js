@@ -1,3 +1,0 @@
-﻿t =>el.verify("ul")
-    el.verify("li")
-        content()

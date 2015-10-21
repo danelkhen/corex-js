@@ -1,5 +1,0 @@
-﻿el.verify('div.sidebarwrapper')
-    el.verify('div.sidebar')
-        el.verify('div.sidebar2').text("sidebar")
-    el.verify('div.sidebarcontent')
-        content(el)
