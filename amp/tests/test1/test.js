@@ -66,10 +66,11 @@ function compile(markup, root) {
         root = {};
     if (root.ctx == null)
         root.ctx = {};
-    if (root.globalCtx == null)
-        root.globalCtx = new HControl();
-    var nodes = compiler.build(markup, root.globalCtx);
+    if (root.nodeProcessorGen == null)
+        root.nodeProcessorGen = node => new HControl(node);
+    var nodes = compiler.build(markup);
     root.funcPrms = nodes.selectMany("funcPrms").distinct();
+    root.children = nodes;
     var root2 = new HNode(root);
     if (root2.func == null)
         root2.func = (ctx) => {
@@ -78,7 +79,7 @@ function compile(markup, root) {
             root2.childrenProcessed = true;
             return root2.children.select(t=>t.process());
         };
-    root2.children = nodes.select(t=>new HNode(t));
+    //root2.children = nodes.select(t=>new HNode(t));
     return root2;
 }
 

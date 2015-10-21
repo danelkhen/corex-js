@@ -1,63 +1,54 @@
 ﻿
-function HNode(_node) {
+function HNode(_node, _root) {
     if (this == null || this == window)
-        return new HNode(_node);
+        return new HNode(_node, root);
     var _this = this;
-    if (_node == null)
-        _node = {};
-    if (_node.children != null)
-        _this._children = _node.children.select(t=>new HNode(t));
-    _this._text = _node.text;
-    var _childrenProcessed;
-    var _ctx = shallowCopy(_node.ctx);
-    var _prms, _lastCtx;
-    var _globalCtx = _node.globalCtx;
-    var _localCtx;
-    var _funcGen = _node.funcGen;
-    var _prms = _node.funcPrms;
-    var _func = _node.func;
-    if (_func == null) {
-        if (_funcGen == null && _node.funcBody) {
-            var compiler = new HierarchyCompiler();
-            _funcGen = compiler.compileGenFunc(_node.funcBody, _ctx, _globalCtx);
-        }
-        if (_funcGen != null) {
-            localizeGlobalCtx();
-            _func = _funcGen(_globalCtx);
-        }
-    }
-    //if (_func == null && _node.funcGen != null)
-    //    _func = _node.funcGen.call(this, _localCtx);
-    //if (_node.funcInfo != null)
-    //    _prms = _node.funcInfo.argNames.toArray();
-    //else
-    //    _prms = _node.prms || [];
+    var _text, _childrenProcessed, _ctx, _funcPrms, _lastCtx, _funcGen, _func, _children, _nodeProcessorGen, _nodeProcessor;
 
     Object.defineProperties(_this, {
-        children: { get: function () { return _this._children; }, set: function (value) { _this._children = value; } },
+        children: { get: function () { return _children; }, set: function (value) { _children = value; } },
         ctx: { get: function () { return _ctx; }, set: function (value) { _ctx = value; } },
-        prms: { get: function () { return _prms; }, set: function (value) { _prms = value; } },
+        funcPrms: { get: function () { return _funcPrms; }, set: function (value) { _funcPrms = value; } },
         lastRes: { get: function () { return _lastRes; } },
         func: { get: function () { return _func; }, set: function (value) { _func = value; } },
+        nodeProcessorGen: { get: function () { return _nodeProcessorGen; }, set: function (value) { _nodeProcessorGen = value; } },
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
     });
 
     Function.addTo(_this, [process, bindPrms, clone, tunnelCtx]);
+    main();
 
-    function localizeGlobalCtx() {
-        if (_globalCtx == null)
-            return;
-        _localCtx = {};
-        Object.keys(_globalCtx).forEach(key=> {
-            var value = _globalCtx[key];
-            if (typeof (value) == "function")
-                value = value.bind(_this);
-            _localCtx[key] = value;
-        });
+    function main() {
+        if (_root == null)
+            _root = _this;
+        if (_node == null)
+            _node = {};
+        _text = _node.text;
+        _ctx = shallowCopy(_node.ctx);
+        _globalCtx = _node.globalCtx || _root.globalCtx;
+        _nodeProcessorGen = _node.nodeProcessorGen || _root.nodeProcessorGen;
+        _funcGen = _node.funcGen;
+        _funcPrms = _node.funcPrms;
+        _func = _node.func;
+        _nodeProcessor = _nodeProcessorGen(_this);
+        if (_func == null) {
+            if (_funcGen == null && _node.funcBody) {
+                var compiler = new HierarchyCompiler();
+                _funcGen = compiler.compileGenFunc(_node.funcBody, _ctx, _nodeProcessor);
+            }
+            if (_funcGen != null) {
+                _nodeProcessorGen();
+                _func = _funcGen(_nodeProcessor);
+            }
+        }
+
+        if (_node.children != null)
+            _children = _node.children.select(t=>new HNode(t, _root));
     }
 
+
     function clone() {
-        var cloned = new HNode(_node);
+        var cloned = new HNode(_node, _root);
         cloned.ctx = shallowCopy(_ctx);
         cloned.ctx.el = null; //TODO: clone the res? keep the res?
         cloned.isClone = true;
@@ -66,7 +57,7 @@ function HNode(_node) {
 
     function bindPrms() {
         var values = Array.from(arguments);
-        values.forEach((value, i) => _ctx[_prms[i]] = value);
+        values.forEach((value, i) => _ctx[_funcPrms[i]] = value);
         return _this;
     }
 
@@ -107,7 +98,7 @@ function HNode(_node) {
     function tunnelCtx() {
         var ctx = shallowCopy(_ctx);
         delete ctx.el;
-        _this._children.forEach(t=>shallowCopy(ctx, t.ctx));
+        _children.forEach(t=>shallowCopy(ctx, t.ctx));
     }
     function process() {
         if (_node.type == "Comment")
@@ -123,8 +114,8 @@ function HNode(_node) {
             _this.lastChildrenRes = childrenRes;
             return childrenRes;
         }
-        else if (_this._children.length > 0) {
-            var childNodes = _this._children.select(t=>t.process());
+        else if (_children.length > 0) {
+            var childNodes = _children.select(t=>t.process());
             var childNodes2 = toNodes(childNodes);
             res.setChildNodes(childNodes2);
         }
@@ -380,3 +371,16 @@ Node.prototype.setChildNodes = function (childNodes) {
 //    }
 
 //}
+
+
+    //function localizeGlobalCtx() {
+    //    if (_globalCtx == null)
+    //        return;
+    //    _localCtx = {};
+    //    Object.keys(_globalCtx).forEach(key=> {
+    //        var value = _globalCtx[key];
+    //        if (typeof (value) == "function")
+    //            value = value.bind(_this);
+    //        _localCtx[key] = value;
+    //    });
+    //}

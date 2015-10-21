@@ -2,9 +2,7 @@
     var _this = this;
     Function.addTo(_this, [compile, compileWithContext, generate, parse, build, compileGenFunc]);
 
-    var _globalCtx;
-    function build(markup, globalCtx) {
-        _globalCtx = globalCtx;
+    function build(markup) {
         var lines = markup.lines();
         var nodes = parse(lines);
         nodes = analyze(nodes);
@@ -61,11 +59,9 @@
         nodes.forEach(function (node) {
             if (parent == null) {
                 node.ctx = { el: null };
-                node.globalCtx = _globalCtx;
             }
             else {
                 node.ctx = shallowCopy(parent.ctx);
-                node.globalCtx = parent.globalCtx;
             }
             if (node.text.startsWith("//") || (parent != null && parent.type == "Comment")) {
                 node.type = "Comment";
