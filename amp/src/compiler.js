@@ -1,22 +1,14 @@
-﻿function HierarchyCompiler() {
+﻿"use strict"
+function HierarchyCompiler() {
     var _this = this;
-    Function.addTo(_this, [compile, compileWithContext, generate, parse, build, compileGenFunc]);
+    Function.addTo(_this, [compile, compileWithContext, generate, parse, parseLines, compileGenFunc]);
 
-    function build(markup) {
+    function parse(markup) {
         var lines = markup.lines();
-        var nodes = parse(lines);
+        var nodes = parseLines(lines);
         nodes = analyze(nodes);
         console.log(nodes);
         return nodes;
-        ////console.log(nodes);
-        //var code = generate(nodes);
-        ////console.log(markup);
-
-        //var func = compileWithContext(code, globalCtx);
-        //console.log(func);
-        //var compiledNodes = func(globalCtx);
-        //_globalCtx = null;
-        //return compiledNodes;
     }
 
     function isValidIdentifier(s) {
@@ -80,15 +72,6 @@
                     node.funcBody = node.text;
                     node.funcPrms = [];
                 }
-                //if (node.type == null && parent != null && parent.funcInfo != null) {
-                //    //node.funcInfo = { argNames: parent.funcInfo.argNames };
-                //    node.type = "ScopedExpression";
-                //    node.funcGen = compileNodeFunc(node.text, node.ctx);
-                //}
-                //if (node.type == null) {
-                //    node.type = "Expression";
-                //    node.funcGen = compileNodeFunc(node.text, node.ctx);
-                //}
             }
             analyze(node.children, node);
         });
@@ -107,7 +90,7 @@
     }
 
 
-    function parse(_lines) {
+    function parseLines(_lines) {
         var stack = [{ children: [], tab: -1 }];
 
         _lines.forEach(function (line) {
@@ -170,8 +153,8 @@ function FunctionHelper() {
     var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
     function parsePrms(s) {
         var list = [];
-        fnText = s.toString().replace(STRIP_COMMENTS, '');
-        argDecl = fnText.match(FN_ARGS);
+        var fnText = s.toString().replace(STRIP_COMMENTS, '');
+        var argDecl = fnText.match(FN_ARGS);
         if (argDecl == null)
             return null;
         argDecl[1].split(FN_ARG_SPLIT).forEach(function (arg) {
@@ -205,3 +188,16 @@ function FunctionHelper() {
     }
 }
 FunctionHelper();
+
+
+
+
+////console.log(nodes);
+//var code = generate(nodes);
+////console.log(markup);
+
+//var func = compileWithContext(code, globalCtx);
+//console.log(func);
+//var compiledNodes = func(globalCtx);
+//_globalCtx = null;
+//return compiledNodes;

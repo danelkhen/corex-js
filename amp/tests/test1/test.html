@@ -4,12 +4,6 @@
     <title>My App</title>
     <link href="test.css" rel="stylesheet" />
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>-->
-
     <script src="/CorexJs/corex.js"></script>
     <script src="/CorexJs/corex-jquery.js"></script>
     <script src="../../src/compiler.js"></script>
@@ -23,27 +17,31 @@
 <body>
     <script>
 function test() {
-    console.log("hello")
+document.body
+    input()
 }
 function test2() {
-(ctl,data) =>  document.body
-    vertical(el)
-        console.log(this._lastRes)
-        horizontal(el).data("layout-size", "30px")
-            el.verify("input").css({width:"100%"}).data("layout-size", "100%")
-            el.verify("button").text("search").css({width:"100%"}).data("layout-size", "200px")
-        horizontal(el).data("layout-size", "100%")
-            el.verify(".sidebar").data("layout-size", "50px")
-                el.verify("button").text("X").on("click.ggg", e => $(e.target).parent().toggleClass("expanded"))
-                el.verify("div").text("aaa")
-                el.verify("div").text("aaa")
-                el.verify("div").text("aaa")
-                el.verify("div").text("aaa")
-                el.verify("div").text("aaa")
-                el.verify("div").text("aaa")
-            el.verify(".content").text("ggg").data("layout-size", "100%")
-                repeater(el, Array.generateNumbers(1, 100))
-                    t => el.verify("div").text("aaa"+t)
+data =>  document.body
+    vertical()
+        horizontal().data("layout-size", "30px")
+            input({ css: { width: "100%" }, data: { "layout-size": "100%" } })
+            button({text:"search", css:{width:"100%"}, data:{"layout-size": "200px"}})
+        horizontal().data("layout-size", "100%")
+            div( {className: "sidebar", data:{"layout-size": "50px" }})
+                button({text:"X", onclick: e => $(e.target).parent().toggleClass("expanded")})
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+                div( {text:"aaa"} )
+            div( {className: "content", text:"ggg", data:{"layout-size": "100%"} })
+                repeater(Array.generateNumbers(1, 100))
+                    t => div({text:"aaa"+t})
 }
     </script>
 </body>

@@ -1,9 +1,9 @@
-﻿
+﻿"use strict"
 function HNode(_node, _root) {
     if (this == null || this == window)
         return new HNode(_node, root);
     var _this = this;
-    var _text, _childrenProcessed, _ctx, _funcPrms, _lastCtx, _funcGen, _func, _children, _nodeProcessorGen, _nodeProcessor;
+    var _text, _childrenProcessed, _ctx, _funcPrms, _lastCtx, _funcGen, _func, _children, _nodeProcessorGen, _nodeProcessor, _lastRes;
 
     Object.defineProperties(_this, {
         children: { get: function () { return _children; }, set: function (value) { _children = value; } },
@@ -25,7 +25,6 @@ function HNode(_node, _root) {
             _node = {};
         _text = _node.text;
         _ctx = shallowCopy(_node.ctx);
-        _globalCtx = _node.globalCtx || _root.globalCtx;
         _nodeProcessorGen = _node.nodeProcessorGen || _root.nodeProcessorGen;
         _funcGen = _node.funcGen;
         _funcPrms = _node.funcPrms;
@@ -83,13 +82,13 @@ function HNode(_node, _root) {
             return el;
         //if (canReuseLastRes())
         //    return _this._lastRes;
-        if (_ctx.el == null)//_lastCtx 
-            _ctx.el = $();
-        _ctx.el.node = _this;
+        //if (_ctx.el == null)//_lastCtx 
+        //    _ctx.el = $();
+        //_ctx.el.node = _this;
         _ctx.node = _this;
         _childrenProcessed = false;
         var el = _func.call(_this, _ctx);
-        _this._lastRes = el;
+        _lastRes = el;
         _ctx.el = el;
         _lastCtx = shallowCopy(_ctx);
         return el;
@@ -115,9 +114,8 @@ function HNode(_node, _root) {
             return childrenRes;
         }
         else if (_children.length > 0) {
-            var childNodes = _children.select(t=>t.process());
-            var childNodes2 = toNodes(childNodes);
-            res.setChildNodes(childNodes2);
+            var childResults= _children.select(t=>t.process());
+            _nodeProcessor.setChildResults(res, childResults);
         }
         return res;
     }
@@ -131,60 +129,6 @@ function HNode(_node, _root) {
 
 
 
-function HierarchyUtils() {
-    Function.addTo(HierarchyUtils, [setChildren]);
-    function setChildren(el, childElements) {
-        childElements.forEach(function (childEl, index) {
-            var currentChild = el.childNodes[index];
-            if (currentChild == childEl)
-                return;
-            if (currentChild != null) {
-                el.insertBefore(childEl, currentChild);
-                return;
-            }
-            el.appendChild(childEl);
-        });
-        for (var i = childElements.length; i < el.childNodes.length; i++) {
-            var childNode = el.childNodes[i];
-            el.removeChild(childNode);
-        }
-
-        return el;
-    }
-}
-HierarchyUtils();
-$.fn.setChildNodes = function (childNodes) {
-    if (!(childNodes instanceof Array))
-        childNodes = childNodes.toArray();
-    HierarchyUtils.setChildren(this[0], childNodes);
-    return this;
-}
-$.fn.verify = function (selector) {
-    if (!this.is(selector))
-        return $.create(selector);
-    return this;
-}
-$.fn.toChildNodes = function () {
-    return this.pushStack(toNodes(this));
-}
-function toNodes(results) {
-    var list = [];
-    _addNodes(results, list);
-    return list;
-    return list;
-}
-function _addNodes(res, list) {
-    if (res == null)
-        return;
-    if (res instanceof Array)
-        res.forEach(t=>_addNodes(t, list));
-    else if (res instanceof jQuery)
-        list.addRange(res.toArray());
-    else if (typeof (res) == "string")
-        list.add(document.createTextNode(res));
-    else
-        list.add(res);
-}
 
 //$.fn.verify2 = function(list, create) {
 //    var childEls = this.toArray();
@@ -211,9 +155,7 @@ function _addNodes(res, list) {
 //    }
 //    if (total == null)
 //        total = 1;
-
 //    var index = childEls.length;
-
 //    if (action != null || storeDataItem) {
 //        var min = Math.min(index, total);
 //        if (list == null)
@@ -252,18 +194,9 @@ function _addNodes(res, list) {
 //    }
 //    return $(childEls);
 //}
-
-
-Node.prototype.setChildNodes = function (childNodes) {
-    HierarchyUtils.setChildren(this, childNodes);
-}
-
-
-
 //function HierarchyProcessor(_opts) {
 //    var _this = this;
 //    Function.addTo(_this, [process]);
-
 //    main();
 //    var _nodes, _cache, _rootEl, _root;
 //    function main() {
@@ -280,14 +213,11 @@ Node.prototype.setChildNodes = function (childNodes) {
 //        ////if (_cache)
 //        ////    addCaching(_root);
 //    }
-
 //    function process(data) {
 //        _root.ctx.data = data;
 //        return _root.process();
 //        //return processNode(_root);
 //    }
-
-
 //    function existing(selector, opts) {
 //        var el = $(selector);
 //        if (opts) {
@@ -302,9 +232,6 @@ Node.prototype.setChildNodes = function (childNodes) {
 //            }
 //        }
 //    }
-
-
-
 //    function cached1(func) {
 //        if (typeof (func) != "function")
 //            throw new Error();
@@ -317,7 +244,6 @@ Node.prototype.setChildNodes = function (childNodes) {
 //            return res;
 //        };
 //    }
-
 //    function addCaching(node) {
 //        if (node._cached)
 //            return;
@@ -325,8 +251,6 @@ Node.prototype.setChildNodes = function (childNodes) {
 //        //node.childNodes.forEach(addCaching);
 //        node._cached = true;
 //    }
-
-
 //    function processChildNodes(node) {
 //        var childEls = [];
 //        node.children.forEach(function (child) {
@@ -338,7 +262,6 @@ Node.prototype.setChildNodes = function (childNodes) {
 //        });
 //        return childEls;
 //    }
-
 //    function processNode(node) {
 //        if (_opts.cache) {
 //            addCaching(node);
@@ -369,10 +292,7 @@ Node.prototype.setChildNodes = function (childNodes) {
 //        }
 //        return res;
 //    }
-
 //}
-
-
     //function localizeGlobalCtx() {
     //    if (_globalCtx == null)
     //        return;

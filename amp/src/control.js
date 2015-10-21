@@ -1,19 +1,28 @@
-﻿function HControl(node) {
+﻿"use strict"
+function HControl(node) {
     var _this = this;
     var _node = node;
-    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content, vertical, horizontal]);
+    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content, vertical, horizontal, verify, setChildResults]);
 
     var _htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "legend", "li", "link", "main", "map", "mark", "menu", "menuitem", "meta", "meter", "nav", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"];
-    //["!--...--","!DOCTYPE ",
 
     main();
+    Object.defineProperties(_this, {
+        el: { get: function () { return _node.lastRes; } }
+    });
 
+    //function input(){
+    //    console.log("input");
+    //    return $.create("input");
+    //}
 
     function main() {
         _htmlTags.forEach(function (tag) {
             if (_this[tag] != null)
                 return;
-            var func = function (el, opts) { return verify(el, tag, opts); };
+            var func = function (opts) {
+                return verify(tag, opts);
+            };
             var funcName = tag;
             if (funcName == "var")
                 funcName = "var_";
@@ -21,7 +30,8 @@
             _this[funcName] = func;
         });
     }
-    function verify(existing, selector, opts) {
+    function verify(selector, opts) {
+        var existing = _node.lastRes;
         var el;
         if (existing != null) {
             el = $(existing);
@@ -32,11 +42,21 @@
             el = $.create(selector);
         if (opts) {
             Object.keys(opts).forEach(function (key) {
-                el = el[key](opts[key]);
+                if (key.startsWith("on")) {
+                    el.on(key.substr(2) + ".hcontrol", opts[key])
+                }
+                else {
+                    var func = el[key];
+                    if (typeof (func) == "function")
+                        el = el[key](opts[key]);
+                    else
+                        el.prop(key, opts[key]);
+                }
             });
         }
-        var el2 = el[0];
-        return el2;
+        return el;
+        //var el2 = el[0];
+        //return el2;
     }
     function create(selector, opts) {
         var el = $.create(selector);
@@ -45,8 +65,9 @@
                 el = el[key](opts[key]);
             });
         }
-        var el2 = el[0];
-        return el2;
+        return el;
+        //var el2 = el[0];
+        //return el2;
     }
     function invisible(node) {
         node.tunnelCtx();
@@ -58,9 +79,10 @@
     function cloneNodes(nodes) {
         return nodes.select(t=>t.clone);
     }
-    function repeater(el, list, opts) {
+    function repeater(list, opts) {
         console.log("repeater this=", this);
-        var node = el.node;
+        var node = _node;
+        var el = _node.lastRes || $();
         var map = node.__map;
         if (map == null) {
             map = new Map();
@@ -80,9 +102,10 @@
             else {
                 //console.log("already exists!", cloned);
             }
-            var x = cloned.selectMany(child=>child.process().toArray());
-            $(x).addClass("rpt-" + i);
-            return x;
+            var x = cloned.select(child=>child.process());
+            var xx = $(x).toChildNodes();
+            xx.addClass("rpt-" + i);
+            return xx;
         }
         var res2 = list.selectMany(template);
         var res3 = $(res2);
@@ -140,13 +163,15 @@
         return el;
     }
 
-    function vertical(el) {
+    function vertical() {
+        var node = _node;
         console.log("vetrical", this);
-        var node = el.node;
+        //var node = el.node;
         node.childrenProcessed = true;
         node.tunnelCtx();
         if (node.children.length == 0)
             return el.empty();
+        var el = node.lastRes || $();
         el = el.verify("table.layout.vertical");
         var tbl = el;
         var tbody = tbl.getAppend("tbody");
@@ -164,8 +189,9 @@
         return el;
     }
 
-    function horizontal(el) {
-        var node = el.node;
+    function horizontal() {
+        var node = _node;
+        var el = _node.lastRes || $();
         node.childrenProcessed = true;
         node.tunnelCtx();
         if (node.children.length == 0)
@@ -186,25 +212,6 @@
         return el;
     }
 
-    //function vertical(el) {
-    //    var node = el.node;
-    //    node.childrenProcessed = true;
-    //    node.tunnelCtx();
-    //    //if (node.children.length == 0)
-    //    //    return el.empty();
-    //    el = el.verify("div.vertical");
-    //    //var tbl = el;
-    //    //var tbody = tbl.getAppend("tbody");
-    //    var children2 = node.children.select(t=>t.process());
-    //    //children2.forEach(t=>t.addClass())
-    //    el.setChildNodes(toNodes(children2));
-
-    //    //tbody.getAppendRemoveForEach("tr", children2, function (tr, child) {
-    //    //    var td = tr.getAppend("td");
-    //    //    td.setChildNodes(toNodes([child]));
-    //    //});
-    //    return el;
-    //}
 
     function changeContext(newContext) {
         return {
@@ -215,7 +222,72 @@
         }
     }
 
+    function setChildResults(parentRes, childResults){
+        var parentEl2 = $(parentRes).toChildNodes()[0];
+        var childNodes2 = $(childResults).toChildNodes();
+         HierarchyUtils.setChildren(parentEl2, childNodes2);
+    }
 }
+
+
+function HierarchyUtils() {
+    Function.addTo(HierarchyUtils, [setChildren]);
+    function setChildren(el, childElements) {
+        childElements.forEach(function (childEl, index) {
+            var currentChild = el.childNodes[index];
+            if (currentChild == childEl)
+                return;
+            if (currentChild != null) {
+                el.insertBefore(childEl, currentChild);
+                return;
+            }
+            el.appendChild(childEl);
+        });
+        for (var i = childElements.length; i < el.childNodes.length; i++) {
+            var childNode = el.childNodes[i];
+            el.removeChild(childNode);
+        }
+
+        return el;
+    }
+}
+HierarchyUtils();
+$.fn.setChildNodes = function (childNodes) {
+    if (!(childNodes instanceof Array))
+        childNodes = childNodes.toArray();
+    HierarchyUtils.setChildren(this[0], childNodes);
+    return this;
+}
+$.fn.verify = function (selector) {
+    if (!this.is(selector))
+        return $.create(selector);
+    return this;
+}
+$.fn.toChildNodes = function () {
+    return this.pushStack(toNodes(this));
+}
+function toNodes(results) {
+    var list = [];
+    _addNodes(results, list);
+    return list;
+}
+function _addNodes(res, list) {
+    if (res == null)
+        return;
+    if (res instanceof Array)
+        res.forEach(t=>_addNodes(t, list));
+    else if (res instanceof jQuery)
+        res.toArray().forEach(t=>_addNodes(t, list));
+    else if (typeof (res) == "string")
+        list.add(document.createTextNode(res));
+    else
+        list.add(res);
+}
+Node.prototype.setChildNodes = function (childNodes) {
+    HierarchyUtils.setChildren(this, childNodes);
+}
+
+
 //var _hierarchyControl = new HierarchyControl();
 //$.fn.repeater = function (list, opts) {
 //    return _hierarchyControl.repeater(this, list, opts);
@@ -226,4 +298,23 @@
 //}
 //$.fn.external = function (name, data) {
 //    return _hierarchyControl.external(this, name, data);
+//}
+//function vertical(el) {
+//    var node = el.node;
+//    node.childrenProcessed = true;
+//    node.tunnelCtx();
+//    //if (node.children.length == 0)
+//    //    return el.empty();
+//    el = el.verify("div.vertical");
+//    //var tbl = el;
+//    //var tbody = tbl.getAppend("tbody");
+//    var children2 = node.children.select(t=>t.process());
+//    //children2.forEach(t=>t.addClass())
+//    el.setChildNodes(toNodes(children2));
+
+//    //tbody.getAppendRemoveForEach("tr", children2, function (tr, child) {
+//    //    var td = tr.getAppend("td");
+//    //    td.setChildNodes(toNodes([child]));
+//    //});
+//    return el;
 //}

@@ -16,7 +16,6 @@ function loadTemplate(name) {
 }
 function main3() {
     var total = 20;
-    var ctl = {};
     var el;
     var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
     for (var i = 0; i < total; i++) {
@@ -25,7 +24,7 @@ function main3() {
     var node;
     time(function () {
         node = loadTemplate("test2");
-        node.bindPrms(ctl, data);
+        node.bindPrms(data);
     });
     time(function () {
         //el = node.process();
@@ -68,7 +67,7 @@ function compile(markup, root) {
         root.ctx = {};
     if (root.nodeProcessorGen == null)
         root.nodeProcessorGen = node => new HControl(node);
-    var nodes = compiler.build(markup);
+    var nodes = compiler.parse(markup);
     root.funcPrms = nodes.selectMany("funcPrms").distinct();
     root.children = nodes;
     var root2 = new HNode(root);
