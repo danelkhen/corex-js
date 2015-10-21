@@ -188,16 +188,3 @@ function FunctionHelper() {
     }
 }
 FunctionHelper();
-
-
-
-
-////console.log(nodes);
-//var code = generate(nodes);
-////console.log(markup);
-
-//var func = compileWithContext(code, globalCtx);
-//console.log(func);
-//var compiledNodes = func(globalCtx);
-//_globalCtx = null;
-//return compiledNodes;
