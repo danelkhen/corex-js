@@ -2,7 +2,11 @@
 function HControl(node) {
     var _this = this;
     var _node = node;
-    Function.addTo(_this, [create, invisible, repeater, changeContext, columnar, external, repeater2, content, vertical, horizontal, verify, setChildResults]);
+    Function.addTo(_this, [
+        create, invisible, repeater, changeContext, twoColumns, external,
+        repeater2, content, vertical, horizontal, verify, setChildResults,
+        conditional, switcher, bindVal, field
+    ]);
 
     var _htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "legend", "li", "link", "main", "map", "mark", "menu", "menuitem", "meta", "meter", "nav", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"];
 
@@ -70,10 +74,10 @@ function HControl(node) {
         //var el2 = el[0];
         //return el2;
     }
-    function invisible(node) {
-        node.tunnelCtx();
-        node.childrenProcessed = true;
-        return node.children.select(child=>child.process());
+    function invisible() {
+        _node.tunnelCtx();
+        _node.childrenProcessed = true;
+        return $(_node.children.select(child=>child.process())).toChildNodes();
     }
 
 
@@ -113,9 +117,23 @@ function HControl(node) {
     }
 
 
-    function _if(condition){
-        if(!condition)
+    function conditional(condition) {
+        if (!condition) {
             _node.childrenProcessed = true;
+            return null;
+        }
+        return invisible();
+    }
+
+    function switcher(index) {
+        _node.childrenProcessed = true;
+        if (index == null)
+            return null;
+        var child = _node.children[index];
+        if (child == null)
+            return null;
+        _node.tunnelCtx([child]);
+        return child.process();
     }
 
     function repeater2(el, list, opts) {
@@ -157,16 +175,28 @@ function HControl(node) {
         return _node.ctx._content.selectMany(t=>t.process());
     }
 
-    function columnar(el) {
-        var node = el.node;
+    function twoColumns() {
+        var node = _node;
         node.childrenProcessed = true;
         node.tunnelCtx();
-        var children = node.children.select(t=>t.process());
-        el = el.verify(".row");
-        el.getAppendRemoveForEach(".col-md-4", children, function (div, child) {
-            div.append(child);
+        var children = $(node.children.select(t=>t.process())).toChildNodes().toArray();
+        var pairs = toPairs(children);
+        var div = _node.lastRes || $();
+        div = div.verify("table").getAppend("tbody");
+        div.getAppendRemoveForEach("tr", pairs, function (row, pair) {
+            row.getAppendRemoveForEach("td", pair, function (cell, child) {
+                cell.append(child);
+            });
         });
-        return el;
+        return div;
+    }
+
+    function toPairs(list) {
+        var list2 = [];
+        for (var i = 0; i < list.length; i += 2) {
+            list2.push([list[i], list[i + 1]]);
+        }
+        return list2;
     }
 
     function vertical() {
@@ -184,7 +214,7 @@ function HControl(node) {
         var results = node.children.select(t=>t.process());
         tbody.getAppendRemoveForEach("tr", results, function (tr, res) {
             var td = tr.getAppend("td");
-            var childNodes = $(res).toChildNodes();
+            var childNodes = $(toNodes(res));
             var height = childNodes.data("layout-height");
             if (height == null)
                 height = childNodes.data("layout-size");
@@ -207,7 +237,7 @@ function HControl(node) {
         var tr = tbl.getAppend("tbody").getAppend("tr");
         var results = node.children.select(t=>t.process());
         tr.getAppendRemoveForEach("td", results, function (td, res) {
-            var childNodes = $(res).toChildNodes();
+            var childNodes = $(toNodes(res));
             var width = childNodes.data("layout-width");
             if (width == null)
                 width = childNodes.data("layout-size");
@@ -219,6 +249,38 @@ function HControl(node) {
     }
 
 
+    function field(name) {
+        var label = $.create("label").text(name+": ");
+        var input = bindVal($.create("input"), name);
+        return $([label[0], input[0]]);
+    }
+    function bindVal(el, name) {
+        var obj = getDataContext() || {};
+        var el2 = $(el);
+        el2.off("change.bindVal").on("change.bindVal", e => obj[name] = $(e.target).val());
+        el2.val(obj[name]);
+        return el2;
+    }
+
+    function getDataContext() {
+        var prms = getLastPrms();
+        var obj;
+        if (prms != null && prms.length > 0)
+            return _node.ctx[prms[0]];
+        return null;
+    }
+
+    function getLastPrms() {
+        var node = _node;
+        while (node != null) {
+            if (node.funcPrms != null && node.funcPrms.length > 0) {
+                return node.funcPrms;
+            }
+            node = node.parent;
+        }
+        return _node.funcPrms;
+    }
+
     function changeContext(newContext) {
         return {
             setTemplate: function (templateFunc) {
@@ -229,8 +291,8 @@ function HControl(node) {
     }
 
     function setChildResults(parentRes, childResults) {
-        var parentEl2 = $(parentRes).toChildNodes()[0];
-        var childNodes2 = $(childResults).toChildNodes();
+        var parentEl2 = toNodes(parentRes)[0];
+        var childNodes2 = toNodes(childResults);
         HierarchyUtils.setChildren(parentEl2, childNodes2);
     }
 }
@@ -298,7 +360,6 @@ Node.prototype.setChildNodes = function (childNodes) {
 //$.fn.repeater = function (list, opts) {
 //    return _hierarchyControl.repeater(this, list, opts);
 //}
-
 //$.fn.columnar = function () {
 //    return _hierarchyControl.columnar(this);
 //}
@@ -317,7 +378,6 @@ Node.prototype.setChildNodes = function (childNodes) {
 //    var children2 = node.children.select(t=>t.process());
 //    //children2.forEach(t=>t.addClass())
 //    el.setChildNodes(toNodes(children2));
-
 //    //tbody.getAppendRemoveForEach("tr", children2, function (tr, child) {
 //    //    var td = tr.getAppend("td");
 //    //    td.setChildNodes(toNodes([child]));

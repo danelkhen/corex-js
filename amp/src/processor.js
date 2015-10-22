@@ -55,6 +55,7 @@ function HNode(_node, _parent, _root) {
         return res;
     }
 
+
     function clone() {
         var cloned = new HNode(_this, _parent, _root);
         cloned.ctx = shallowCopy(_ctx);
@@ -102,10 +103,12 @@ function HNode(_node, _parent, _root) {
         return el;
     }
 
-    function tunnelCtx() {
+    function tunnelCtx(toNodes) {
+        if (toNodes == null)
+            toNodes = _children;
         var ctx = shallowCopy(_ctx);
         delete ctx.el;
-        _children.forEach(t=>shallowCopy(ctx, t.ctx));
+        toNodes.forEach(t=>shallowCopy(ctx, t.ctx));
     }
     function process() {
         if (_node.type == "Comment")

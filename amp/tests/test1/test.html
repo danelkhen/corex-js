@@ -23,31 +23,40 @@ function pretty() {
     div({css:{border:"solid 1px black"}});
         content()
 }
-function test2(data) {
+function test2(contact) {
 document.body
-    vertical()
-        horizontal().data("layout-size", "30px")
-            input({ css: { width: "100%" }, data: { "layout-size": "100%" } })
-            button({text:"search", css:{width:"100%"}, data:{"layout-size": "200px"}})
-        horizontal().data("layout-size", "100%")
-            div( { className: "sidebar", data: {"layout-size": "50px" } } )
-                button({text:"X", onclick: e => $(e.target).parent().toggleClass("expanded") })
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-                div( { text:"aaa" } )
-            div( {className: "content", text:"ggg", data:{"layout-size": "100%"} })
-                test.callAmp("shooki")
-                external(pretty)
-                    input({val:"yey!"});
-                repeater(data.contacts)
-                    t => div({text:"hello "+t.name})
+    twoColumns()
+        "hello"
+        "hello2"
+        field("name")
+        field("age")
+}
+function test3(data) {
+document.body
+    conditional(data!=null)
+        vertical()
+            horizontal().data("layout-size", "30px")
+                input({ css: { width: "100%" }, data: { "layout-size": "100%" } })
+                button({text:"search", css:{width:"100%"}, data:{"layout-size": "200px"}})
+            horizontal().data("layout-size", "100%")
+                div( { className: "sidebar", data: {"layout-size": "50px" } } )
+                    button({text:"X", onclick: e => $(e.target).parent().toggleClass("expanded") })
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                    div( { text:"aaa" } )
+                div( {className: "content", text:"ggg", data:{"layout-size": "100%"} })
+                    test.callAmp("shooki")
+                    external(pretty)
+                        input({val:"yey!"});
+                    repeater(data.contacts)
+                        t => div({text:"hello "+t.name})
 }
     </script>
 </body>

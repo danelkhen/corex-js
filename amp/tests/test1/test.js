@@ -3,6 +3,8 @@
 var _templates = {};
 
 function main() {
+    test2.callAmp({name:"shooki", age:7});
+    return;
     main3();
 }
 
