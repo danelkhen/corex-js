@@ -136,8 +136,13 @@ function FunctionHelper() {
     function parse(s) {
         var prms = parseArrowFunctionArgNames(s);
         if (prms != null) {
-            var body = s.substr(s.indexOf("=>") + 2);
-            return { body: body, prms: prms, type: "ArrowFunction", name: null };
+            var arrowEnd = s.indexOf("=>") + 2;
+            var body = s.substr(arrowEnd);
+            var type = "ArrowExpressionFunction";
+            if(body.trim().startsWith("{"))
+                type = "ArrowFunction";
+
+            return { body: body, prms: prms, type:type, name: null };
         }
         prms = parsePrms(s);
         if (prms == null)

@@ -4,6 +4,7 @@ function HNode(_node, _parent, _root) {
         return new HNode(_node, root);
     var _this = this;
     var _text, _childrenProcessed, _ctx, _funcPrms, _lastCtx, _funcGen, _func, _children, _nodeProcessorGen, _nodeProcessor, _lastRes;
+    var _compiledCtx;
 
     Object.defineProperties(_this, {
         parent: { get: function () { return _parent; }, set: function (value) { _parent = value; } },
@@ -33,26 +34,38 @@ function HNode(_node, _parent, _root) {
         _funcPrms = _node.funcPrms;
         _func = _node.func;
         _nodeProcessor = _nodeProcessorGen(_this);
-        if (_func == null) {
-            //console.log("compiling", _text);
-            if (_funcGen == null && _node.funcBody) {
-                var compiler = new HierarchyCompiler();
-                _funcGen = compiler.compileGenFunc(_node.funcBody, _ctx, _nodeProcessor);
-            }
-            if (_funcGen != null) {
-                _nodeProcessorGen();
-                _func = _funcGen(_nodeProcessor);
-            }
-        }
+        compileFunc();
 
         if (_node.children != null)
             _children = _node.children.select(t=>new HNode(t, _this, _root));
     }
 
-    function invoke(args) {
-        bindArgs(args);
-        var res = process();
-        return res;
+    function shouldRecompileFunc() {
+        if (keysEqual(_ctx, _compiledCtx))
+            return false;
+        return true;
+    }
+
+    function recompileFunc(){
+        if(_node.func!=null || _node.funcGen!=null)
+            return;
+        _func = null;
+        _funcGen = null;
+        compileFunc();
+    }
+
+    function compileFunc() {
+        if (_func != null)
+            return;
+        if (_node.funcGen == null && _node.funcBody!=null) {
+            _compiledCtx = shallowCopy(_ctx);
+            var compiler = new HierarchyCompiler();
+            _funcGen = compiler.compileGenFunc(_node.funcBody, _ctx, _nodeProcessor);
+        }
+        if (_funcGen != null) {
+            _nodeProcessorGen();
+            _func = _funcGen(_nodeProcessor);
+        }
     }
 
 
@@ -69,6 +82,21 @@ function HNode(_node, _parent, _root) {
         return _this;
     }
 
+    function keysEqual(x, y) {
+        if (x == y)
+            return true;
+        if (x == null || y == null)
+            return false;
+        var xx = Object.keys(x);
+        var yy = Object.keys(y);
+        if (xx.length != yy.length)
+            return false;
+        xx.sort();
+        yy.sort();
+        if (!xx.itemsEqual(yy))
+            return false;
+        return true;
+    }
     function canReuseLastRes() {
         if (_lastCtx == null)
             return false;
@@ -87,6 +115,9 @@ function HNode(_node, _parent, _root) {
 
 
     function invoke() {
+        if (shouldRecompileFunc()) {
+            recompileFunc();
+        }
         if (_node.type == "Comment")
             return el;
         //if (canReuseLastRes())
@@ -96,7 +127,7 @@ function HNode(_node, _parent, _root) {
         //_ctx.el.node = _this;
         _ctx.node = _this;
         _childrenProcessed = false;
-        var el = _func.call(_this, _ctx);
+        var el = _func.call(_nodeProcessor, _ctx);
         _lastRes = el;
         _ctx.el = el;
         _lastCtx = shallowCopy(_ctx);

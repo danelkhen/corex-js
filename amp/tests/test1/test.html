@@ -16,6 +16,7 @@
 </head>
 <body>
     <script>
+"use strict"
 function test(name) {
     input({val:"hello "+name});
 }
@@ -25,12 +26,14 @@ function pretty() {
 }
 function test2(contact) {
 document.body
+    define(x => 7);
+        () => { x++ }
+        "hello "+x
     twoColumns()
-        "hello"
-        "hello2"
         field("name")
         field("age")
 }
+
 function test3(data) {
 document.body
     conditional(data!=null)
@@ -58,6 +61,17 @@ document.body
                     repeater(data.contacts)
                         t => div({text:"hello "+t.name})
 }
+function label2(np, text){
+    return np.span( { className: "label label-primary", text:text });
+}
+
+HControl.prototype.author = function () {
+    //this.node.ctx.ctl.authorLink(el)
+}
+HControl.prototype.label2 = function(text){
+    return label2(this, text);
+}
+
     </script>
 </body>
 </html>

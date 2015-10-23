@@ -5,8 +5,12 @@ function HControl(node) {
     Function.addTo(_this, [
         create, invisible, repeater, changeContext, twoColumns, external,
         repeater2, content, vertical, horizontal, verify, setChildResults,
-        conditional, switcher, bindVal, field
+        conditional, switcher, bindVal, field, define
     ]);
+    Object.forEach(HControl.prototype, (key, value) => {
+        if (typeof (value) == "function")
+            _this[key] = value.bind(_this);
+    });
 
     var _htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "legend", "li", "link", "main", "map", "mark", "menu", "menuitem", "meta", "meter", "nav", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"];
 
@@ -46,6 +50,8 @@ function HControl(node) {
             el = $.create(selector);
         if (opts) {
             Object.keys(opts).forEach(function (key) {
+                if(key=="each")
+                    return;
                 if (key.startsWith("on")) {
                     var name = key.substr(2) + ".hcontrol";
                     el.off(name).on(name, opts[key]);
@@ -125,6 +131,16 @@ function HControl(node) {
         return invisible();
     }
 
+    function first() {
+        _node.childrenProcessed = true;
+        if (index == null)
+            return null;
+        var child = _node.children[index];
+        if (child == null)
+            return null;
+        _node.tunnelCtx([child]);
+        return child.process();
+    }
     function switcher(index) {
         _node.childrenProcessed = true;
         if (index == null)
@@ -250,7 +266,7 @@ function HControl(node) {
 
 
     function field(name) {
-        var label = $.create("label").text(name+": ");
+        var label = $.create("label").text(name + ": ");
         var input = bindVal($.create("input"), name);
         return $([label[0], input[0]]);
     }
@@ -260,6 +276,14 @@ function HControl(node) {
         el2.off("change.bindVal").on("change.bindVal", e => obj[name] = $(e.target).val());
         el2.val(obj[name]);
         return el2;
+    }
+
+    function define(func){
+        var fi = FunctionHelper.parse(func.toString());
+        fi.prms.forEach(function(prm){
+            _node.ctx[prm] = func();
+        });
+        return invisible();
     }
 
     function getDataContext() {
@@ -295,6 +319,7 @@ function HControl(node) {
         var childNodes2 = toNodes(childResults);
         HierarchyUtils.setChildren(parentEl2, childNodes2);
     }
+
 }
 
 
@@ -346,10 +371,10 @@ function _addNodes(res, list) {
         res.forEach(t=>_addNodes(t, list));
     else if (res instanceof jQuery)
         res.toArray().forEach(t=>_addNodes(t, list));
-    else if (typeof (res) == "string")
-        list.add(document.createTextNode(res));
-    else
+    else if (res instanceof Node)
         list.add(res);
+    else
+        list.add(document.createTextNode(res));
 }
 Node.prototype.setChildNodes = function (childNodes) {
     HierarchyUtils.setChildren(this, childNodes);
