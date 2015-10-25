@@ -46,8 +46,8 @@ function HNode(_node, _parent, _root) {
         return true;
     }
 
-    function recompileFunc(){
-        if(_node.func!=null || _node.funcGen!=null)
+    function recompileFunc() {
+        if (_node.func != null || _node.funcGen != null)
             return;
         _func = null;
         _funcGen = null;
@@ -57,7 +57,7 @@ function HNode(_node, _parent, _root) {
     function compileFunc() {
         if (_func != null)
             return;
-        if (_node.funcGen == null && _node.funcBody!=null) {
+        if (_node.funcGen == null && _node.funcBody != null) {
             _compiledCtx = shallowCopy(_ctx);
             var compiler = new HierarchyCompiler();
             _funcGen = compiler.compileGenFunc(_node.funcBody, _ctx, _nodeProcessor);
@@ -146,16 +146,14 @@ function HNode(_node, _parent, _root) {
             return null;
         //console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
         var res = invoke();
-        tunnelCtx();
         if (res == null)
             return res;
-        if (_childrenProcessed) {
-            var childrenRes = res;//.processChildren(_this);
-            //_ctx.res = childrenRes;
-            _this.lastChildrenRes = childrenRes;
-            return childrenRes;
+        if (res instanceof HNode) {
+            tunnelCtx([res]);
+            return res.process();
         }
-        else if (_children.length > 0) {
+        if (_children.length > 0) {
+            tunnelCtx();
             var childResults = _children.select(t=>t.process());
             _nodeProcessor.setChildResults(res, childResults);
         }

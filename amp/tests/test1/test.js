@@ -3,12 +3,12 @@
 var _templates = {};
 
 function main() {
-    test2.callAmp({ name: "shooki", age: 7 });
-    return;
+    //test2.callAmp({ name: "shooki", age: 7 });
+    //return;
     main3();
 }
 
-
+                            
 function main3() {
     var total = 20;
     var el;
@@ -17,7 +17,7 @@ function main3() {
         data.contacts.push(Q.copy(data.contacts[0]));
     }
     var x = test2.callAmp(data);
-    document.body.appendChild(x);
+    //document.body.appendChild(x);
     return;
     var node;
     console.log("compile");
@@ -75,8 +75,9 @@ function compile(markup, root) {
         root = nodes[0];
     }
     else {
-        if (root == null)
+        if (root == null) {
             root = {};
+        }
         if (root.ctx == null) {
             root.ctx = {};
             nodes.forEach(node => shallowCopy(node.ctx, root.ctx));
@@ -85,10 +86,8 @@ function compile(markup, root) {
             root.funcPrms = nodes.selectMany("funcPrms").distinct();
         root.children = nodes;
         if (root.func == null)
-            root.func = ctx => {
-                ctx.node.tunnelCtx();
-                ctx.node.childrenProcessed = true;
-                return ctx.node.children.select(t=>t.process());
+            root.func = function (ctx) { 
+                return this.invisible(); 
             };
     }
     if (root.nodeProcessorGen == null)

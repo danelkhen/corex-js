@@ -50,7 +50,7 @@ function HControl(node) {
             el = $.create(selector);
         if (opts) {
             Object.keys(opts).forEach(function (key) {
-                if(key=="each")
+                if (key == "each")
                     return;
                 if (key.startsWith("on")) {
                     var name = key.substr(2) + ".hcontrol";
@@ -80,10 +80,19 @@ function HControl(node) {
         //var el2 = el[0];
         //return el2;
     }
-    function invisible() {
-        _node.tunnelCtx();
-        _node.childrenProcessed = true;
-        return $(_node.children.select(child=>child.process())).toChildNodes();
+    function invisible(children) {
+        if(arguments.length==0)
+            children = _node.children;
+        return new HNode({
+            func: function (ctx) {
+                ctx.node.tunnelCtx(children);
+                //_node.tunnelCtx();
+                //_node.childrenProcessed = true;
+                return $(children.select(child=>child.process())).toChildNodes();
+            },
+            children: [],
+            nodeProcessorGen: node => new HControl(node),
+        }, _node, _node.root);
     }
 
 
@@ -92,16 +101,11 @@ function HControl(node) {
     }
     function repeater(list, opts) {
         var node = _node;
-        var el = _node.lastRes || $();
         var map = node.__map;
         if (map == null) {
             map = new Map();
             node.__map = map;
         }
-        node.childrenProcessed = true;
-        if (list == null)
-            list = [];
-
         var template = function (obj, i) {
             var cloned = map.get(obj);
             if (cloned == null) {
@@ -112,21 +116,25 @@ function HControl(node) {
             else {
                 //console.log("already exists!", cloned);
             }
-            var x = cloned.select(child=>child.process());
-            var xx = $(x).toChildNodes();
-            xx.addClass("rpt-" + i);
-            return xx;
+            return cloned;
         }
-        var res2 = list.selectMany(template);
-        var res3 = $(res2);
-        return res3;
+        var children = list.selectMany(template);
+        return invisible(children);
+       //return new HNode({
+       //     nodeProcessorGen: node => new HControl(node),
+       //     children: children,
+       //     func: function () {
+       //     }
+       // });
     }
 
 
     function conditional(condition) {
         if (!condition) {
-            _node.childrenProcessed = true;
             return null;
+            //return new HNode({
+            //    func: function () { return null;}
+            //});
         }
         return invisible();
     }
@@ -278,9 +286,9 @@ function HControl(node) {
         return el2;
     }
 
-    function define(func){
+    function define(func) {
         var fi = FunctionHelper.parse(func.toString());
-        fi.prms.forEach(function(prm){
+        fi.prms.forEach(function (prm) {
             _node.ctx[prm] = func();
         });
         return invisible();
