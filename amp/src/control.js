@@ -161,7 +161,7 @@ function HControl(node) {
             node.externalNode = externalNode;
         }
         if (data != null)
-            externalNode.bindPrms(data);
+            externalNode.bindArgs(data);
         externalNode.ctx._content = node.children;
         return externalNode;
     }

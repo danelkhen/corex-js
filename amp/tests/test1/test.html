@@ -26,9 +26,16 @@ document.body
         "hello2"
         "hello2"
 }
+
+function test2(data){
+horizontal().data("layout-size", "30px")
+    input({ css: { width: "100%" }, data: { "layout-size": "100%" } })
+    button({text:"search", css:{width:"100%"}, data:{"layout-size": "200px"}})
+}
+
 function test(data) {
-document.body
-    conditional(data!=null)
+document.body;
+    conditional(data != null)
         vertical()
             horizontal().data("layout-size", "30px")
                 input({ css: { width: "100%" }, data: { "layout-size": "100%" } })
@@ -50,6 +57,8 @@ document.body
                     repeater(data.contacts)
                         t => div({text:"hello "+t.name})
 }
+
+
 $(main);
 function main() {
     var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };

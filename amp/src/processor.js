@@ -159,8 +159,16 @@ function HNode(_node, _parent, _root) {
         _childrenProcessed = false;
         _isInvisible = false;
         var res = invoke();
-        if (_childrenProcessed)
+        if (_childrenProcessed) {
+            if (res instanceof HNode) {
+                if (res.parent == null)
+                    res.parent = _this;
+                //tunnelCtx([res]);
+                var res2 = res.process();
+                return res2;
+            }
             return res;
+        }
         if (_visualChildren == null)
             _visualChildren = _children.toArray();
         if (_isInvisible) {
@@ -173,7 +181,8 @@ function HNode(_node, _parent, _root) {
             if (res.parent == null)
                 res.parent = _this;
             //tunnelCtx([res]);
-            return res.process();
+            var res2 = res.process();
+            return res2;
         }
 
         if (_visualChildren.length > 0) {
