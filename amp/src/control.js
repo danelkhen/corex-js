@@ -80,19 +80,26 @@ function HControl(node) {
         //var el2 = el[0];
         //return el2;
     }
+
+    //TODO: rename to group()
     function invisible(children) {
-        if(arguments.length==0)
-            children = _node.children;
-        return new HNode({
-            func: function (ctx) {
-                ctx.node.tunnelCtx(children);
-                //_node.tunnelCtx();
-                //_node.childrenProcessed = true;
-                return $(children.select(child=>child.process())).toChildNodes();
-            },
-            children: [],
-            nodeProcessorGen: node => new HControl(node),
-        }, _node, _node.root);
+        _node.isInvisible = true;
+        if (arguments.length > 0) {
+            _node.visualChildren = children;
+        }
+        return;
+        //if (arguments.length == 0)
+        //    children = _node.children;
+        //return new HNode({
+        //    func: function (ctx) {
+        //        //ctx.node.tunnelCtx(children);
+        //        //_node.tunnelCtx();
+        //        //_node.childrenProcessed = true;
+        //        return $(children.select(child=>child.process())).toChildNodes();
+        //    },
+        //    children: [],
+        //    nodeProcessorGen: node => new HControl(node),
+        //}, _node, _node.root);
     }
 
 
@@ -120,12 +127,6 @@ function HControl(node) {
         }
         var children = list.selectMany(template);
         return invisible(children);
-       //return new HNode({
-       //     nodeProcessorGen: node => new HControl(node),
-       //     children: children,
-       //     func: function () {
-       //     }
-       // });
     }
 
 
@@ -140,24 +141,22 @@ function HControl(node) {
     }
 
     function first() {
-        _node.childrenProcessed = true;
         if (index == null)
             return null;
         var child = _node.children[index];
         if (child == null)
             return null;
-        _node.tunnelCtx([child]);
-        return child.process();
+        return invisible([child]);
+        //_node.tunnelCtx([child]);
+        //return child.process();
     }
     function switcher(index) {
-        _node.childrenProcessed = true;
         if (index == null)
             return null;
         var child = _node.children[index];
         if (child == null)
             return null;
-        _node.tunnelCtx([child]);
-        return child.process();
+        return invisible([child]);
     }
 
     function repeater2(el, list, opts) {
@@ -180,7 +179,6 @@ function HControl(node) {
     function external(ctl, data) {
         var node = _node;
         node.childrenProcessed = true;
-        node.tunnelCtx();
         var externalNode = node.externalNode;
         if (externalNode == null) {
             externalNode = compileFakeFunction(ctl);// loadTemplate(ctl);
@@ -190,9 +188,10 @@ function HControl(node) {
         if (data != null)
             externalNode.bindPrms(data);
         externalNode.ctx._content = node.children;
-        var el2 = externalNode.process();
-        //el2.externalNode = externalNode;
-        return el2;
+        return externalNode;
+        //var el2 = externalNode.process();
+        ////el2.externalNode = externalNode;
+        //return el2;
     }
 
     function content() {
@@ -225,10 +224,8 @@ function HControl(node) {
 
     function vertical() {
         var node = _node;
-        console.log("vetrical", this);
-        //var node = el.node;
         node.childrenProcessed = true;
-        node.tunnelCtx();
+        console.log("vetrical", this);
         if (node.children.length == 0)
             return el.empty();
         var el = node.lastRes || $();
@@ -253,7 +250,6 @@ function HControl(node) {
         var node = _node;
         var el = _node.lastRes || $();
         node.childrenProcessed = true;
-        node.tunnelCtx();
         if (node.children.length == 0)
             return el.empty();
         el = el.verify("table.layout.horizontal");

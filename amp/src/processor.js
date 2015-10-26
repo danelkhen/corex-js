@@ -3,7 +3,7 @@ function HNode(_node, _parent, _root) {
     if (this == null || this == window)
         return new HNode(_node, root);
     var _this = this;
-    var _text, _childrenProcessed, _ctx, _funcPrms, _lastCtx, _funcGen, _func, _children, _nodeProcessorGen, _nodeProcessor, _lastRes;
+    var _text, _childrenProcessed, _ctx, _funcPrms, _lastCtx, _funcGen, _func, _children, _nodeProcessorGen, _nodeProcessor, _lastRes, _isInvisible, _visualChildren;
     var _compiledCtx;
 
     Object.defineProperties(_this, {
@@ -17,9 +17,11 @@ function HNode(_node, _parent, _root) {
         nodeProcessor: { get: function () { return _nodeProcessor; }, set: function (value) { _nodeProcessor = value; } },
         nodeProcessorGen: { get: function () { return _nodeProcessorGen; }, set: function (value) { _nodeProcessorGen = value; } },
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
+        isInvisible: { get: function () { return _isInvisible; }, set: function (value) { _isInvisible = value; } },
+        visualChildren: { get: function () { return _visualChildren; }, set: function (value) { _visualChildren = value; } },
     });
 
-    Function.addTo(_this, [process, bindArgs, clone, tunnelCtx, invoke]);
+    Function.addTo(_this, [process, bindArgs, clone, tunnelCtx, inheritCtx, invoke]);
     main();
 
     function main() {
@@ -141,24 +143,42 @@ function HNode(_node, _parent, _root) {
         delete ctx.el;
         toNodes.forEach(t=>shallowCopy(ctx, t.ctx));
     }
+
+    function inheritCtx() {
+        if (_parent == null)
+            return;
+        _parent.tunnelCtx([_this]);
+    }
+
     function process() {
         if (_node.type == "Comment")
             return null;
+        inheritCtx();
         //console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
+        _visualChildren = null;
         var res = invoke();
+        if(_visualChildren==null && !_childrenProcessed)
+            _visualChildren = _children.toArray();
+        if (_isInvisible) {
+            var childResults = _visualChildren.select(t=>t.process());
+            return childResults;
+        }
         if (res == null)
             return res;
         if (res instanceof HNode) {
-            tunnelCtx([res]);
+            if (res.parent == null)
+                res.parent = _this;
+            //tunnelCtx([res]);
             return res.process();
         }
-        if (_children.length > 0) {
-            tunnelCtx();
-            var childResults = _children.select(t=>t.process());
+        if (_visualChildren!=null && !_childrenProcessed && _visualChildren.length > 0) {
+            //tunnelCtx();
+            var childResults = _visualChildren.select(t=>t.process());
             _nodeProcessor.setChildResults(res, childResults);
         }
         return res;
     }
+
 
 
     function shallowCopy(src, dest) {
