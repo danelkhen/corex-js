@@ -508,8 +508,10 @@
     Array.prototype.getEnumerator = function () {
         return new ArrayEnumerator(this);
     }
-    Array.prototype.orderBy = function (selector, desc) {
-        return this.toArray().sortBy(selector, desc);
+    Array.prototype.orderBy = function (selector, desc, comparer) {
+        if(arguments.length==1 && selector instanceof Array)
+            return this.toArray().sortBy(selector);
+        return this.toArray().sortBy(selector, desc, comparer);
     }
     Array.prototype.orderByDescending = function (selector, desc) {
         return this.orderBy(selector, true);
