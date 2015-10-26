@@ -10,38 +10,26 @@
     <script src="../../src/processor.js"></script>
     <script src="../../src/control.js"></script>
     <script src="test.js"></script>
-    <script>
-        $(main);
-    </script>
 </head>
 <body>
     <script>
 "use strict"
-function test(name) {
-    input({val:"hello "+name});
-}
-function pretty() {
-    div({css:{border:"solid 1px black"}});
-        content()
-}
-function test3(contact) {
-document.body
-    define(x => 7);
-        () => { x++ }
-        "hello "+x
-    twoColumns()
-        field("name")
-        field("age")
-}
-function test3(data) {
-document.body
-    div({ text: "hello" })
-}
-function test2(data) {
+function test2(data){
 document.body
     conditional(data!=null)
         vertical()
-            "hello"
+            horizontal()
+                "hello2"
+                "hello2"
+                "hello2"
+        "hello2"
+        "hello2"
+        "hello2"
+}
+function test(data) {
+document.body
+    conditional(data!=null)
+        vertical()
             horizontal().data("layout-size", "30px")
                 input({ css: { width: "100%" }, data: { "layout-size": "100%" } })
                 button({text:"search", css:{width:"100%"}, data:{"layout-size": "200px"}})
@@ -59,22 +47,15 @@ document.body
                     div( { text:"aaa" } )
                     div( { text:"aaa" } )
                 div( {className: "content", text:"ggg", data:{"layout-size": "100%"} })
-                    test.callAmp("shooki")
-                    external(pretty)
-                        input({val:"yey!"});
                     repeater(data.contacts)
                         t => div({text:"hello "+t.name})
 }
-function label2(np, text){
-    return np.span( { className: "label label-primary", text:text });
+$(main);
+function main() {
+    var data = { contacts: [{ name: "shooki", phones: [{ number: "06-42342342" }, { number: "06-99999999" }] }, { name: "booki", phones: [] }] };
+    test.callAmp(data);
 }
 
-HControl.prototype.author = function () {
-    //this.node.ctx.ctl.authorLink(el)
-}
-HControl.prototype.label2 = function(text){
-    return label2(this, text);
-}
 
     </script>
 </body>

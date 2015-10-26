@@ -193,3 +193,77 @@ function FunctionHelper() {
     }
 }
 FunctionHelper();
+
+function time(action) {
+    var start = new Date();
+    action();
+    var end = new Date();
+    console.log(end.valueOf() - start.valueOf() + "ms");
+}
+
+function shallowCopy(src, dest) {
+    return $.extend(dest || {}, src);
+}
+
+function compile(markup, root) {
+    var compiler = new HierarchyCompiler();
+    var nodes = compiler.parse(markup, root);
+    if (root == null && nodes.length == 1) {
+        root = nodes[0];
+    }
+    else {
+        if (root == null) {
+            root = {};
+        }
+        if (root.ctx == null) {
+            root.ctx = {};
+            nodes.forEach(node => shallowCopy(node.ctx, root.ctx));
+        }
+        if (root.funcPrms == null)
+            root.funcPrms = nodes.selectMany("funcPrms").distinct();
+        root.children = nodes;
+        if (root.func == null)
+            root.func = function (ctx) { 
+                return this.invisible(); 
+            };
+    }
+    if (root.nodeProcessorGen == null)
+        root.nodeProcessorGen = node => new HControl(node);
+    var root2 = new HNode(root);
+    //root2.children = nodes.select(t=>new HNode(t));
+    return root2;
+}
+
+Function.prototype.callAmp = function (varargs) {
+    var node = compileFakeFunction(this);
+    node.bindArgs(Array.from(arguments));
+    var res = node.process();
+    return res;
+}
+Function.prototype.applyAmp = function (args) {
+    var node = compileFakeFunction(this);
+    node.bindArgs(args);
+    var res = node.process();
+    return res;
+}
+
+Function.prototype.toAmp = function () {
+    return toAmpFunction(this);
+}
+function toAmpFunction(fakeFunc) {
+    if (fakeFunc.compiledNode != null)
+        return fakeFunc.compiledNode.toFunction();
+    var node = compileFakeFunction(fakeFunc);
+    return node.toFunction();
+}
+function compileFakeFunction(func) {
+    if (func.compiledNode != null)
+        return func.compiledNode;
+    var funcInfo = FunctionHelper.parse(func.toString());
+    var ctx = {};
+    funcInfo.prms.forEach(prm => ctx[prm] = null);
+    var node = compile(funcInfo.body, { funcPrms: funcInfo.prms, ctx: ctx });
+    func.compiledNode = node;
+    return func.compiledNode;
+}
+

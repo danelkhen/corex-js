@@ -19,6 +19,7 @@ function HNode(_node, _parent, _root) {
         childrenProcessed: { get: function () { return _childrenProcessed; }, set: function (value) { _childrenProcessed = value; } },
         isInvisible: { get: function () { return _isInvisible; }, set: function (value) { _isInvisible = value; } },
         visualChildren: { get: function () { return _visualChildren; }, set: function (value) { _visualChildren = value; } },
+        text: { get: function () { return _text; }, set: function (value) { _text = value; } },
     });
 
     Function.addTo(_this, [process, bindArgs, clone, tunnelCtx, inheritCtx, invoke]);
@@ -128,7 +129,6 @@ function HNode(_node, _parent, _root) {
         //    _ctx.el = $();
         //_ctx.el.node = _this;
         _ctx.node = _this;
-        _childrenProcessed = false;
         var el = _func.call(_nodeProcessor, _ctx);
         _lastRes = el;
         _ctx.el = el;
@@ -156,8 +156,12 @@ function HNode(_node, _parent, _root) {
         inheritCtx();
         //console.log("processing: " + Array(_node.tab).join(" ")+ _node.text);
         _visualChildren = null;
+        _childrenProcessed = false;
+        _isInvisible = false;
         var res = invoke();
-        if(_visualChildren==null && !_childrenProcessed)
+        if (_childrenProcessed)
+            return res;
+        if (_visualChildren == null)
             _visualChildren = _children.toArray();
         if (_isInvisible) {
             var childResults = _visualChildren.select(t=>t.process());
@@ -171,8 +175,8 @@ function HNode(_node, _parent, _root) {
             //tunnelCtx([res]);
             return res.process();
         }
-        if (_visualChildren!=null && !_childrenProcessed && _visualChildren.length > 0) {
-            //tunnelCtx();
+
+        if (_visualChildren.length > 0) {
             var childResults = _visualChildren.select(t=>t.process());
             _nodeProcessor.setChildResults(res, childResults);
         }
@@ -186,7 +190,6 @@ function HNode(_node, _parent, _root) {
     }
 
 }
-
 
 
 

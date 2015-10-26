@@ -66,8 +66,6 @@ function HControl(node) {
             });
         }
         return el;
-        //var el2 = el[0];
-        //return el2;
     }
     function create(selector, opts) {
         var el = $.create(selector);
@@ -77,29 +75,14 @@ function HControl(node) {
             });
         }
         return el;
-        //var el2 = el[0];
-        //return el2;
     }
 
     //TODO: rename to group()
     function invisible(children) {
         _node.isInvisible = true;
-        if (arguments.length > 0) {
-            _node.visualChildren = children;
-        }
-        return;
-        //if (arguments.length == 0)
-        //    children = _node.children;
-        //return new HNode({
-        //    func: function (ctx) {
-        //        //ctx.node.tunnelCtx(children);
-        //        //_node.tunnelCtx();
-        //        //_node.childrenProcessed = true;
-        //        return $(children.select(child=>child.process())).toChildNodes();
-        //    },
-        //    children: [],
-        //    nodeProcessorGen: node => new HControl(node),
-        //}, _node, _node.root);
+        if (arguments.length == 0)
+            return;
+        _node.visualChildren = children;
     }
 
 
@@ -120,9 +103,6 @@ function HControl(node) {
                 cloned.forEach(t=>t.bindArgs([obj]));
                 map.set(obj, cloned);
             }
-            else {
-                //console.log("already exists!", cloned);
-            }
             return cloned;
         }
         var children = list.selectMany(template);
@@ -131,12 +111,8 @@ function HControl(node) {
 
 
     function conditional(condition) {
-        if (!condition) {
+        if (!condition)
             return null;
-            //return new HNode({
-            //    func: function () { return null;}
-            //});
-        }
         return invisible();
     }
 
@@ -181,17 +157,13 @@ function HControl(node) {
         node.childrenProcessed = true;
         var externalNode = node.externalNode;
         if (externalNode == null) {
-            externalNode = compileFakeFunction(ctl);// loadTemplate(ctl);
+            externalNode = compileFakeFunction(ctl);
             node.externalNode = externalNode;
-            //externalNode.el = el;
         }
         if (data != null)
             externalNode.bindPrms(data);
         externalNode.ctx._content = node.children;
         return externalNode;
-        //var el2 = externalNode.process();
-        ////el2.externalNode = externalNode;
-        //return el2;
     }
 
     function content() {
@@ -222,13 +194,13 @@ function HControl(node) {
         return list2;
     }
 
+
     function vertical() {
         var node = _node;
         node.childrenProcessed = true;
-        console.log("vetrical", this);
+        var el = node.lastRes || $();
         if (node.children.length == 0)
             return el.empty();
-        var el = node.lastRes || $();
         el = el.verify("table.layout.vertical");
         var tbl = el;
         var tbody = tbl.getAppend("tbody");
@@ -322,6 +294,7 @@ function HControl(node) {
         var parentEl2 = toNodes(parentRes)[0];
         var childNodes2 = toNodes(childResults);
         HierarchyUtils.setChildren(parentEl2, childNodes2);
+        return parentRes;
     }
 
 }
