@@ -150,6 +150,10 @@ function HNode(_node, _parent, _root) {
         _parent.tunnelCtx([_this]);
     }
 
+    function isPromise(obj){
+        return typeof(obj)=="object" && typeof(obj.promise)=="function" && typeof(obj.then)=="function" && typeof(obj.done)=="function";
+    }
+
     function process() {
         if (_node.type == "Comment")
             return null;
