@@ -260,7 +260,7 @@ function jQueryHelper2() {
         var els = newMappings.select("el");
         
         var q = this.pushStack(els);
-        q._zip = { added, removed, existing, changed, unchanged, mappings };
+        q._zip = { added:added, removed:removed, existing:existing, changed:changed, unchanged:unchanged, mappings:mappings };
         q._originalSelector = this._originalSelector;
         q._generator = this._generator;
         q._adder = this._adder;
