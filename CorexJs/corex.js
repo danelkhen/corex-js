@@ -509,7 +509,7 @@
         return new ArrayEnumerator(this);
     }
     Array.prototype.orderBy = function (selector, desc, comparer) {
-        if(arguments.length==1 && selector instanceof Array)
+        if (arguments.length == 1 && selector instanceof Array)
             return this.toArray().sortBy(selector);
         return this.toArray().sortBy(selector, desc, comparer);
     }
@@ -518,7 +518,7 @@
     }
     Array.prototype.sortBy = function (selector, desc, comparer) {
         var compareFunc;
-        if(arguments.length==1 && selector instanceof Array)
+        if (arguments.length == 1 && selector instanceof Array)
             compareFunc = ComparerHelper.createCombined(selector);
         else
             compareFunc = ComparerHelper.create(selector, desc, comparer);
@@ -1236,6 +1236,8 @@
         x.setHours(0, 0, 0, 0);
         return x;
     }
+
+    Date._formatPartArgIndexes = { yyyy: 0, yy: 0, MMM: 1, MM: 1, M: 1, dd: 2, d: 2, H: 3, HH: 3, h: 3, hh: 3, m: 4, mm: 4, s: 5, ss: 5, f: 6, ff: 6 };
     Date._parsePart = function (ctx, part, setter) {
         if (ctx.failed)
             return;
@@ -1254,13 +1256,15 @@
                 value++;
         }
         else {
-            var value = Q.parseInt(token);
+            value = Q.parseInt(token);
             if (value == null) {
                 ctx.failed = true;
                 return;
             }
         }
-        ctx.date = setter.call(ctx.date, value);
+        var argIndex = Date._formatPartArgIndexes[part];
+        ctx.args[argIndex] = value;
+        //ctx.date = setter.call(ctx.date, value);
         ctx.format = ctx.format.replaceAt(index, part.length, "".padRight(part.length));
         ctx.s = ctx.s.replaceAt(index, part.length, "".padRight(part.length));
     }
@@ -1277,21 +1281,21 @@
     Date._tryParseExact = function (s, format) {
         if (s.length != format.length)
             return null;
-        var date = Date.create();
-        var ctx = { date: date, s: s, format: format };
-        Date._parsePart(ctx, "yyyy", date.year);
-        Date._parsePart(ctx, "yy", date.year);
-        Date._parsePart(ctx, "MMM", date.month);
-        Date._parsePart(ctx, "MM", date.month);
-        Date._parsePart(ctx, "dd", date.day);
-        Date._parsePart(ctx, "HH", date.hour);
-        Date._parsePart(ctx, "mm", date.minute);
-        Date._parsePart(ctx, "ss", date.second);
+        var ctx = { s: s, format: format, args:[1970,0,1,0,0,0,0] };
+        Date._parsePart(ctx, "yyyy");
+        Date._parsePart(ctx, "yy");
+        Date._parsePart(ctx, "MMM");
+        Date._parsePart(ctx, "MM");
+        Date._parsePart(ctx, "dd");
+        Date._parsePart(ctx, "HH");
+        Date._parsePart(ctx, "mm");
+        Date._parsePart(ctx, "ss");
         if (ctx.failed)
             return null;
         if (ctx.s != ctx.format)
             return null;
-        return ctx.date;
+        var date = Date.create.apply(null, ctx.args);
+        return date;
     };
     Date.tryParseJsonDate = function (s) {
         if (s.length == 26 && s[0] == "\"" && s[value.length - 1] == "\"") {
@@ -2174,17 +2178,17 @@ function ComparerHelper() {
         func.comparers = comparers;
         return func;
     }
-    function _default(x, y){
-        if(x>y)
+    function _default(x, y) {
+        if (x > y)
             return 1;
-        if(x<y)
+        if (x < y)
             return -1;
         return 0;
     }
     //createCombined( [ "name", ["size", true], ["custom", false, customComparer] ] )
     function createCombined(list) {
-        var comparers = list.select(function(item){
-            if(item instanceof Array)
+        var comparers = list.select(function (item) {
+            if (item instanceof Array)
                 return create.apply(this, item);
             return create(item);
         });
@@ -2193,7 +2197,7 @@ function ComparerHelper() {
     }
     function create(selector, desc, comparer) {
         var selectorFunc = Q.createSelectorFunction(selector);
-        if(comparer==null)
+        if (comparer == null)
             comparer = _default;
         if (desc) {
             var func = function DescendingComparer(x, y) {
