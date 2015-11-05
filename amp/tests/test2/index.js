@@ -34,8 +34,9 @@ function index() {
 
     function template(func) {
         return Control({
-            renderSelf: function() {
-                this.children = func(this.data);
+            render: function() {
+                var children = func(this.data);
+                return children.select(t=>t.render());
             }
         });
     }
