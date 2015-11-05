@@ -71,6 +71,9 @@
     <Content Include="src\control.js" />
     <Content Include="src\processor.js" />
     <Content Include="src\compiler.js" />
+    <Content Include="tests\test2\index.css" />
+    <Content Include="tests\test2\index.html" />
+    <Content Include="tests\test2\index.js" />
     <Content Include="tests\test1\test.css" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
