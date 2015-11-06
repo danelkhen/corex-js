@@ -1,9 +1,43 @@
 ﻿"use strict"
 
+function test(){
+    document.body
+        "hello"
+        repeater(["a", "b"])
+            item => create("div.test")
+                "item " + item
+        "world"
+}
 
 function index() {
     $(main);
     function main() {
+        var func = test;
+        var funcInfo = FunctionHelper.parse(func.toString());
+
+        var compiler = new Compiler();
+        var nodes = compiler.parse(funcInfo.body);
+        console.log(nodes);
+        var code = compiler.generate(nodes[0]);
+        var ctx = {
+            C:Control.from,
+            repeater:repeater,
+            group:group,
+            create:create,
+        };
+
+        var func3 = compiler.compile(code, ctx);
+        //console.log(code);
+        //var func2 = new Function("C", code);
+        //console.log(func2);
+        //var func3 = function(){
+        //    return func2(Control.from);
+        //};
+        console.log(func3);
+        var ctl = func3(ctx);
+        ctl.render();
+        console.log(ctl);
+        return;
         //var ctl = horizontal().append([
         //    vertical().append([
         //        template(function (item) {
@@ -23,18 +57,35 @@ function index() {
         //;
         //$("body").empty().append(ctl.render());
 
-        var ctl = repeater(["a", "b"]).append([
-            template(function (item) {
-                return [create("div.test").append([text("item " + item)])];
-            }),
+        var ctl = value(document.body).append([
+            "hello",
+            repeater(["a", "b"]).append([
+                item => create("div.test").append([
+                    "item " + item,
+                ]),
+            ])
         ])
         ;
-        $("body").empty().append(ctl.render());
+        ctl.render();
+        //$("body").empty().append(ctl.render());
+    }
+
+    function func(func_) {
+        return new Control({ renderSelf: func_ });
+    }
+
+    function group() {
+        return new Control({
+            render: function () {
+                var list = this.children.select(t=>t.render());
+                return list;
+            }
+        });
     }
 
     function template(func) {
         return Control({
-            render: function() {
+            render: function () {
                 var children = func(this.data);
                 return children.select(t=>t.render());
             }
@@ -44,6 +95,11 @@ function index() {
         return Control({
             render: function () {
                 var node = this;
+                //cloned = node.children[0].clone();//.select(t=>t.clone());
+                var controls = list.select(obj => node.children[0].render(obj));
+                var children = controls.select(t=>t.render());
+                return children;
+
                 var map = node.__map;
                 if (map == null) {
                     map = new Map();
@@ -140,108 +196,3 @@ function index() {
 }
 
 
-function Control(_opts) {
-    if (this == null)
-        return new Control(_opts);
-    var _this = this;
-    var _selfResult;
-    var _childrenResults;
-
-    Function.addTo(_this, [render, append, clone]);
-    Object.defineProperties(_this, {
-        opts: { get: function () { return _opts; } },
-    });
-
-    function clone() {
-        return new Control(shallowCopy(_opts));
-    }
-    function append(list) {
-        if (_opts.children == null)
-            _opts.children = [];
-        if (list instanceof Array)
-            _opts.children.addRange(list);
-        else
-            _opts.children.add(list);
-        return this;
-    }
-    main();
-    function main() {
-    }
-
-    function render() {
-        if (_opts.render != null) {
-            _selfResult = _opts.render();
-            return _selfResult
-        }
-        if (_opts.renderSelf != null)
-            _selfResult = _opts.renderSelf();
-        else
-            throw new Error("renderSelf not defined");
-        if (_opts.children != null) {
-            _childrenResults = _opts.children.select(t=>t.render());
-            if (_opts.setChildren)
-                _opts.setChildren(_childrenResults);
-            else
-                $(toNodes(_selfResult)).setChildNodes(toNodes(_childrenResults));
-        }
-        return _selfResult;
-    }
-}
-
-
-function toNodes(results) {
-    var list = [];
-    _addNodes(results, list);
-    return list;
-}
-function _addNodes(res, list) {
-    if (res == null)
-        return;
-    if (res instanceof Array)
-        res.forEach(t=>_addNodes(t, list));
-    else if (res instanceof jQuery)
-        res.toArray().forEach(t=>_addNodes(t, list));
-    else if (res instanceof Node)
-        list.add(res);
-    else
-        list.add(document.createTextNode(res));
-}
-
-function HierarchyUtils() {
-    Function.addTo(HierarchyUtils, [setChildren]);
-    function setChildren(el, childElements) {
-        childElements.forEach(function (childEl, index) {
-            var currentChild = el.childNodes[index];
-            if (currentChild == childEl)
-                return;
-            if (currentChild != null) {
-                el.insertBefore(childEl, currentChild);
-                return;
-            }
-            el.appendChild(childEl);
-        });
-        for (var i = childElements.length; i < el.childNodes.length; i++) {
-            var childNode = el.childNodes[i];
-            el.removeChild(childNode);
-        }
-
-        return el;
-    }
-}
-HierarchyUtils();
-
-
-$.fn.setChildNodes = function (childNodes) {
-    if (!(childNodes instanceof Array))
-        childNodes = childNodes.toArray();
-    HierarchyUtils.setChildren(this[0], childNodes);
-    return this;
-}
-$.fn.verify = function (selector) {
-    if (!this.is(selector))
-        return $.create(selector);
-    return this;
-}
-function shallowCopy(src, dest) {
-    return $.extend(dest || {}, src);
-}
