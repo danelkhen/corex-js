@@ -15,6 +15,8 @@ function Control(_opts) {
         return new Control(shallowCopy(_opts));
     }
     function append(list) {
+        if(_opts.append!=null)
+            return _opts.append(list);
         if (_opts.children == null)
             _opts.children = [];
         if (list instanceof Array)
@@ -147,6 +149,8 @@ function Compiler() {
     }
 
     function compile(code, ctx) {
+        if(ctx==null)
+            return new Function("return "+code);
         var func = compileWithContext(code, ctx);
         return func;
     }

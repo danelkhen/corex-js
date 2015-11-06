@@ -1,27 +1,30 @@
 ﻿"use strict"
 
-function test() {
-document.body
-    "hello"
-    repeater(["a", "b"])
-        item => create("div.test")
-            "item " + item
-    "world"
-}
 
 
 function index() {
     $(main);
-    function main() {
-        var func = test;
+
+    function fromFakeFunc(func, ctx) {
         var funcInfo = FunctionHelper.parse(func.toString());
 
         var compiler = new Compiler();
         var nodes = compiler.parse(funcInfo.body);
         console.log(nodes);
-        var code = compiler.generate(nodes[0]);
-        var ctx = new LANG();
+        var prms = funcInfo.prms.join(", ");
+        if (funcInfo.prms.length > 1)
+            prms = "(" + prms + ")";
 
+        var root;
+        if (nodes.length == 1) {
+            root = nodes[0];
+            root.text = prms+" => " + root.text;
+        }
+        else {
+            root = { text: prms+" => group()", children: nodes };
+        }
+        var code = compiler.generate(root);
+        //var ctx = new LANG();
         var func3 = compiler.compile(code, ctx);
         //console.log(code);
         //var func2 = new Function("C", code);
@@ -30,8 +33,31 @@ function index() {
         //    return func2(Control.from);
         //};
         console.log(func3);
-        var ctl = func3(ctx);
-        ctl.render();
+        var res = func3(ctx);
+        return res;
+    }
+
+    function main() {
+        var res = fromFakeFunc(test, new LANG());
+        //var func = test;
+        //var funcInfo = FunctionHelper.parse(func.toString());
+
+        //var compiler = new Compiler();
+        //var nodes = compiler.parse(funcInfo.body);
+        //console.log(nodes);
+        //var code = compiler.generate(nodes[0]);
+        //var ctx = new LANG();
+
+        //var func3 = compiler.compile(code, ctx);
+        ////console.log(code);
+        ////var func2 = new Function("C", code);
+        ////console.log(func2);
+        ////var func3 = function(){
+        ////    return func2(Control.from);
+        ////};
+        //console.log(func3);
+        //var res = func3(ctx);
+        res("GGGGGGGGGGGGGGGGGGGGGGGGGGGGG").render();
         console.log(ctl);
         return;
         //var ctl = horizontal().append([
@@ -65,17 +91,14 @@ function index() {
         ctl.render();
         //$("body").empty().append(ctl.render());
     }
-    }
-function LANG(){
+}
+
+function LANG() {
     Function.addTo(this, [group, repeater, create, APPEND]);
 
     function APPEND(obj, children) {
         return Control.append(obj, children);
     }
-    function func(func_) {
-        return new Control({ renderSelf: func_ });
-    }
-
     function group() {
         return new Control({
             render: function () {
@@ -85,54 +108,41 @@ function LANG(){
         });
     }
 
-    function template(func) {
-        return Control({
-            render: function () {
-                var children = func(this.data);
-                return children.select(t=>t.render());
-            }
-        });
-    }
     function repeater(list, opts) {
         return Control({
+            append: function (children) {
+                this.templateFunc = children[0];
+            },
             render: function () {
                 var node = this;
-                //cloned = node.children[0].clone();//.select(t=>t.clone());
-                var controls = list.select(obj => node.children[0].render(obj));
+                var templateFunc = this.templateFunc;
+                var controls = list.select((obj, i) => this.templateFunc(obj, i));//node.children[0].render(obj));
                 var children = controls.select(t=>t.render());
                 return children;
 
-                var map = node.__map;
-                if (map == null) {
-                    map = new Map();
-                    node.__map = map;
-                }
-                var template = function (obj, i) {
-                    var cloned = map.get(obj);
-                    if (cloned == null) {
-                        cloned = node.children.select(t=>t.clone());
-                        cloned.forEach(t=>t.opts.data = obj);
-                        map.set(obj, cloned);
-                    }
-                    return cloned;
-                }
-                var children = list.selectMany(template).select(t=>t.render());
-                return children;// invisible(children);
+                //TODO: cache:
+                //var map = node.__map;
+                //if (map == null) {
+                //    map = new Map();
+                //    node.__map = map;
+                //}
+                //var template = function (obj, i) {
+                //    var cloned = map.get(obj);
+                //    if (cloned == null) {
+                //        cloned = node.children.select(t=>t.clone());
+                //        cloned.forEach(t=>t.opts.data = obj);
+                //        map.set(obj, cloned);
+                //    }
+                //    return cloned;
+                //}
+                //var children = list.selectMany(template).select(t=>t.render());
+                //return children;// invisible(children);
             }
         });
     }
 
-    //function func(func_) {
-    //    return Control({ renderSelf: () => $.create(selector) });
-    //}
     function create(selector) {
         return Control({ renderSelf: () => $.create(selector) });
-    }
-    function value(el) {
-        return Control({ renderSelf: () => el });
-    }
-    function text(s) {
-        return Control({ renderSelf: () => document.createTextNode(s) });
     }
 
     function conditional(condition) {
@@ -196,5 +206,6 @@ function LANG(){
 
 
 }
+Function.addTo(LANG, Object.values(new LANG()));
 
 
