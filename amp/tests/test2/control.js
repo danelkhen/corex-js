@@ -58,6 +58,11 @@ Control.from = function (obj) {
         return new Control({ renderSelf: obj });
     return new Control({ renderSelf: () => obj });
 }
+Control.append = function(obj, children) {
+    var ctl = Control.from(obj);
+    ctl.append(children);
+    return ctl;
+}
 
 
 function toNodes(results) {
@@ -132,7 +137,7 @@ function Compiler() {
         var code = [];
         if (keys.length > 0)
             code.push("var " + keys.select(function (key) { return key + "=__ctx." + key }).join(",") + ";");
-        code.push("var __res = " + expr + ";");
+        code.push("var __res = \n" + expr + ";");
         if (!oneWay)
             code.push(keys.select(function (key) { return "__ctx." + key + "=" + key + ";" }).join("\n"));
         code.push("return __res;");
@@ -145,15 +150,15 @@ function Compiler() {
         var func = compileWithContext(code, ctx);
         return func;
     }
-    function generate2(node, nodeText) {
-        var tab = "".padRight(node.tab, " ");
-        var s = tab+"C(" + nodeText + ")";
+    function generate2(node, nodeText, tab) {
         var hasChildren = node.children != null && node.children.length > 0;
         if (hasChildren) {
-            s += ".append([\n"
-            s += node.children.select(generate).join(",\n");
-            s += "])"
+            var s = tab+"APPEND(" + nodeText + ", [\n"
+            s += node.children.select(generate).join(", \n");
+            s += tab+"])"
+            return s;
         }
+        var s = tab+nodeText;
         return s;
     }
     function generate(node) {
@@ -161,16 +166,16 @@ function Compiler() {
         var hasChildren = node.children != null && node.children.length > 0;
         var nodeText = node.text;
         var tab = "".padRight(node.tab, " ");
-        if (func != null && hasChildren & func.prms!=null && func.prms.length>0) {
+        if (func != null && hasChildren & func.prms != null && func.prms.length > 0) {
             var prms = func.prms.join(", ");
-            if(func.prms.length>1)
-                prms = "("+prms+")";
-            var s = tab+prms +" => ";
-            nodeText = func.body;
-            s+=generate2(node, nodeText);
+            if (func.prms.length > 1)
+                prms = "(" + prms + ")";
+            var s = tab + prms + " => ";
+            nodeText = func.body.trim();
+            s += generate2(node, nodeText, "");
             return s;
         }
-        return generate2(node, node.text);
+        return generate2(node, node.text, tab);
     }
 
     function parse(markup, parent) {

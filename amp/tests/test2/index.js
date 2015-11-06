@@ -1,13 +1,14 @@
 ﻿"use strict"
 
-function test(){
-    document.body
-        "hello"
-        repeater(["a", "b"])
-            item => create("div.test")
-                "item " + item
-        "world"
+function test() {
+document.body
+    "hello"
+    repeater(["a", "b"])
+        item => create("div.test")
+            "item " + item
+    "world"
 }
+
 
 function index() {
     $(main);
@@ -19,12 +20,7 @@ function index() {
         var nodes = compiler.parse(funcInfo.body);
         console.log(nodes);
         var code = compiler.generate(nodes[0]);
-        var ctx = {
-            C:Control.from,
-            repeater:repeater,
-            group:group,
-            create:create,
-        };
+        var ctx = new LANG();
 
         var func3 = compiler.compile(code, ctx);
         //console.log(code);
@@ -69,7 +65,13 @@ function index() {
         ctl.render();
         //$("body").empty().append(ctl.render());
     }
+    }
+function LANG(){
+    Function.addTo(this, [group, repeater, create, APPEND]);
 
+    function APPEND(obj, children) {
+        return Control.append(obj, children);
+    }
     function func(func_) {
         return new Control({ renderSelf: func_ });
     }
