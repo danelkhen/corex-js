@@ -43,25 +43,8 @@ function index() {
 
     function main() {
         var res = fromFakeFunc(test, new LANG());
-        //var func = test;
-        //var funcInfo = FunctionHelper.parse(func.toString());
-
-        //var compiler = new Compiler();
-        //var nodes = compiler.parse(funcInfo.body);
-        //console.log(nodes);
-        //var code = compiler.generate(nodes[0]);
-        //var ctx = new LANG();
-
-        //var func3 = compiler.compile(code, ctx);
-        ////console.log(code);
-        ////var func2 = new Function("C", code);
-        ////console.log(func2);
-        ////var func3 = function(){
-        ////    return func2(Control.from);
-        ////};
-        //console.log(func3);
-        //var res = func3(ctx);
-        var node = res;//("GGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+        var node = res;
+        console.log(node);
         var ctl = LANG.build(node);
         ctl("gggggggggggggggggggggggggggggg").render();
         console.log(ctl);
