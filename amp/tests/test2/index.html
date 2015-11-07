@@ -8,17 +8,18 @@
     <script src="/CorexJs/corex-jquery.js"></script>
     <script src="control.js"></script>
     <script src="compiler.js"></script>
+    <script src="lang.js"></script>
     <script src="index.js"></script>
     <script>index();</script>
 </head>
 <body>
     <script>
 function test(myprm) {
-    COMPILER.import("LANG")
+    IMPORT("LANG");
     document.body
         "hello "+myprm
         $.create("div").text("hellogggggg")
-        LANG.repeater(["a", "b"])
+        repeater(["a", "b"])
             item => create("div.test")
                 "item " + item
         "world"

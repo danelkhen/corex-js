@@ -89,6 +89,7 @@
     <Content Include="tests\test-old\test.js" />
     <Content Include="tests\test1\test.html" />
     <Content Include="tests\test1\test.js" />
+    <Content Include="tests\test2\lang.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,16 @@
 function Compiler() {
     var _this = this;
     Function.addTo(_this, [parse, parseLines, generate, compile]);
+
+    var _directives = {};
+    Function.addTo(_directives, IMPORT);
+    var _keywords = Object.keys(_directives);
+
+    function IMPORT(name) {
+        var obj = window[name];
+        return genImportExport(name, obj).imp;
+    }
+
     function isValidIdentifier(s) {
         return /^[a-zA-Z_]+[a-zA-Z0-9]*$/.test(s);
     }
@@ -38,43 +48,52 @@ function Compiler() {
         var func = compileWithContext(code, ctx);
         return func;
     }
-    function generate2(node, nodeText, tab) {
-        var hasChildren = node.children != null && node.children.length > 0;
-        if (hasChildren) {
-            var s = tab + "APPEND(" + nodeText + ", [\n"
-            s += node.children.select(generate).join(", \n");
-            s += tab + "])"
-            return s;
-        }
-        var s = tab + nodeText;
-        return s;
+    function isDirective(node) {
+        return _keywords.any(keyword => startsWithKeyword(node.text, keyword));
     }
 
-    _this.import = function (name) {
-        var obj = window[name];
-        return genImportExport(name, obj).imp;
+    function startsWithKeyword(s, keyword){
+        if(!s.startsWith(keyword))
+            return false;
+        var nextChar = s[keyword.length];
+        if(nextChar==null)
+            return true;
+        return "( \t\r\n".contains(nextChar);
     }
+
+
 
     function generate(node) {
-        if (node.text.trim().startsWith("COMPILER.")) {
-            var ctx ={ COMPILER: _this }; 
-            var code = compileWithContext(node.text, ctx)(ctx);
+        var nodeText = node.text;
+        if (isDirective(node)) {
+            var code = compileWithContext(node.text, _directives)(_directives);
             return code;
         }
-        var func = FunctionHelper.parse(node.text);
+        var func = FunctionHelper.parse(nodeText);
         var hasChildren = node.children != null && node.children.length > 0;
-        var nodeText = node.text;
         var tab = "".padRight(node.tab, " ");
         if (func != null && hasChildren & func.prms != null && func.prms.length > 0) {
-            var prms = func.prms.join(", ");
-            if (func.prms.length > 1)
-                prms = "(" + prms + ")";
-            var s = tab + prms + " => ";
+            //var prms = func.prms.join(", ");
+            var s = "{type:'function', value:function (" + func.prms.join(", ") + ") {\n";
             nodeText = func.body.trim();
-            s += generate2(node, nodeText, "");
+            var directives = node.children.where(isDirective);
+            s += directives.select(generate).join("\n");
+            var children = node.children.where(t=>!isDirective(t));
+            var fakeNode = { text: nodeText, children: children };
+            s += "return LANG.build(" + generate(fakeNode);
+            s += ")\n}\n}";
             return s;
         }
-        return generate2(node, node.text, tab);
+
+        var s = "{value:" + nodeText;
+        var hasChildren = node.children != null && node.children.length > 0;
+        if (hasChildren) {
+            s += ",\nchildren:[\n"
+            s += node.children.select(generate).join(", \n");
+            s += "]\n";
+        }
+        s += "}";
+        return s;
     }
 
     function parse(markup, parent) {
