@@ -1,17 +1,44 @@
 ﻿function LANG() {
-    Function.addTo(this, [group, repeater, create, APPEND, build]);
+    Function.addTo(this, [group, repeater, create, build]);
 
-    function build(node){
+    var _appenders = [
+        [Node, Node, (x, y) => x.appendChild(y)],
+        [jQuery, Node, (x, y) => x.appendChild(y)],
+    ];
+
+    function build(node) {
         var obj = node.value;
-        if(node.children!=null && node.children.length>0){
-            obj = APPEND(obj, node.children.select(build));
+        if (node.children != null && node.children.length > 0) {
+            var childrenValues = node.children.select(build);
+            var ctl;
+            if (obj instanceof Control)
+                ctl = obj;
+            else if (node.type == "function")
+                ctl = new Control({ renderSelf: obj });
+            else
+                ctl = new Control({ renderSelf: () => obj });
+            ctl.append(childrenValues);
+            return ctl;
         }
         return obj;
     }
+    //function append(obj, children) {
+    //    if (obj instanceof Control) {
+    //        obj.append(children);
+    //        return obj;
+    //    }
+    //    if (obj instanceof Node) {
+    //        var node = obj;
+    //        $(node).setChildNodes(toNodes(children));
+    //        return node;
+    //        //children.forEach(child => node.appendChild(child));
+    //    }
+    //    console.warn("Don't know how to append:", obj, children);
+    //    return obj;
 
-    function APPEND(obj, children) {
-        return Control.append(obj, children);
-    }
+    //}
+
+
     function group() {
         return new Control({
             render: function () {
