@@ -7,12 +7,14 @@
     <script src="/CorexJs/corex.js"></script>
     <script src="/CorexJs/corex-jquery.js"></script>
     <script src="control.js"></script>
+    <script src="compiler.js"></script>
     <script src="index.js"></script>
     <script>index();</script>
 </head>
 <body>
     <script>
 function test(myprm) {
+    COMPILER.import("LANG")
     document.body
         "hello "+myprm
         $.create("div").text("hellogggggg")
