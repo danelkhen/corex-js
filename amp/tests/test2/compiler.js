@@ -33,10 +33,14 @@ function Compiler() {
         var code = [];
         if (keys.length > 0)
             code.push(ie.imp);
-        code.push("var __res = \n" + expr + ";");
-        if (!oneWay)
+        if (oneWay) {
+            code.push("return " + expr + ";\n");
+        }
+        else {
+            code.push("var __res = \n" + expr + ";");
             code.push(ie.exp);
-        code.push("return __res;");
+            code.push("return __res;");
+        }
         var code2 = code.join("\n");
         var func = new Function("__ctx", code2);
         return func;
@@ -52,21 +56,65 @@ function Compiler() {
         return _keywords.any(keyword => startsWithKeyword(node.text, keyword));
     }
 
-    function startsWithKeyword(s, keyword){
-        if(!s.startsWith(keyword))
+    function startsWithKeyword(s, keyword) {
+        if (!s.startsWith(keyword))
             return false;
         var nextChar = s[keyword.length];
-        if(nextChar==null)
+        if (nextChar == null)
             return true;
         return "( \t\r\n".contains(nextChar);
     }
 
-
+    function generateNodes(nodes) {
+        return "[\n" + nodes.select(generate).join(", \n") + "\n]";
+    }
 
     function generate(node) {
-        var nodeText = node.text;
+        var nodeText = node.text.trim();
         if (isDirective(node)) {
             var code = compileWithContext(node.text, _directives)(_directives);
+            return code;
+        }
+
+        if (nodeText.endsWith("{")) {
+            nodeText = nodeText.substr(0, nodeText.length-1);
+        }
+
+        var func = FunctionHelper.parse(nodeText);
+        var hasChildren = node.children != null && node.children.length > 0;
+        var tab = "".padRight(node.tab, " ");
+        if (func != null && hasChildren & func.prms != null && func.prms.length > 0) {
+            //var prms = func.prms.join(", ");
+            var directives = node.children.where(isDirective);
+            var children = node.children.where(t=>!isDirective(t));
+            var s = "C(function " + (func.name || "") + "(" + func.prms.join(", ") + ") {\n";
+            if (func.type=="ArrowExpressionFunction") {
+                children = [{ text: func.body.trim(), children: children }];
+            }
+            s += directives.select(generate).join("\n");
+            if (children.length == 1)
+                s += "return " + generate(children[0]) + ";";
+            else
+                s += "return " + generateNodes(children) + ";";
+            s += "\n})";
+            return s;
+        }
+
+        var s = "C(" + nodeText;
+        var hasChildren = node.children != null && node.children.length > 0;
+        if (hasChildren) {
+            s += ",\n"
+            s += generateNodes(node.children);
+        }
+        s += ")";
+        return s;
+    }
+
+
+    function generate2(node) {
+        var nodeText = node.text;
+        if (isDirective(node)) {
+            var code = compileWithContext(node.text, _directives, true)(_directives);
             return code;
         }
         var func = FunctionHelper.parse(nodeText);
@@ -74,25 +122,29 @@ function Compiler() {
         var tab = "".padRight(node.tab, " ");
         if (func != null && hasChildren & func.prms != null && func.prms.length > 0) {
             //var prms = func.prms.join(", ");
-            var s = "{type:'function', value:function (" + func.prms.join(", ") + ") {\n";
-            nodeText = func.body.trim();
             var directives = node.children.where(isDirective);
-            s += directives.select(generate).join("\n");
             var children = node.children.where(t=>!isDirective(t));
-            var fakeNode = { text: nodeText, children: children };
-            s += "return LANG.build(" + generate(fakeNode);
-            s += ")\n}\n}";
+            var s = "function " + func.name + "(" + func.prms.join(", ") + ") {\n";
+            if (nodeText.trim().endsWith("{")) {
+                nodeText = "";
+            }
+            else {
+                nodeText = func.body.trim();
+                children = [{ text: nodeText, children: children }];
+            }
+            s += directives.select(generate).join("\n");
+            s += "return " + generateNodes(children) + ";";
+            s += "\n}";
             return s;
         }
 
-        var s = "{value:" + nodeText;
+        var s = nodeText;
         var hasChildren = node.children != null && node.children.length > 0;
         if (hasChildren) {
-            s += ",\nchildren:[\n"
-            s += node.children.select(generate).join(", \n");
-            s += "]\n";
+            s += ".setChildren(\n"
+            s += generateNodes(node.children);
+            s += ")";
         }
-        s += "}";
         return s;
     }
 
@@ -110,7 +162,20 @@ function Compiler() {
             var node = { text: line.substr(tab), tab: tab, children: [] };
             var prev = stack.last();
             var prevTab = prev.tab;
-            if (tab > prevTab) {
+            if (line.trim().endsWith("{")) {
+                prev.children.push(node);
+                stack.push(node);
+            }
+            else if (line.trim() == "}") {
+                while (tab <= prevTab) {
+                    stack.pop();
+                    prev = stack.last();
+                    prevTab = prev.tab;
+                }
+                //prev.children.push(node);
+                //stack.push(node);
+            }
+            else if (tab > prevTab) {
                 prev.children.push(node);
                 stack.push(node);
             }

@@ -10,6 +10,24 @@
         var obj = node.value;
         if (node.children != null && node.children.length > 0) {
             var childrenValues = node.children.select(build);
+            $(toNodes(obj)).setChildNodes(toNodes(childrenValues));
+            //var ctl;
+            //if (obj instanceof Control)
+            //    ctl = obj;
+            //else if (node.type == "function")
+            //    ctl = new Control({ renderSelf: obj });
+            //else
+            //    ctl = new Control({ renderSelf: () => obj });
+            //ctl.append(childrenValues);
+            //return ctl;
+        }
+        return obj;
+    }
+
+    function build2(node) {
+        var obj = node.value;
+        if (node.children != null && node.children.length > 0) {
+            var childrenValues = node.children.select(build);
             var ctl;
             if (obj instanceof Control)
                 ctl = obj;
@@ -49,36 +67,38 @@
     }
 
     function repeater(list, opts) {
-        return Control({
-            append: function (children) {
-                this.templateFunc = children[0];
+        return {
+            setChildren: function (children) {
+                var templateFunc = children[0];
+                var controls = list.select((obj, i) => templateFunc(obj, i));//node.children[0].render(obj));
+                return controls;
             },
-            render: function () {
-                var node = this;
-                var templateFunc = this.templateFunc;
-                var controls = list.select((obj, i) => this.templateFunc(obj, i));//node.children[0].render(obj));
-                var children = controls.select(t=>t.render());
-                return children;
+            //render: function () {
+            //    var node = this;
+            //    var templateFunc = this.templateFunc;
+            //    var controls = list.select((obj, i) => this.templateFunc(obj, i));//node.children[0].render(obj));
+            //    var children = controls.select(t=>t.render());
+            //    return children;
 
-                //TODO: cache:
-                //var map = node.__map;
-                //if (map == null) {
-                //    map = new Map();
-                //    node.__map = map;
-                //}
-                //var template = function (obj, i) {
-                //    var cloned = map.get(obj);
-                //    if (cloned == null) {
-                //        cloned = node.children.select(t=>t.clone());
-                //        cloned.forEach(t=>t.opts.data = obj);
-                //        map.set(obj, cloned);
-                //    }
-                //    return cloned;
-                //}
-                //var children = list.selectMany(template).select(t=>t.render());
-                //return children;// invisible(children);
-            }
-        });
+            //    //TODO: cache:
+            //    //var map = node.__map;
+            //    //if (map == null) {
+            //    //    map = new Map();
+            //    //    node.__map = map;
+            //    //}
+            //    //var template = function (obj, i) {
+            //    //    var cloned = map.get(obj);
+            //    //    if (cloned == null) {
+            //    //        cloned = node.children.select(t=>t.clone());
+            //    //        cloned.forEach(t=>t.opts.data = obj);
+            //    //        map.set(obj, cloned);
+            //    //    }
+            //    //    return cloned;
+            //    //}
+            //    //var children = list.selectMany(template).select(t=>t.render());
+            //    //return children;// invisible(children);
+            //}
+        };
     }
 
     function create(selector) {

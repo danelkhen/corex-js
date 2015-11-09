@@ -353,7 +353,7 @@ function _addNodes(res, list) {
     else
         list.add(document.createTextNode(res));
 }
-Node.prototype.setChildNodes = function (childNodes) {
+Element.prototype.setChildNodes = function (childNodes) {
     HierarchyUtils.setChildren(this, childNodes);
 }
 

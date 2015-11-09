@@ -14,17 +14,26 @@
 </head>
 <body>
     <script>
-function test(myprm) {
-    IMPORT("LANG");
+function test2(myprm) {
     document.body
         "hello "+myprm
-        $.create("div").text("hellogggggg")
-        repeater(["a", "b"])
-            item => create("div.test")
-                "item " + item
+        $.create("div")[0]
+            $.create("div")[0]
+                "hellloggggg"
+            "world"
+}
+function test(data) {
+    IMPORT("LANG")
+    document.body
+        "world"
+        repeater(data.contacts)
+            t => $.create("div")[0]
+                "hello "+t.name
+        "world"
+        "world"
+        "world"
         "world"
 }
-
     </script>
 </body>
 </html>

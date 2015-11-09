@@ -124,5 +124,10 @@ function shallowCopy(src, dest) {
     return $.extend(dest || {}, src);
 }
 
+Element.prototype.setChildren = function (list) {
+    var childNodes = toNodes(list);
+    HierarchyUtils.setChildren(this, childNodes);
+    return this;
+}
 
 

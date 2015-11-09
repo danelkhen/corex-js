@@ -1,28 +1,31 @@
 ﻿"use strict"
-
-
+//function C(obj, children) {
+//    var ctl = obj;
+//    if(obj instanceof Element){
+//        ctl = new Control({render:() => obj});
+//    }
+//    if(arguments.length>=2) {
+//        obj.setChildren(children);
+//    }
+//    return ctl;
+//}
+function C(obj, children) {
+    if (arguments.length >= 2) {
+        var res = obj.setChildren(children);
+        return res;
+    }
+    return obj;
+}
 
 function index() {
     $(main);
 
-    function parseFakeFunc(funcText){
-        var funcInfo = FunctionHelper.parse(funcText);
-
+    function parseFakeFunc(funcText) {
         var compiler = new Compiler();
-        var nodes = compiler.parse(funcInfo.body);
-        var prms = funcInfo.prms.join(", ");
-        if (funcInfo.prms.length > 1)
-            prms = "(" + prms + ")";
-
-        var root;
-        if (nodes.length == 1) {
-            root = nodes[0];
-            root.text = prms+" => " + root.text;
-        }
-        else {
-            root = { text: prms+" => group()", children: nodes };
-        }
-        return root;
+        var nodes = compiler.parse(funcText); //funcInfo.body);
+        if (nodes.length != 1)
+            throw new Error();
+        return nodes[0];
     }
     function fromFakeFunc(func, ctx) {
         var compiler = new Compiler();
@@ -42,12 +45,15 @@ function index() {
     }
 
     function main() {
-        var res = fromFakeFunc(test, new LANG());
-        var node = res;
-        console.log(node);
-        var ctl = LANG.build(node);
-        ctl("gggggggggggggggggggggggggggggg").render();
+        var func = fromFakeFunc(test, new LANG());
+        var ctl = func({ contacts: [{ name: "ggg" }, { name: "fff" }] });
         console.log(ctl);
+        //var res = ctl[0].render();
+        //console.log(res);
+        //var node = res;
+        //console.log(node);
+        //var ctl = LANG.build(node);
+        //ctl("gggggggggggggggggggggggggggggg").render();
         return;
         //var ctl = horizontal().append([
         //    vertical().append([
