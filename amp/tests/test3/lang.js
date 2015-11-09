@@ -1,6 +1,6 @@
 ﻿"use strict"
 function LANG() {
-    Function.addTo(this, [group, repeater, create, C]);
+    Function.addTo(this, [group, repeater, create, C, conditional]);
 
     function Temp(obj) {
         if (this == null)
@@ -11,7 +11,7 @@ function LANG() {
     }
 
     function C(obj, children) {
-        if (arguments.length >= 2 || typeof(obj.setChildren)=="function") {
+        if (arguments.length >= 2 || typeof (obj.setChildren) == "function") {
             var res = obj.setChildren(children);
             return res;
         }
@@ -42,29 +42,31 @@ function LANG() {
     }
 
     function create(selector) {
-        var list = $.create(selector).toArray();
-        return list;
+        return $.create(selector)[0];
     }
 
     function conditional(condition) {
-        if (!condition)
-            return null;
-        return invisible();
+        return new Temp({
+            setChildren: function (children) {
+                if (condition)
+                    return children;
+                return null;
+            }
+        });
     }
 
     function vertical() {
-        return Control({
-            render: function () {
+        return new Temp({
+            setChildren: function (children) {
                 var node = this;
-                node.childrenProcessed = true;
                 var el = node.lastRes || $();
-                if (node.children.length == 0)
+                if (children.length == 0)
                     return el.empty();
                 el = el.verify("table.layout.vertical");
                 var tbl = el;
                 var tbody = tbl.getAppend("tbody");
                 var results = node.children.select(t=>t.render());
-                tbody.getAppendRemoveForEach("tr", results, function (tr, res) {
+                tbody.getAppendRemoveForEach("tr", children, function (tr, child) {
                     var td = tr.getAppend("td");
                     var childNodes = $(toNodes(res));
                     var height = childNodes.data("layout-height");
@@ -72,7 +74,7 @@ function LANG() {
                         height = childNodes.data("layout-size");
                     if (height != null)
                         td.css({ height: height });
-                    td.setChildNodes(childNodes);
+                    td.setChildren([child]);
                 });
                 return el;
             }

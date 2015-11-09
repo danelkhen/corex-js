@@ -25,7 +25,15 @@ function test2(myprm) {
 function test(data) {
     IMPORT("LANG")
     document.body
-        "world"
+        conditional(1==2)
+            "fakse"
+        conditional(1==1)
+            "true"
+        group()
+            create("div")
+                "hello"
+            create("div")
+                "hello"
         repeater(data.contacts)
             contact => repeater(contact.phones)
                 phone => $.create("div")
