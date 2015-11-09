@@ -12,21 +12,6 @@
 
 function index() {
     $(main);
-    function simpleSetChildren(obj, children) {
-        if (arguments.length >= 2 || typeof(obj.setChildren)=="function") {
-            var res = obj.setChildren(children);
-            return res;
-        }
-        return obj;
-    }
-    function simpleSetChildren2(obj, children) {
-        return {value:obj, children:children};
-        if (arguments.length >= 2) {
-            var res = obj.setChildren(children);
-            return res;
-        }
-        return obj;
-    }
 
     function parseFakeFunc(funcText) {
         var compiler = new Compiler();
@@ -56,7 +41,7 @@ function index() {
     }
 
     function main() {
-        var func = fromFakeFunc(test, { C: simpleSetChildren });
+        var func = fromFakeFunc(test, { C: LANG.C });
         var ctl = func({ contacts: [{ name: "ggg", phones:["09-98234", "234324324"] }, { name: "fff", phones:["02-111234", "1111"] }] });
         console.log(ctl);
         //var res = ctl[0].render();

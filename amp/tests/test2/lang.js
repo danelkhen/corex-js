@@ -58,19 +58,30 @@
 
 
     function group() {
-        return new Control({
-            render: function () {
-                var list = this.children.select(t=>t.render());
-                return list;
-            }
-        });
+        return {
+            setChildren: function (children) {
+                return children;
+            },
+        }
+
+        //new Control({
+        //    render: function () {
+        //        var list = this.children.select(t=>t.render());
+        //        return list;
+        //    }
+        //});
     }
 
     function repeater(list, opts) {
         return {
             setChildren: function (children) {
-                var templateFunc = children[0];
-                var controls = list.select((obj, i) => templateFunc(obj, i));//node.children[0].render(obj));
+                if(children==null || children.length==0)
+                    return [];
+                var controls = list.selectMany((obj, i) => children.select(child => {
+                    if (typeof (child) == "function")
+                        return child(obj, i);
+                    return child;
+                }));
                 return controls;
             },
             //render: function () {

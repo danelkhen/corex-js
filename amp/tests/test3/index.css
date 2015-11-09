@@ -1,0 +1,76 @@
+﻿.contact, .phone {
+    border: solid 1px red;
+    padding: 5px;
+    margin: 5px;
+}
+
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    font-family:'Segoe UI';
+    line-height:1;
+}
+
+.sidebar {
+    position:fixed;
+    background-color: #221a1a;
+    color: white;
+    background-color:#333;
+    width:50px;
+}
+.sidebar.expanded {
+    width:200px;
+}
+
+.sidebar2 {
+    height: 100%;
+    position: fixed;
+}
+
+.sidebarwrapper {
+    height: 100%;
+}
+
+.sidebarcontent {
+    overflow-y: scroll;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+table.layout{
+    width: 100%;
+    height:100%;
+    table-layout:fixed;
+    border-spacing:0;
+}
+table.layout > tbody > tr > td {
+    vertical-align:top;
+    padding:0;
+}
+
+table.layout.horizontal > tbody > tr > td > :only-child{
+    height:100%;
+}
+table.layout.vertical > tbody > tr > td > :only-child{
+    height:100%;
+}
+
+textarea,input,button {
+    vertical-align:top;
+    line-height:inherit;
+    margin:0;
+    padding:0;
+    box-sizing:content-box;
+}
+
+.content{
+    overflow-y:auto;
+}
+div.test {
+    background-color:pink;
+    border:solid 1px black;
+}
+
+

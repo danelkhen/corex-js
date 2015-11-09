@@ -28,7 +28,7 @@ function test(data) {
         "world"
         repeater(data.contacts)
             contact => repeater(contact.phones)
-                phone => $.create("div")[0]
+                phone => $.create("div")
                     "hello "+phone
             contact => $.create("div")[0]
                     "hello "+contact.name

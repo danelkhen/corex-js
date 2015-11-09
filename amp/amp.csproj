@@ -67,16 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <Content Include="tests\test-old\amp-old.js" />
-    <Content Include="src\control.js" />
-    <Content Include="src\processor.js" />
-    <Content Include="src\compiler.js" />
-    <Content Include="tests\test2\compiler.js" />
-    <Content Include="tests\test2\control.js" />
-    <Content Include="tests\test2\index.css" />
-    <Content Include="tests\test2\index.html" />
-    <Content Include="tests\test2\index.js" />
-    <Content Include="tests\test1\test.css" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -85,11 +75,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="tests\test-old\test.html" />
-    <Content Include="tests\test-old\test.js" />
-    <Content Include="tests\test1\test.html" />
-    <Content Include="tests\test1\test.js" />
-    <Content Include="tests\test2\lang.js" />
+    <Content Include="tests\test3\compiler.js" />
+    <Content Include="tests\test3\control.js" />
+    <Content Include="tests\test3\index.css" />
+    <Content Include="tests\test3\index.html" />
+    <Content Include="tests\test3\index.js" />
+    <Content Include="tests\test3\lang.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
