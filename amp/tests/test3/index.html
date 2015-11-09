@@ -24,26 +24,31 @@ function test2(myprm) {
 }
 function test(data) {
     IMPORT("LANG")
-    document.body
-        conditional(1==2)
-            "fakse"
-        conditional(1==1)
-            "true"
-        group()
-            create("div")
-                "hello"
-            create("div")
-                "hello"
-        repeater(data.contacts)
-            contact => repeater(contact.phones)
-                phone => $.create("div")
-                    "hello "+phone
-            contact => $.create("div")[0]
-                    "hello "+contact.name
-            "Heya"
-        "world"
-        "world"
-        "world"
+    function innerTest(){
+        "INNER TEST"
+    }
+        document.body
+            vertical()
+                innerTest()
+                conditional(1==2)
+                    "fakse"
+                conditional(1==1)
+                    "true"
+                create("div")
+                    "hello"
+                create("div")
+                    "hello"
+                horizontal()
+                    repeater(data.contacts)
+                        contact => repeater(contact.phones)
+                            phone => $.create("div")
+                                "hello "+phone
+                        contact => $.create("div")[0]
+                                "hello "+contact.name
+                        "Heya"
+                    "world"
+                    "world"
+                    "world"
 }
     </script>
 </body>
