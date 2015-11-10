@@ -72,15 +72,15 @@ function LANG() {
                 el = el.verify("table.layout.vertical");
                 var tbl = el;
                 var tbody = tbl.getAppend("tbody");
-                tbody.getAppendRemoveForEach("tr", children, function (tr, child) {
+                var childNodes = $(toNodes(children));
+                tbody.getAppendRemoveForEach("tr", childNodes, function (tr, child) {
                     var td = tr.getAppend("td");
-                    var childNodes = $(toNodes(child));
                     var height = childNodes.data("layout-height");
                     if (height == null)
                         height = childNodes.data("layout-size");
                     if (height != null)
                         td.css({ height: height });
-                    Element_setChildren(td[0], childNodes);
+                    Element_setChildren(td[0], child);
                 });
                 return el[0];
             }
@@ -94,14 +94,14 @@ function LANG() {
                 el = el.verify("table.layout.horizontal");
                 var tbl = el;
                 var tr = tbl.getAppend("tbody").getAppend("tr");
-                tr.getAppendRemoveForEach("td", children, function (td, child) {
-                    var childNodes = $(toNodes(child));
+                var childNodes = $(toNodes(children));
+                tr.getAppendRemoveForEach("td", childNodes, function (td, child) {
                     var width = childNodes.data("layout-width");
                     if (width == null)
                         width = childNodes.data("layout-size");
                     if (width != null)
                         td.css({ width: width });
-                    Element_setChildren(td[0], childNodes);
+                    Element_setChildren(td[0], child);
                 });
                 return el[0];
             }
