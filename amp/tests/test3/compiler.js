@@ -83,7 +83,7 @@ function Compiler() {
         var func = FunctionHelper.parse(nodeText);
         var hasChildren = node.children != null && node.children.length > 0;
         var tab = "".padRight(node.tab, " ");
-        if (func != null && hasChildren & func.prms != null && func.prms.length > 0) {
+        if (func != null && hasChildren & func.prms != null) {
             //var prms = func.prms.join(", ");
             var directives = node.children.where(isDirective);
             var children = node.children.where(t=>!isDirective(t));

@@ -1,6 +1,22 @@
 ﻿"use strict"
 
 
+function toNodesAsync(results) {
+    var deferred = $.Deferred();
+    var list = toNodes(results);
+    var promises = list.where(isPromise);
+    $.when.apply($, promises).done(function () {
+        var values = Array.from(arguments);
+        promises.forEach(function (p, i) {
+            var index = list.indexOf(p);
+            list[index] = values[i];
+        });
+        var list2 = toNodes(list);
+        deferred.resolveWith(null, list2);
+    });
+    return deferred;
+}
+
 function toNodes(results) {
     var list = [];
     _addNodes(results, list);

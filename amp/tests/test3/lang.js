@@ -1,6 +1,6 @@
 ﻿"use strict"
 function LANG() {
-    Function.addTo(this, [group, repeater, create, C, conditional, vertical, horizontal]);
+    Function.addTo(this, [group, repeater, create, C, conditional, vertical, horizontal, get]);
 
     function Temp(obj) {
         if (this == null)
@@ -8,6 +8,21 @@ function LANG() {
         if (obj == null)
             obj = { setChildren: function (children) { return children; } };
         shallowCopy(obj, this);
+    }
+
+    function get(url) {
+        return new Temp({
+            setChildren: function (children) {
+                var func = children[0];
+                var div = $.create(".placeholder");
+                $.get(url).done(function (res) {
+                    var res2 = func(res);
+                    div[0].setChildren(res2);
+                    div.replaceWith(div.contents());
+                });
+                return div[0];
+            }
+        });
     }
 
     function C(obj, children) {
