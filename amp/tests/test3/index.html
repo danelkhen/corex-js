@@ -6,7 +6,6 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="/CorexJs/corex.js"></script>
     <script src="/CorexJs/corex-jquery.js"></script>
-    <script src="control.js"></script>
     <script src="compiler.js"></script>
     <script src="lang.js"></script>
     <script src="index.js"></script>
@@ -14,22 +13,23 @@
 </head>
 <body>
     <script>
-function test2(myprm) {
+(function test2(myprm) {
     document.body
         "hello "+myprm
         $.create("div")[0]
             $.create("div")[0]
                 "hellloggggg"
             "world"
-}
-function test(data) {
+}).compileAmp();
+
+(function test(data) {
     IMPORT("LANG")
     document.body
         vertical()
             get("index.html")
                 t => t
             conditional(1==2)
-                "fakse"
+                "false"
             conditional(1==1)
                 "true"
             create("div")
@@ -47,7 +47,7 @@ function test(data) {
                 "world"
                 "world"
                 "world"
-}
+}).compileAmp();
     </script>
 </body>
 </html>

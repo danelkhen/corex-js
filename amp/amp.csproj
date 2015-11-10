@@ -76,7 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="tests\test3\compiler.js" />
-    <Content Include="tests\test3\control.js" />
     <Content Include="tests\test3\index.css" />
     <Content Include="tests\test3\index.html" />
     <Content Include="tests\test3\index.js" />

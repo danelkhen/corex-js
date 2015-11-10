@@ -1,14 +1,23 @@
 ﻿"use strict"
 function Compiler() {
     var _this = this;
-    Function.addTo(_this, [parse, parseLines, generate, compile]);
+    Function.addTo(_this, [parse, parseLines, generate, compile, setContext]);
+
+    var _context;
+
+    function setContext(ctx) {
+        _context = ctx;
+    }
+
 
     var _directives = {};
     Function.addTo(_directives, IMPORT);
     var _keywords = Object.keys(_directives);
 
     function IMPORT(name) {
-        var obj = window[name];
+        var obj = _context!=null ? _context[name] : null;
+        if (obj == null)
+            obj = window[name];
         return genImportExport(name, obj).imp;
     }
 
@@ -48,6 +57,8 @@ function Compiler() {
 
     function compile(code, ctx) {
         if (ctx == null)
+            ctx = _context;
+        if (ctx == null)
             return new Function("return " + code);
         var func = compileWithContext(code, ctx);
         return func;
@@ -77,7 +88,7 @@ function Compiler() {
         }
 
         if (nodeText.endsWith("{")) {
-            nodeText = nodeText.substr(0, nodeText.length-1);
+            nodeText = nodeText.substr(0, nodeText.length - 1);
         }
 
         var func = FunctionHelper.parse(nodeText);
@@ -88,7 +99,7 @@ function Compiler() {
             var directives = node.children.where(isDirective);
             var children = node.children.where(t=>!isDirective(t));
             var s = "C(function " + (func.name || "") + "(" + func.prms.join(", ") + ") {\n";
-            if (func.type=="ArrowExpressionFunction") {
+            if (func.type == "ArrowExpressionFunction") {
                 children = [{ text: func.body.trim(), children: children }];
             }
             s += directives.select(generate).join("\n");
@@ -207,6 +218,40 @@ function Compiler() {
 
     }
 }
+Compiler.fromFakeFunc = function(func, ctx) {
+    var compiler = new Compiler();
+    if (ctx == null)
+        ctx = {};
+    if (ctx.LANG == null)
+        ctx.LANG = new LANG();
+    if (ctx.C == null)
+        ctx.C = ctx.LANG.C;
+
+    compiler.setContext(ctx);
+    var nodes = compiler.parse(func.toString());
+    if (nodes.length != 1)
+        throw new Error();
+    var root = nodes[0];
+    var code = compiler.generate(root);
+    var func3 = compiler.compile(code);
+    func3.ctx = ctx;
+    return func3;
+    //console.log(func3);
+    //var res = func3(ctx);
+    //return res;
+}
+
+Function.prototype.compileAmp = function (defaultCtx) {
+    var name = this.getName();
+    var func = Compiler.fromFakeFunc(this);
+    var func2 = function () {
+        return func(this || defaultCtx || func.ctx).apply(this, arguments);
+    };
+    if(name!=null && name.length>0)
+        window[name] = func2;
+    return func2;
+}
+
 
 
 function FunctionHelper() {
