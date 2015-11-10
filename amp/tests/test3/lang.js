@@ -26,6 +26,10 @@ function LANG() {
     }
 
     function C(obj, children) {
+        if (arguments.length >= 2 && typeof (obj.setChildrenAsync) == "function") {
+            var deferred = obj.setChildrenAsync(children);
+            return obj;
+        }
         if (arguments.length >= 2 || typeof (obj.setChildren) == "function") {
             var res = obj.setChildren(children);
             return res;

@@ -1,18 +1,20 @@
 ﻿"use strict"
 
-
+function isPromise(obj) {
+    return typeof (obj.then) == "function" && typeof (obj.fail) == "function";
+}
 function toNodesAsync(results) {
     var deferred = $.Deferred();
     var list = toNodes(results);
     var promises = list.where(isPromise);
-    $.when.apply($, promises).done(function () {
+    $.whenAll(promises).done(function () {
         var values = Array.from(arguments);
         promises.forEach(function (p, i) {
             var index = list.indexOf(p);
             list[index] = values[i];
         });
         var list2 = toNodes(list);
-        deferred.resolveWith(null, list2);
+        deferred.resolveWith(null, [list2]);
     });
     return deferred;
 }
@@ -82,4 +84,11 @@ Element.prototype.setChildren = function (list) {
     return this;
 }
 
+
+//Element.prototype.setChildrenAsync = function (list) {
+//    var _this = this;
+//    return toNodesAsync(list).done(function (childNodes) {
+//        setChildNodes(_this, childNodes);
+//    });
+//}
 
