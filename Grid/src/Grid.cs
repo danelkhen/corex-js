@@ -177,7 +177,7 @@ namespace corexjs.ui.grid
 
         void OrderBy(GridCol<T> col)
         {
-            if (OrderByCol == null || OrderByCol.SourceCol == col.SourceCol)
+            if (OrderByCol == null)// || OrderByCol.SourceCol == col.SourceCol
             {
                 OrderByColClickCount = 1;
                 OrderByCol = col;

@@ -183,7 +183,7 @@ corexjs.ui.grid.Grid.prototype.Search = function (){
     this.RenderTimer.set(100);
 };
 corexjs.ui.grid.Grid.prototype.OrderBy = function (col){
-    if (this.OrderByCol == null || this.OrderByCol.SourceCol == col.SourceCol){
+    if (this.OrderByCol == null){
         this.OrderByColClickCount = 1;
         this.OrderByCol = col;
         this.Options.OrderByDesc = false;
