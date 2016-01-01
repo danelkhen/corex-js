@@ -879,8 +879,10 @@
     Array.toArray = function (arrayLike) {
         return Array.prototype.slice.call(arrayLike, 0);
     }
-    Array.from = function (arrayLike) {
-        return Array.prototype.slice.call(arrayLike, 0);
+    if(Array.from==null) {
+        Array.from = function (arrayLike) {
+            return Array.prototype.slice.call(arrayLike, 0);
+        }
     }
     Array.generateNumbers = function (from, until) {
         if (arguments.length == 1) {
@@ -1281,7 +1283,7 @@
     Date._tryParseExact = function (s, format) {
         if (s.length != format.length)
             return null;
-        var ctx = { s: s, format: format, args:[1970,0,1,0,0,0,0] };
+        var ctx = { s: s, format: format, args: [1970, 0, 1, 0, 0, 0, 0] };
         Date._parsePart(ctx, "yyyy");
         Date._parsePart(ctx, "yy");
         Date._parsePart(ctx, "MMM");
@@ -2062,16 +2064,18 @@
         return sb.join("&");
     }
     QueryString.write = function (obj, sb) {
-        for (var p in obj) {
+        Object.keys(obj).forEach(function (p) {
             var value = obj[p];
+            if (value == null)
+                return;
             if (value instanceof Array) {
                 if (value.length > 0)
-                    sb.push(p + "=" + value.select(function (item) { return encodeURIComponent(item); }).join(","));
+                    sb.push(p + "=" + value.exceptNulls().select(function (item) { return encodeURIComponent(item); }).join(","));
             }
             else {
                 sb.push(p + "=" + encodeURIComponent(value));
             }
-        }
+        });
     }
 
 
