@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorexJs", "CorexJs\CorexJs.csproj", "{4639B8BF-851C-42A3-862F-BBF893D6F7C5}"
 EndProject
@@ -18,6 +18,48 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "amp", "amp\amp.csproj", "{F5073644-76D6-425E-A1AB-C6D34C84F002}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "corex-js", "corex-js\", "{AE525B91-AB89-485D-A1F3-90410151AB5F}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_64997"
+		Debug.AspNetCompiler.PhysicalPath = "corex-js\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_64997\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_64997"
+		Release.AspNetCompiler.PhysicalPath = "corex-js\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_64997\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "64997"
+		SlnRelativePath = "corex-js\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "corex-jquery", "corex-jquery\", "{A60869B3-E3C1-4BD1-869A-472A99F55DE6}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_52561"
+		Debug.AspNetCompiler.PhysicalPath = "corex-jquery\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_52561\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_52561"
+		Release.AspNetCompiler.PhysicalPath = "corex-jquery\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_52561\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "52561"
+		SlnRelativePath = "corex-jquery\"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +83,14 @@ Global
 		{F5073644-76D6-425E-A1AB-C6D34C84F002}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5073644-76D6-425E-A1AB-C6D34C84F002}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5073644-76D6-425E-A1AB-C6D34C84F002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE525B91-AB89-485D-A1F3-90410151AB5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE525B91-AB89-485D-A1F3-90410151AB5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE525B91-AB89-485D-A1F3-90410151AB5F}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE525B91-AB89-485D-A1F3-90410151AB5F}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{A60869B3-E3C1-4BD1-869A-472A99F55DE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A60869B3-E3C1-4BD1-869A-472A99F55DE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A60869B3-E3C1-4BD1-869A-472A99F55DE6}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{A60869B3-E3C1-4BD1-869A-472A99F55DE6}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
