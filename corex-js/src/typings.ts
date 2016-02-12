@@ -107,7 +107,6 @@ interface Array<T> {
     groupBy(keySelector, itemSelector);
     splitIntoChunksOf(countInEachChunk);
     avg();
-    selectMany(selector);
     sum();
     skip(count);
     take(count);
