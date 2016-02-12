@@ -49,7 +49,7 @@ interface Array<T> {
     exceptNulls(): Array<T>;
     insert(index: number, item: T);
     toArray(): Array<T>;
-    where<R>(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): R[];
+    where(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
     removeAll<R>(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): void;
     select<R>(selector: (value: T, index: number, array: T[]) => R, thisArg?: any): R[];
     select<R>(selector: string, thisArg?: any): R[];
@@ -75,7 +75,6 @@ interface Array<T> {
     containsAny(items);
     any(predicate);
     forEachAsyncProgressive(actionWithCallback, finalCallback);
-    where(predicate);
     whereEq(selector, value);
     whereNotEq(selector, value);
     firstEq(selector, value);
@@ -126,6 +125,8 @@ interface Array<T> {
     selectWith(list, func);
     crossJoin(list2, selector);
 }
+
+
 interface DateConstructor {
     fromUnix(value);
     today();
@@ -326,9 +327,9 @@ declare class TimeSpan {
 }
 
 interface Error {
-    wrap(e: Error): Error;
-    innerError: Error;
-    causedBy(e: Error);
+    wrap?(e: Error): Error;
+    innerError?: Error;
+    causedBy?(e: Error);
 }
 
 

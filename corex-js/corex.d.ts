@@ -71,7 +71,7 @@ interface Array<T> {
     exceptNulls(): Array<T>;
     insert(index: number, item: T): any;
     toArray(): Array<T>;
-    where<R>(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): R[];
+    where(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
     removeAll<R>(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): void;
     select<R>(selector: (value: T, index: number, array: T[]) => R, thisArg?: any): R[];
     select<R>(selector: string, thisArg?: any): R[];
@@ -95,7 +95,6 @@ interface Array<T> {
     containsAny(items: any): any;
     any(predicate: any): any;
     forEachAsyncProgressive(actionWithCallback: any, finalCallback: any): any;
-    where(predicate: any): any;
     whereEq(selector: any, value: any): any;
     whereNotEq(selector: any, value: any): any;
     firstEq(selector: any, value: any): any;
@@ -332,9 +331,9 @@ declare class TimeSpan {
     constructor(ms: number);
 }
 interface Error {
-    wrap(e: Error): Error;
-    innerError: Error;
-    causedBy(e: Error): any;
+    wrap?(e: Error): Error;
+    innerError?: Error;
+    causedBy?(e: Error): any;
 }
 declare class ArrayEnumerator<T> {
     list: Array<T>;

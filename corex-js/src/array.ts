@@ -1,3 +1,4 @@
+///<reference path="function.ts" />
 "use strict";
 Array.prototype.forEachJoin = function (action, actionBetweenItems) {
     var first = true;
