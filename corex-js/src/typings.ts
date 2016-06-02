@@ -46,6 +46,7 @@ interface Array<T> {
     take(count: number): T[];
     skip(count: number): T[];
     first(predicate?: (item: T, index?: number) => boolean): T;
+    last(predicate?: (item: T, index?: number) => boolean): T;
     exceptNulls(): Array<T>;
     insert(index: number, item: T);
     toArray(): Array<T>;
@@ -54,17 +55,22 @@ interface Array<T> {
     select<R>(selector: (value: T, index: number, array: T[]) => R, thisArg?: any): R[];
     select<R>(selector: string, thisArg?: any): R[];
     selectMany<R>(callbackfn: (value: T, index: number, array: T[]) => R[], thisArg?: any): R[];
+
+    orderBy<R>(selector: (value: T, index: number, array: T[]) => R, desc?:boolean, comparer?:Comparer);
+    orderByDescending<R>(selector: (value: T, index: number, array: T[]) => R, desc?:boolean);
+    sortBy<R>(selector: (value: T, index: number, array: T[]) => R, desc?:boolean, comparer?:Comparer);
+    sortByDescending<R>(selector: (value: T, index: number, array: T[]) => R);
+
     groupBy<K>(callbackfn: (value: T, index: number, array: T[]) => K, thisArg?: any): Grouping<K, T>[];
+    //groupBy(keySelector, itemSelector);
     addRange(items: T[]);
     distinct(): T[];
 
 
     forEachJoin(action, actionBetweenItems);
-    first(predicate);
     toArray();
     insert(index, item);
     insertRange(index, items);
-    last(predicate);
     toObject(selector);
     toObjectKeys(defaultValue);
     keysToObject(defaultValue);
@@ -89,10 +95,6 @@ interface Array<T> {
     min();
     max();
     getEnumerator();
-    orderBy(selector, desc, comparer);
-    orderByDescending(selector, desc);
-    sortBy(selector, desc, comparer);
-    sortByDescending(selector);
     mapAsyncParallel(asyncFunc, finalCallback);
     forEachAsyncParallel(asyncFunc, finalCallback);
     clear();
@@ -104,7 +106,6 @@ interface Array<T> {
     flatten();
     selectToObject(keySelector, valueSelector);
     groupByToObject(keySelector, itemSelector);
-    groupBy(keySelector, itemSelector);
     splitIntoChunksOf(countInEachChunk);
     avg();
     sum();
@@ -112,17 +113,17 @@ interface Array<T> {
     take(count);
     toSelector();
     removeNulls();
-    exceptNulls();
-    truncate(totalItems);
-    random();
+    exceptNulls(): T[];
+    truncate(totalItems: number);
+    random(): T;
     selectRecursive(selector, recursiveFunc);
     selectManyRecursive(selector, recursiveFunc);
     peek(predicate);
     removeLast();
-    add();
-    forEachWith(list, action);
-    selectWith(list, func);
-    crossJoin(list2, selector);
+    add(item: T);
+    forEachWith(list: T[], action);
+    selectWith(list: T[], func);
+    crossJoin(list2: T[], selector);
 }
 
 
@@ -130,7 +131,7 @@ interface DateConstructor {
     fromUnix(value);
     today();
     current();
-    create(y, m, d, h, mm, s, ms);
+    create(y?, m?, d?, h?, mm?, s?, ms?);
     _parsePart(ctx, part, setter?);
     tryParseExact(s, formats);
     _tryParseExact(s, format);
@@ -209,30 +210,6 @@ interface Function {
     addTo(target);
     comparers: Comparer[];
 }
-interface QConstructor {
-    copy(src, target, options, depth);
-    objectToNameValueArray();
-    objectValuesToArray(obj);
-    cloneJson(obj);
-    forEachValueInObject(obj, func, thisArg);
-    mapKeyValueInArrayOrObject(objOrList, func, thisArg);
-    jMap(objOrList, func, thisArg);
-    isEmptyObject(obj);
-    min(list);
-    max(list);
-    stringifyFormatted(obj);
-    _canInlineObject(obj);
-    _canInlineArray(list);
-    stringifyFormatted2(obj, sb);
-    bindFunctions(obj);
-    parseInt(s);
-    parseFloat(s);
-    createSelectorFunction(selector);
-    isNullOrEmpty(stringOrArray);
-    isNotNullOrEmpty(stringOrArray);
-    isNullEmptyOrZero(v);
-    isAny(v, vals);
-}
 interface StringConstructor {
     isInt(s);
     isFloat(s);
@@ -243,18 +220,18 @@ interface String {
     startsWith(s);
     forEach(action);
     contains(s);
-    replaceAll(token, newToken, ignoreCase): string;
-    replaceMany(finds, replacer);
-    truncateEnd(finalLength);
-    truncateStart(finalLength);
-    remove(index, length);
-    insert(index, text);
-    replaceAt(index, length, text);
-    padRight(totalWidth, paddingChar?);
-    padLeft(totalWidth, paddingChar?);
+    replaceAll(token: string, newToken: string, ignoreCase?: boolean): string;
+    replaceMany(finds: string, replacer: Function);
+    truncateEnd(finalLength: number);
+    truncateStart(finalLength: number);
+    remove(index: number, length: number);
+    insert(index: number, text: string);
+    replaceAt(index: number, length: number, text: string);
+    padRight(totalWidth: number, paddingChar?: string);
+    padLeft(totalWidth: number, paddingChar?: string);
     toLambda();
     toSelector();
-    substringBetween(start, end);
+    substringBetween(start: string, end: string, fromIndex?: number);
     all(predicate);
     every();
     isInt();
@@ -268,10 +245,10 @@ interface NumberConstructor {
     roundUsing(mathOp, x, precision);
 }
 interface Number {
-    format(format);
-    round(precision);
-    ceil(precision);
-    floor(precision);
+    format(format: string);
+    round(precision?: number);
+    ceil(precision?: number);
+    floor(precision?: number);
     isInt();
     isFloat();
     inRangeInclusive(min, max);
@@ -282,16 +259,6 @@ interface JSON {
 interface Math {
     randomInt(min, max);
 }
-//declare class ComparerHelper {
-//    static combine(comparers);
-//    static create(selector, desc, comparer);
-//    static createCombined(list);
-//}
-//declare class ArrayEnumerator<T> {
-//    constructor(source: Array<T>);
-//    moveNext();
-//    getCurrent();
-//}
 interface ComparerConstructor {
 }
 interface Comparer {
@@ -332,3 +299,37 @@ interface Error {
 }
 
 
+//interface QConstructor {
+//    copy(src, target, options, depth);
+//    objectToNameValueArray();
+//    objectValuesToArray(obj);
+//    cloneJson(obj);
+//    forEachValueInObject(obj, func, thisArg);
+//    mapKeyValueInArrayOrObject(objOrList, func, thisArg);
+//    jMap(objOrList, func, thisArg);
+//    isEmptyObject(obj);
+//    min(list);
+//    max(list);
+//    stringifyFormatted(obj);
+//    _canInlineObject(obj);
+//    _canInlineArray(list);
+//    stringifyFormatted2(obj, sb);
+//    bindFunctions(obj);
+//    parseInt(s);
+//    parseFloat(s);
+//    createSelectorFunction(selector);
+//    isNullOrEmpty(stringOrArray);
+//    isNotNullOrEmpty(stringOrArray);
+//    isNullEmptyOrZero(v);
+//    isAny(v, vals);
+//}
+//declare class ComparerHelper {
+//    static combine(comparers);
+//    static create(selector, desc, comparer);
+//    static createCombined(list);
+//}
+//declare class ArrayEnumerator<T> {
+//    constructor(source: Array<T>);
+//    moveNext();
+//    getCurrent();
+//}

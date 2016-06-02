@@ -16,7 +16,7 @@ declare class Q {
     static bindFunctions(obj: Object): void;
     static parseInt(s: any): any;
     static parseFloat(s: any): any;
-    static createSelectorFunction(selector: any): any;
+    static createSelectorFunction<T, R>(selector: any): any;
     static isNullOrEmpty(stringOrArray: any): boolean;
     static isNotNullOrEmpty(stringOrArray: any): boolean;
     static isNullEmptyOrZero(v: any): boolean;
@@ -68,6 +68,7 @@ interface Array<T> {
     take(count: number): T[];
     skip(count: number): T[];
     first(predicate?: (item: T, index?: number) => boolean): T;
+    last(predicate?: (item: T, index?: number) => boolean): T;
     exceptNulls(): Array<T>;
     insert(index: number, item: T): any;
     toArray(): Array<T>;
@@ -76,15 +77,17 @@ interface Array<T> {
     select<R>(selector: (value: T, index: number, array: T[]) => R, thisArg?: any): R[];
     select<R>(selector: string, thisArg?: any): R[];
     selectMany<R>(callbackfn: (value: T, index: number, array: T[]) => R[], thisArg?: any): R[];
+    orderBy<R>(selector: (value: T, index: number, array: T[]) => R, desc?: boolean, comparer?: Comparer): any;
+    orderByDescending<R>(selector: (value: T, index: number, array: T[]) => R, desc?: boolean): any;
+    sortBy<R>(selector: (value: T, index: number, array: T[]) => R, desc?: boolean, comparer?: Comparer): any;
+    sortByDescending<R>(selector: (value: T, index: number, array: T[]) => R): any;
     groupBy<K>(callbackfn: (value: T, index: number, array: T[]) => K, thisArg?: any): Grouping<K, T>[];
     addRange(items: T[]): any;
     distinct(): T[];
     forEachJoin(action: any, actionBetweenItems: any): any;
-    first(predicate: any): any;
     toArray(): any;
     insert(index: any, item: any): any;
     insertRange(index: any, items: any): any;
-    last(predicate: any): any;
     toObject(selector: any): any;
     toObjectKeys(defaultValue: any): any;
     keysToObject(defaultValue: any): any;
@@ -109,10 +112,6 @@ interface Array<T> {
     min(): any;
     max(): any;
     getEnumerator(): any;
-    orderBy(selector: any, desc: any, comparer: any): any;
-    orderByDescending(selector: any, desc: any): any;
-    sortBy(selector: any, desc: any, comparer: any): any;
-    sortByDescending(selector: any): any;
     mapAsyncParallel(asyncFunc: any, finalCallback: any): any;
     forEachAsyncParallel(asyncFunc: any, finalCallback: any): any;
     clear(): any;
@@ -124,7 +123,6 @@ interface Array<T> {
     flatten(): any;
     selectToObject(keySelector: any, valueSelector: any): any;
     groupByToObject(keySelector: any, itemSelector: any): any;
-    groupBy(keySelector: any, itemSelector: any): any;
     splitIntoChunksOf(countInEachChunk: any): any;
     avg(): any;
     sum(): any;
@@ -132,23 +130,23 @@ interface Array<T> {
     take(count: any): any;
     toSelector(): any;
     removeNulls(): any;
-    exceptNulls(): any;
-    truncate(totalItems: any): any;
-    random(): any;
+    exceptNulls(): T[];
+    truncate(totalItems: number): any;
+    random(): T;
     selectRecursive(selector: any, recursiveFunc: any): any;
     selectManyRecursive(selector: any, recursiveFunc: any): any;
     peek(predicate: any): any;
     removeLast(): any;
-    add(): any;
-    forEachWith(list: any, action: any): any;
-    selectWith(list: any, func: any): any;
-    crossJoin(list2: any, selector: any): any;
+    add(item: T): any;
+    forEachWith(list: T[], action: any): any;
+    selectWith(list: T[], func: any): any;
+    crossJoin(list2: T[], selector: any): any;
 }
 interface DateConstructor {
     fromUnix(value: any): any;
     today(): any;
     current(): any;
-    create(y: any, m: any, d: any, h: any, mm: any, s: any, ms: any): any;
+    create(y?: any, m?: any, d?: any, h?: any, mm?: any, s?: any, ms?: any): any;
     _parsePart(ctx: any, part: any, setter?: any): any;
     tryParseExact(s: any, formats: any): any;
     _tryParseExact(s: any, format: any): any;
@@ -227,30 +225,6 @@ interface Function {
     addTo(target: any): any;
     comparers: Comparer[];
 }
-interface QConstructor {
-    copy(src: any, target: any, options: any, depth: any): any;
-    objectToNameValueArray(): any;
-    objectValuesToArray(obj: any): any;
-    cloneJson(obj: any): any;
-    forEachValueInObject(obj: any, func: any, thisArg: any): any;
-    mapKeyValueInArrayOrObject(objOrList: any, func: any, thisArg: any): any;
-    jMap(objOrList: any, func: any, thisArg: any): any;
-    isEmptyObject(obj: any): any;
-    min(list: any): any;
-    max(list: any): any;
-    stringifyFormatted(obj: any): any;
-    _canInlineObject(obj: any): any;
-    _canInlineArray(list: any): any;
-    stringifyFormatted2(obj: any, sb: any): any;
-    bindFunctions(obj: any): any;
-    parseInt(s: any): any;
-    parseFloat(s: any): any;
-    createSelectorFunction(selector: any): any;
-    isNullOrEmpty(stringOrArray: any): any;
-    isNotNullOrEmpty(stringOrArray: any): any;
-    isNullEmptyOrZero(v: any): any;
-    isAny(v: any, vals: any): any;
-}
 interface StringConstructor {
     isInt(s: any): any;
     isFloat(s: any): any;
@@ -261,18 +235,18 @@ interface String {
     startsWith(s: any): any;
     forEach(action: any): any;
     contains(s: any): any;
-    replaceAll(token: any, newToken: any, ignoreCase: any): string;
-    replaceMany(finds: any, replacer: any): any;
-    truncateEnd(finalLength: any): any;
-    truncateStart(finalLength: any): any;
-    remove(index: any, length: any): any;
-    insert(index: any, text: any): any;
-    replaceAt(index: any, length: any, text: any): any;
-    padRight(totalWidth: any, paddingChar?: any): any;
-    padLeft(totalWidth: any, paddingChar?: any): any;
+    replaceAll(token: string, newToken: string, ignoreCase?: boolean): string;
+    replaceMany(finds: string, replacer: Function): any;
+    truncateEnd(finalLength: number): any;
+    truncateStart(finalLength: number): any;
+    remove(index: number, length: number): any;
+    insert(index: number, text: string): any;
+    replaceAt(index: number, length: number, text: string): any;
+    padRight(totalWidth: number, paddingChar?: string): any;
+    padLeft(totalWidth: number, paddingChar?: string): any;
     toLambda(): any;
     toSelector(): any;
-    substringBetween(start: any, end: any): any;
+    substringBetween(start: string, end: string, fromIndex?: number): any;
     all(predicate: any): any;
     every(): any;
     isInt(): any;
@@ -286,10 +260,10 @@ interface NumberConstructor {
     roundUsing(mathOp: any, x: any, precision: any): any;
 }
 interface Number {
-    format(format: any): any;
-    round(precision: any): any;
-    ceil(precision: any): any;
-    floor(precision: any): any;
+    format(format: string): any;
+    round(precision?: number): any;
+    ceil(precision?: number): any;
+    floor(precision?: number): any;
     isInt(): any;
     isFloat(): any;
     inRangeInclusive(min: any, max: any): any;

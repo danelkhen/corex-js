@@ -275,7 +275,7 @@ class Q {
             return null;
         return x;
     }
-    static createSelectorFunction(selector) {
+    static createSelectorFunction<T, R>(selector) {
         if (selector == null)
             return function (t) { return t; };
         if (typeof (selector) == "function")

@@ -1802,9 +1802,43 @@ String.prototype.splitAt = function (index) {
     return [this.substr(0, index), this.substr(index)];
 };
 String.prototype.lines = function () {
-    return this.match(/[^\r\n]+/g);
+    return this.split(/\r?\n/);
 };
 "use strict";
+//interface QConstructor {
+//    copy(src, target, options, depth);
+//    objectToNameValueArray();
+//    objectValuesToArray(obj);
+//    cloneJson(obj);
+//    forEachValueInObject(obj, func, thisArg);
+//    mapKeyValueInArrayOrObject(objOrList, func, thisArg);
+//    jMap(objOrList, func, thisArg);
+//    isEmptyObject(obj);
+//    min(list);
+//    max(list);
+//    stringifyFormatted(obj);
+//    _canInlineObject(obj);
+//    _canInlineArray(list);
+//    stringifyFormatted2(obj, sb);
+//    bindFunctions(obj);
+//    parseInt(s);
+//    parseFloat(s);
+//    createSelectorFunction(selector);
+//    isNullOrEmpty(stringOrArray);
+//    isNotNullOrEmpty(stringOrArray);
+//    isNullEmptyOrZero(v);
+//    isAny(v, vals);
+//}
+//declare class ComparerHelper {
+//    static combine(comparers);
+//    static create(selector, desc, comparer);
+//    static createCombined(list);
+//}
+//declare class ArrayEnumerator<T> {
+//    constructor(source: Array<T>);
+//    moveNext();
+//    getCurrent();
+//}
 "use strict";
 //******** JSON
 JSON.iterateRecursively = function (obj, action) {

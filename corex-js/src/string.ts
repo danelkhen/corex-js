@@ -151,5 +151,6 @@ String.prototype.splitAt = function (index) {
     return [this.substr(0, index), this.substr(index)];
 }
 String.prototype.lines = function () {
-    return this.match(/[^\r\n]+/g);
-}
+    return this.split(/\r?\n/);
+};
+

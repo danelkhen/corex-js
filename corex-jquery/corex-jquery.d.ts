@@ -101,11 +101,11 @@ interface JQueryStatic {
     whenAll(list: any): any;
 }
 interface JQuery {
-    bindChildrenToList<T>(selector: string, list: Array<T>, action: (el: JQuery, obj: T) => void): any;
-    getAppend(selector: string): any;
-    isotope(opts: any): any;
+    bindChildrenToList<T>(selector: string, list: Array<T>, action: (el: JQuery, obj: T) => void): JQuery;
+    getAppendRemoveForEach<T>(selector: string, list: Array<T>, action: (el: JQuery, obj: T) => void): JQuery;
+    getAppendRemove<T>(selector: string, total: number): JQuery;
+    getAppend(selector: string): JQuery;
     toArray$(): Array<JQuery>;
-    getAppendRemoveForEach<T>(selector: string, list: Array<T>, action: (el: JQuery, obj: T) => void): any;
     val2(value?: any): any;
     generator<T>(func: (obj: T) => JQuery): JQuery;
     generator<T>(): (obj: T) => JQuery;
