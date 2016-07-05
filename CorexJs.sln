@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorexJs", "CorexJs\CorexJs.csproj", "{4639B8BF-851C-42A3-862F-BBF893D6F7C5}"
 EndProject
@@ -61,6 +61,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "corex-jquery", "corex-jquer
 		SlnRelativePath = "corex-jquery\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "template", "template\", "{4CC50A26-0913-4735-9738-DA3D03F87BFF}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_64602"
+		Debug.AspNetCompiler.PhysicalPath = "template\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_64602\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_64602"
+		Release.AspNetCompiler.PhysicalPath = "template\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_64602\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "64602"
+		SlnRelativePath = "template\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +112,10 @@ Global
 		{A60869B3-E3C1-4BD1-869A-472A99F55DE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A60869B3-E3C1-4BD1-869A-472A99F55DE6}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{A60869B3-E3C1-4BD1-869A-472A99F55DE6}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{4CC50A26-0913-4735-9738-DA3D03F87BFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CC50A26-0913-4735-9738-DA3D03F87BFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CC50A26-0913-4735-9738-DA3D03F87BFF}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CC50A26-0913-4735-9738-DA3D03F87BFF}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
