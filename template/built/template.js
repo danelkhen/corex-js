@@ -135,7 +135,7 @@ var Template = (function () {
             return;
         }
         var el3 = el2[0];
-        var els2 = el2.siblings(".template-instance").toArray();
+        var els2 = el2.nextUntil(":not(.template-instance)").toArray();
         if (list != null) {
             var els = list.select(function (obj) {
                 var el4 = els2.first(function (t) { return t._data == obj; });

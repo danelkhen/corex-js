@@ -137,7 +137,7 @@ export class Template {
         }
         let el3 = <HTMLElementEx>el2[0];
 
-        let els2: HTMLElementEx[] = el2.siblings(".template-instance").toArray();
+        let els2: HTMLElementEx[] = el2.nextUntil(":not(.template-instance)").toArray();
         if (list != null) {
             let els = list.select(obj => {
                 let el4 = els2.first(t => t._data == obj);
