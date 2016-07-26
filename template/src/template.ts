@@ -45,7 +45,10 @@ export class Template {
     static onPromise(promise: Promise<any>): Promise<any> { return promise; }
     static dataBind(node: Node, obj: any, thisContext: any) {
         if (node.nodeType == 3) {
-            let s = node.nodeValue;
+            let node2: NodeEx = node;
+            if (node2.originalNodeValue == null)
+                node2.originalNodeValue = node.nodeValue;
+            let s = node2.originalNodeValue;
             if ((node.nextSibling != null || node.previousSibling != null) && s.trim() == "") {
                 node.parentElement.removeChild(node);
                 return;
@@ -275,3 +278,6 @@ export interface ParsedFunction {
 }
 
 
+interface NodeEx extends Node {
+    originalNodeValue?: string;
+}

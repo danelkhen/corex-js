@@ -45,7 +45,10 @@ var Template = (function () {
     Template.dataBind = function (node, obj, thisContext) {
         var _this = this;
         if (node.nodeType == 3) {
-            var s = node.nodeValue;
+            var node2 = node;
+            if (node2.originalNodeValue == null)
+                node2.originalNodeValue = node.nodeValue;
+            var s = node2.originalNodeValue;
             if ((node.nextSibling != null || node.previousSibling != null) && s.trim() == "") {
                 node.parentElement.removeChild(node);
                 return;
