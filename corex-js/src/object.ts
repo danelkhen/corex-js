@@ -14,7 +14,7 @@ Object.allKeys = function (obj) {
     }
     return list;
 }
-Object.keysValues = function (obj) {
+Object.keysValues = function (obj:Object):Array<{key:string,value:any}> {
     var list = [];
     for (var p in obj) {
         list.push({ key: p, value: obj[p] });

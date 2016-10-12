@@ -14,8 +14,8 @@ declare class Q {
     static _canInlineArray(list: any): boolean;
     static stringifyFormatted2(obj: any, sb: any): void;
     static bindFunctions(obj: Object): void;
-    static parseInt(s: any): any;
-    static parseFloat(s: any): any;
+    static parseInt(s: any): number;
+    static parseFloat(s: any): number;
     static createSelectorFunction<T, R>(selector: any): any;
     static isNullOrEmpty(stringOrArray: any): boolean;
     static isNotNullOrEmpty(stringOrArray: any): boolean;
@@ -23,9 +23,12 @@ declare class Q {
     static isAny(v: any, vals: any): any;
 }
 interface ObjectConstructor {
-    toArray(obj: any): any;
-    allKeys(obj: any): any;
-    keysValues(obj: any): any;
+    toArray(obj: Object): any[];
+    allKeys(obj: Object): string[];
+    keysValues(obj: any): Array<{
+        key: string;
+        value: any;
+    }>;
     pairs(obj: any): any;
     fromPairs(keysValues: any): any;
     fromKeysValues(keysValues: any): any;
@@ -58,7 +61,6 @@ interface ArrayConstructor {
     slice(): any;
     concat(): any;
     fromIterator(iterator: any): any;
-    from<T>(arrayLike: any): Array<T>;
 }
 interface Array<T> {
     isArrayOfPairs?: boolean;
@@ -343,7 +345,7 @@ declare class Dictionary<K, T> {
     add(key: any, value: any): void;
     get(key: any): any;
     set(key: any, value: any): void;
-    values(): any;
+    values(): any[];
 }
 declare class ComparerHelper {
     static combine(comparers: any[]): (x: any, y: any) => any;

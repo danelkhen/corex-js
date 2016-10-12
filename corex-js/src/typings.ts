@@ -1,8 +1,8 @@
 "use strict";
 interface ObjectConstructor {
-    toArray(obj);
-    allKeys(obj);
-    keysValues(obj);
+    toArray(obj:Object):any[];
+    allKeys(obj:Object):string[];
+    keysValues(obj):Array<{key:string,value:any}>;
     pairs(obj);
     fromPairs(keysValues);
     fromKeysValues(keysValues);
@@ -35,8 +35,6 @@ interface ArrayConstructor {
     slice();
     concat();
     fromIterator(iterator);
-    from<T>(arrayLike): Array<T>;
-    //from(arrayLike):Array<any>;
 }
 interface Array<T> {
     isArrayOfPairs?: boolean;

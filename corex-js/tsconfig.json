@@ -8,7 +8,8 @@
         "removeComments": false,
         "noImplicitAny": false,
         "out": "corex.js",
-        "rootDir": "src"
+        "rootDir": "src",
+        "newLine": "LF"
     },
     "exclude": [
         "node_modules",
