@@ -159,8 +159,8 @@ Array.prototype.addRange = function (items) {
 Array.prototype.diff = function (target) {
     var source = this;
     var res = {
-        added: source.where(function (t) { return !target.contains(t); }),
-        removed: target.where(function (t) { return !source.contains(t); }),
+        added: target.where(function (t) { return !source.contains(t); }),
+        removed: source.where(function (t) { return !target.contains(t); }),
     };
     return res;
 }
