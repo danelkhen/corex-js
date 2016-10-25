@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
         "target": "es5",
         "noImplicitAny": false,
-        "sourceMap": false
+        "sourceMap": false,
+        "outFile": "grid2.js"
     },
     "exclude": [
         "node_modules"

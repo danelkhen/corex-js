@@ -1,59 +1,55 @@
-﻿    export interface GridCol
-    {
-        SourceCol:GridCol ;
-        Name: JsString ;
-        Def:GridCol ;
-        Defs:JsArray<GridCol> ;
-        Prop:JsNativeFunc<object, object> ;
-        JsString Title;
-        JsFunc<object, object> Getter;
-        JsFunc<object, object, JsNumber> Comparer;
-        JsBoolean Visible;
-        JsFunc<object, JsString> Format;
-        JsFunc<object, JsString> ClassFunc;
-        JsString Class;
-        JsNumber Width;
-        JsAction<GridCol, object, jQuery> RenderCell;
-        JsAction<GridCol, jQuery> RenderHeaderCell;
-    }
+﻿
+interface GridCol {
+    SourceCol: GridCol;
+    Name: string;
+    Def: GridCol;
+    Defs: Array<GridCol>;
+    Prop: JsFunc1<any, any>;
+    Title: string;
+    Getter: JsFunc1<any, any>;
+    Comparer: JsFunc2<any, any, number>;
+    Visible: boolean;
+    Format: JsFunc1<any, string>;
+    ClassFunc: JsFunc1<any, string>;
+    Class: string;
+    Width: number;
+    RenderCell: JsAction3<GridCol, any, JQuery>;
+    RenderHeaderCell: JsAction2<GridCol, JQuery>;
+}
 
-    export interface GridCol<T> extends GridCol
-    {
-        JsNativeFunc<T, object> Prop;
-        JsFunc<T, object> Getter;
-        JsFunc<T, T, JsNumber> Comparer;
-        JsAction<GridCol<T>, T, jQuery> RenderCell ;
-        JsAction<GridCol<T>, jQuery> RenderHeaderCell;
-    }
-    
-    export interface GridCol<T, V> extends GridCol<T>
-    {
-        JsNativeFunc<T, V> Prop;
-        JsFunc<T, V> Getter;
-        JsFunc<V, JsString> Format;
-        JsFunc<V, JsString> ClassFunc;
-    }
+interface GridCol1<T> extends GridCol {
+    Prop: JsFunc1<T, any>;
+    Getter: JsFunc1<T, any>;
+    Comparer: JsFunc2<T, T, number>;
+    RenderCell: JsAction3<GridCol1<T>, T, JQuery>;
+    RenderHeaderCell: JsAction2<GridCol1<T>, JQuery>;
+}
+
+interface GridCol2<T, V> extends GridCol1<T> {
+    Prop: JsFunc1<T, V>;
+    Getter: JsFunc1<T, V>;
+    Format: JsFunc1<V, string>;
+    ClassFunc: JsFunc1<V, string>;
+}
 
 
-    export static class Extensions5
-    {
-        public static ToGrid<T>(list:JsArray<T> , j:jQuery , opts:GridOptions<T> ):jQuery 
-        {
-            opts.Items = list;
-            return j.Grid(opts);
-        }
+class Extensions5 {
+    static ToGrid<T>(list: Array<T>, j: JQuery, opts: GridOptions<T>): JQuery {
+        opts.Items = list;
+        return j.Grid(opts);
     }
+}
 
-    export class GridOptions<T>
-    {
-        JsArray<GridCol<T>> Columns;
-        JsArray<T> Items;
-        T FooterItem;
-        JsNumber PageIndex;
-        JsNumber PageSize;
-        JsString Query;
-        JsFunc<T, T, JsNumber> OrderBy2;
-        bool OrderByDesc;
-        JsFunc<T, JsNumber, JsString> RowClass;
-        JsAction RenderFinished;
-    }
+class GridOptions<T>
+{
+    Columns: Array<GridCol1<T>>;
+    Items: Array<T>;
+    FooterItem: T;
+    PageIndex: number;
+    PageSize: number;
+    Query: string;
+    OrderBy2: JsFunc2<T, T, number>;
+    OrderByDesc: boolean;
+    RowClass: JsFunc2<T, number, string>;
+    RenderFinished: JsAction;
+}

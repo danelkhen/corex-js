@@ -56,13 +56,14 @@
   <ItemGroup>
     <TypeScriptCompile Include="grid.d.ts" />
     <Content Include="grid.js" />
+    <TypeScriptCompile Include="grid\references.d.ts" />
     <TypeScriptCompile Include="grid\grid-options.ts" />
     <TypeScriptCompile Include="grid\grid.ts" />
     <TypeScriptCompile Include="grid\plugin.ts" />
     <TypeScriptCompile Include="grid\utils.ts" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="grid\tsconfig.json" />
+    <None Include="tsconfig.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\Common.targets" />
