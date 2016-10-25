@@ -3,9 +3,11 @@
         "target": "es5",
         "noImplicitAny": false,
         "sourceMap": false,
-        "outFile": "grid2.js"
+        "declaration": true,
+        "outFile": "grid.js"
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "grid.d.ts"
     ]
 }
