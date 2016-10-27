@@ -318,7 +318,7 @@ function jQueryHelper2() {
     function generator(funcOrSelector) {
         if (arguments.length > 0) {
             if (typeof (funcOrSelector) == "string") {
-                var selector = funcOrSelector;
+                let selector = funcOrSelector;
                 this._generator = function () { return $.create(selector); };
             }
             else {
@@ -327,7 +327,7 @@ function jQueryHelper2() {
             return this;
         }
         if (this._generator === undefined) {
-            var selector = this._originalSelector;
+            let selector = this._originalSelector;
             if (selector == null)
                 throw new Error("Can't resolve selector for this jQuery object");
             this._generator = function () { return $.create(selector); };

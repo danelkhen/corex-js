@@ -98,13 +98,13 @@ class Grid<T>
         this.Cols = this.Options.Columns.select(t => this.FinalizeCol(t));
         this.Cols.forEach(col => {
             if (col.Name == null && col.Prop != null)
-                col.Name = this.Options.Items.ItemProp(col.Prop);
+                col.Name = Utils.ItemProp(this.Options.Items, col.Prop);
             if (col.Getter == null && col.Prop != null)
                 col.Getter = col.Prop as JsFunc1<T, any>;
             if (col.Getter == null && col.Name != null)
                 col.Getter = t => t[col.Name] as string;
             if (col.Comparer == null && col.Getter != null)
-                col.Comparer = col.Getter.ToComparer();
+                col.Comparer = Utils.ToComparer(col.Getter);
             if (col.Title == null && col.Name != null)
                 col.Title = col.Name;
             if (col.Visible == null)
@@ -121,9 +121,9 @@ class Grid<T>
         if (this.Options.OrderBy2 == null)
             return;
         if (this.Options.OrderByDesc)
-            this.CurrentList = this.Options.OrderBy2.ToDescending().Order(this.CurrentList);//.orderByDescending(Options.OrderBy);
+            this.CurrentList = Utils.Order(Utils.ToDescending(this.Options.OrderBy2), this.CurrentList);//.orderByDescending(Options.OrderBy);
         else
-            this.CurrentList = this.Options.OrderBy2.Order(this.CurrentList);
+            this.CurrentList = Utils.Order(this.Options.OrderBy2, this.CurrentList);
     }
 
     ApplyPaging(): void {
@@ -302,7 +302,7 @@ class Grid<T>
             this.SearchEl = this.El.getAppend(".Search").addClass("form-inline");
         if (this.SearchInputEl == null)
             this.SearchInputEl = this.SearchEl.getAppend("input.tbSearch").addClass("form-control").attr("placeholder", "Find");
-        if (this.SearchInputEl.DataGetSet("GridSearchInputEventAttached", true))
+        if (Utils.DataGetSet(this.SearchInputEl, "GridSearchInputEventAttached", true))
             return;
         this.SearchInputEl.on("input", e => {
             this.Options.Query = this.SearchInputEl.val();
@@ -358,7 +358,7 @@ class Grid<T>
     Table: JQuery;
 
     GetItem(el: JQuery): T {
-        return el.closest("tr").DataItem<T>();
+        return el.closest("tr").dataItem();
     }
     GetRow(obj: T): JQuery {
         if (this.DataRows == null)

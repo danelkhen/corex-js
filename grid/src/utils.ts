@@ -3,7 +3,7 @@
 class Utils {
     static ToComparer<T, V>(getter: JsFunc1<T, V>, desc?: boolean): JsFunc2<T, T, number> {
         if (desc)
-            return getter.ToDescendingComparer();
+            return Utils.ToDescendingComparer(getter);
         var valueComparer = this.GetDefaultComparer<V>();
         var comparer = <JsFunc2<T, T, number>>((x, y) => valueComparer(getter(x), getter(y)));
         return comparer;
@@ -25,7 +25,8 @@ class Utils {
         });
     }
     static ThenBy<T, V>(comparer: JsFunc2<T, T, number>, getter: JsFunc1<T, V>, desc?: boolean): JsFunc2<T, T, number> {
-        return comparer.ThenBy(getter.ToComparer(desc));
+        return Utils.ThenBy2(comparer, Utils.ToComparer(getter, desc));
+        //return comparer.ThenBy(getter.ToComparer(desc));
     }
     static Order<T>(comparer: JsFunc2<T, T, number>, list: Array<T>): T[] {
         var list2 = list.toArray();
@@ -46,7 +47,7 @@ class Utils {
         return value2;
     }
     static Prop<T>(prop: JsFunc1<T, any>): string {
-        let prop2:any =  prop;
+        let prop2: any = prop;
         let code: string;
         if (prop2.isDelegate)
             code = prop2.func.toString();
@@ -63,10 +64,10 @@ class Utils {
 }
 
 
-class Comparer<T>
-{
-    compare(x: T, y: T): number { return null; }
-    static _default: Comparer<T>;
-}
+//class Comparer<T>
+//{
+//    compare(x: T, y: T): number { return null; }
+//    static _default: Comparer<T>;
+//}
 
 

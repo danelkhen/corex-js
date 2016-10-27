@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorexJs", "CorexJs\CorexJs.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TidyTree", "TidyTree\TidyTree.csproj", "{A3097FCE-19B7-4C82-B7DE-5B3B24622ED2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grid", "Grid\Grid.csproj", "{723BBDA1-DF13-4763-9E88-D00247666CE4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7831F383-51E9-439F-9485-8577BBC9587D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
@@ -82,7 +80,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "template", "template\", "{4
 		SlnRelativePath = "template\"
 	EndProjectSection
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "corex(1)", "corex\", "{D7C4756C-3251-40BA-9BE1-164F54931C46}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "corex", "corex\", "{D7C4756C-3251-40BA-9BE1-164F54931C46}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_52067"
@@ -103,6 +101,26 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "corex(1)", "corex\", "{D7C4
 		SlnRelativePath = "corex\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "grid", "grid\", "{ACE54181-B0C6-457D-9416-C2BBEDB1F824}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_58724"
+		Debug.AspNetCompiler.PhysicalPath = "grid\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58724\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_58724"
+		Release.AspNetCompiler.PhysicalPath = "grid\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58724\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "58724"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,10 +135,6 @@ Global
 		{A3097FCE-19B7-4C82-B7DE-5B3B24622ED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3097FCE-19B7-4C82-B7DE-5B3B24622ED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3097FCE-19B7-4C82-B7DE-5B3B24622ED2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{723BBDA1-DF13-4763-9E88-D00247666CE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{723BBDA1-DF13-4763-9E88-D00247666CE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{723BBDA1-DF13-4763-9E88-D00247666CE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{723BBDA1-DF13-4763-9E88-D00247666CE4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F5073644-76D6-425E-A1AB-C6D34C84F002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F5073644-76D6-425E-A1AB-C6D34C84F002}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5073644-76D6-425E-A1AB-C6D34C84F002}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -141,6 +155,10 @@ Global
 		{D7C4756C-3251-40BA-9BE1-164F54931C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7C4756C-3251-40BA-9BE1-164F54931C46}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{D7C4756C-3251-40BA-9BE1-164F54931C46}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{ACE54181-B0C6-457D-9416-C2BBEDB1F824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACE54181-B0C6-457D-9416-C2BBEDB1F824}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACE54181-B0C6-457D-9416-C2BBEDB1F824}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACE54181-B0C6-457D-9416-C2BBEDB1F824}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

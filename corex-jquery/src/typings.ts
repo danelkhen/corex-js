@@ -8,7 +8,7 @@ interface JQueryStatic {
 }
 
 interface JQuery {
-    bindChildrenToList<T>(selector: string, list: Array<T>, action: (el: JQuery, obj: T) => void): JQuery;
+    bindChildrenToList<T>(selector: string, list: Array<T>, action: (el: JQuery, obj: T, index:number) => void): JQuery;
     getAppendRemoveForEach<T>(selector: string, list: Array<T>, action: (el: JQuery, obj: T) => void): JQuery;
     getAppendRemove<T>(selector: string, total:number): JQuery;
     getAppend(selector: string): JQuery;
