@@ -23,7 +23,7 @@ declare class JsError extends Error {
 }
 declare class JsDateEx extends Date {
 }
-declare var JsMath: Math;
+//declare var JsMath: Math;
 
 declare class JsObjectEx extends Object {
 }

@@ -127,7 +127,7 @@ class Grid<T>
     }
 
     ApplyPaging(): void {
-        this.TotalPages = JsMath.ceil(this.CurrentList.length / this.Options.PageSize);
+        this.TotalPages = Math.ceil(this.CurrentList.length / this.Options.PageSize);
         if (this.Options.PageIndex >= this.TotalPages)
             this.Options.PageIndex = this.TotalPages - 1;
         if (this.Options.PageIndex < 0)
@@ -257,7 +257,7 @@ class Grid<T>
             e.preventDefault();
             this.OrderBy(col);
         });
-        th.text(col.Title || col.Name);
+        th.text(col.Title!=null ? col.Title : col.Name);
         var classes = new Array<string>();
         if (col.Class != null)
             classes.push(col.Class);

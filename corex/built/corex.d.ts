@@ -72,14 +72,14 @@ declare module "array" {
         selectWith(list: any, func: any): any;
         crossJoin(list2: any, selector: any): any[];
         static joinAll(lists: any, keySelector: any, resultSelector: any): any[];
-        static outerJoin(list1: any, list2: any, keySelector1: any, keySelector2: any, resultSelector: any): any[];
+        static outerJoin(list1: any, list2: any, keySelector1: any, keySelector2: any, resultSelector: any): ArrayEx<any>;
         static outerJoinAll(lists: any, keySelector: any, resultSelector: any): any[];
         static forEachAll(lists: any, action: any): void;
         static selectAll(lists: any, func: any): any[];
         static forEachTwice(list1: any, list2: any, action: any): void;
         static selectTwice(list1: any, list2: any, func: any): any[];
         static generate(length: any, generator: any): any[];
-        static wrapIfNeeded(obj: any): any;
+        static wrapIfNeeded(obj: any): any[];
         static toArray(arrayLike: any): any;
         static from<T>(x: T[]): ArrayEx<T>;
         static generateNumbers(from: any, until: any): any[];
@@ -101,8 +101,8 @@ declare class Q {
     static _canInlineArray(list: any): boolean;
     static stringifyFormatted2(obj: any, sb: any): void;
     static bindFunctions(obj: Object): void;
-    static parseInt(s: any): any;
-    static parseFloat(s: any): any;
+    static parseInt(s: any): number;
+    static parseFloat(s: any): number;
     static createSelectorFunction<T, R>(selector: any): any;
     static isNullOrEmpty(stringOrArray: any): boolean;
     static isNotNullOrEmpty(stringOrArray: any): boolean;

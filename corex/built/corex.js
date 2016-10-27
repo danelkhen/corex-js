@@ -128,9 +128,10 @@ var __extends = (this && this.__extends) || function (d, b) {
 //        target[func.getName()] = func;
 //    });
 //}
-System.register("array", [], function(exports_1) {
+System.register("array", [], function(exports_1, context_1) {
     ///<reference path="function.ts" />
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var ArrayEx;
     return {
         setters:[],
@@ -646,11 +647,11 @@ System.register("array", [], function(exports_1) {
                     resultSelector = Q.createSelectorFunction(resultSelector);
                     var groups1 = list1.groupByToObject(keySelector1);
                     var groups2 = list2.groupByToObject(keySelector2);
-                    var allKeys = Object.keys(groups1);
+                    var allKeys = ArrayEx.from(Object.keys(groups1));
                     allKeys.addRange(Object.keys(groups2));
                     allKeys = allKeys.distinct();
                     //allKeys.sort();
-                    var list3 = [];
+                    var list3 = ArrayEx.from([]);
                     allKeys.forEach(function (key) {
                         var group1 = groups1[key] || [];
                         var group2 = groups2[key] || [];

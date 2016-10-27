@@ -7,11 +7,6 @@ var Extensions5 = (function () {
     };
     return Extensions5;
 }());
-var GridOptions = (function () {
-    function GridOptions() {
-    }
-    return GridOptions;
-}());
 /** <summary>
 /// Render
 ///     Verify
@@ -125,7 +120,7 @@ var Grid = (function () {
             this.CurrentList = Utils.Order(this.Options.OrderBy2, this.CurrentList);
     };
     Grid.prototype.ApplyPaging = function () {
-        this.TotalPages = JsMath.ceil(this.CurrentList.length / this.Options.PageSize);
+        this.TotalPages = Math.ceil(this.CurrentList.length / this.Options.PageSize);
         if (this.Options.PageIndex >= this.TotalPages)
             this.Options.PageIndex = this.TotalPages - 1;
         if (this.Options.PageIndex < 0)
@@ -245,7 +240,7 @@ var Grid = (function () {
             e.preventDefault();
             _this.OrderBy(col);
         });
-        th.text(col.Title || col.Name);
+        th.text(col.Title != null ? col.Title : col.Name);
         var classes = new Array();
         if (col.Class != null)
             classes.push(col.Class);

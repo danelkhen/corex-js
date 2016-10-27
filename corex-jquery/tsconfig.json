@@ -8,6 +8,7 @@
         "removeComments": false,
         "noImplicitAny": false,
         "out": "corex-jquery.js",
+        "newLine": "LF",
         "rootDir": "src"
     },
     "exclude": [
