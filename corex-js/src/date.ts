@@ -296,7 +296,7 @@ Date.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "
 Date._parts = ["year", "month", "day", "hour", "minute", "second", "ms"];
 
 
-Date.fromUnix = function (value) {
+Date.fromUnix = function (value:number):Date {
     return new Date(value * 1000);
 };
 Date.today = function () {

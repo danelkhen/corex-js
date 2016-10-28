@@ -128,14 +128,14 @@ interface Array<T> {
 
 
 interface DateConstructor {
-    fromUnix(value);
-    today();
-    current();
-    create(y?, m?, d?, h?, mm?, s?, ms?);
+    fromUnix(value:number):Date;
+    today():Date;
+    current():Date;
+    create(y?, m?, d?, h?, mm?, s?, ms?):Date;
     _parsePart(ctx, part, setter?);
-    tryParseExact(s, formats);
-    _tryParseExact(s, format);
-    tryParseJsonDate(s);
+    tryParseExact(s:string, formats:string[] | string):Date;
+    _tryParseExact(s:string, format:string):Date;
+    tryParseJsonDate(s:string):Date;
     roundUsing(mathOp, date, part, precision);
     _dowNames;
     _dowNamesAbbr;
