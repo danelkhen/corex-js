@@ -233,14 +233,15 @@ var Grid = (function () {
             col.RenderHeaderCell(col, th);
             return;
         }
-        th.off();
-        th.mousedown(function (e) {
+        var span = th.getAppend("button");
+        span.off();
+        span.mousedown(function (e) {
             if (e.which != 1)
                 return;
             e.preventDefault();
             _this.OrderBy(col);
         });
-        th.text(col.Title != null ? col.Title : col.Name);
+        span.text(col.Title != null ? col.Title : col.Name);
         var classes = new Array();
         if (col.Class != null)
             classes.push(col.Class);

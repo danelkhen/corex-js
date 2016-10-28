@@ -250,14 +250,15 @@ class Grid<T>
             col.RenderHeaderCell(col, th);
             return;
         }
-        th.off();
-        th.mousedown(e => {
+        let span = th.getAppend("button");
+        span.off();
+        span.mousedown(e => {
             if (e.which != 1)
                 return;
             e.preventDefault();
             this.OrderBy(col);
         });
-        th.text(col.Title!=null ? col.Title : col.Name);
+        span.text(col.Title!=null ? col.Title : col.Name);
         var classes = new Array<string>();
         if (col.Class != null)
             classes.push(col.Class);
