@@ -125,6 +125,16 @@ Function.addTo = function (target, funcs) {
 };
 ///<reference path="function.ts" />
 "use strict";
+Array.prototype.takeWhile = function (pred) {
+    var took = [];
+    this.first(function (t) {
+        var take = pred(t);
+        if (take)
+            took.push(t);
+        return !take;
+    });
+    return took;
+};
 Array.prototype.forEachJoin = function (action, actionBetweenItems) {
     var first = true;
     for (var i = 0; i < this.length; i++) {
@@ -2051,7 +2061,8 @@ function createCompareFuncFromSelector(selector, desc) {
 function toStringOrEmpty(val) {
     return val == null ? "" : val.toString();
 }
-Function.addTo(window, [toStringOrEmpty, createCompareFuncFromSelector, combineCompareFuncs]);
+if (typeof (window) != "undefined")
+    Function.addTo(window, [toStringOrEmpty, createCompareFuncFromSelector, combineCompareFuncs]);
 var Dictionary = (function () {
     function Dictionary() {
         this._obj = new Object();

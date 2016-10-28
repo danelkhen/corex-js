@@ -228,7 +228,8 @@ function toStringOrEmpty(val) {
     return val == null ? "" : val.toString();
 }
 
-Function.addTo(window, [toStringOrEmpty, createCompareFuncFromSelector, combineCompareFuncs]);
+if (typeof (window) != "undefined")
+    Function.addTo(window, [toStringOrEmpty, createCompareFuncFromSelector, combineCompareFuncs]);
 
 
 class Dictionary<K, T> {

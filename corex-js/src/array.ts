@@ -1,5 +1,17 @@
 ///<reference path="function.ts" />
 "use strict";
+
+Array.prototype.takeWhile = function (pred) {
+    var took = [];
+    this.first(t=> {
+        var take = pred(t);
+        if (take)
+            took.push(t);
+        return !take;
+    });
+    return took;
+};
+
 Array.prototype.forEachJoin = function (action, actionBetweenItems) {
     var first = true;
     for (var i = 0; i < this.length; i++) {
@@ -227,7 +239,7 @@ Array.prototype.max = function () {
 Array.prototype.getEnumerator = function () {
     return new ArrayEnumerator(this);
 }
-Array.prototype.orderBy = function (selector, desc, comparer) {
+Array.prototype.orderBy = function (selector, desc?, comparer?) {
     if (arguments.length == 1 && selector instanceof Array)
         return this.toArray().sortBy(selector);
     return this.toArray().sortBy(selector, desc, comparer);

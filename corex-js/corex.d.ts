@@ -56,13 +56,14 @@ interface ArrayConstructor {
     selectTwice(list1: any, list2: any, func: any): any;
     generate(length: any, generator: any): any;
     wrapIfNeeded(obj: any): any;
-    toArray(arrayLike: any): any;
-    generateNumbers(from: any, until: any): any;
+    toArray<T>(arrayLike: any): T[];
+    generateNumbers(from: number, until: number): number[];
     slice(): any;
     concat(): any;
     fromIterator(iterator: any): any;
 }
 interface Array<T> {
+    takeWhile(pred: any): T[];
     isArrayOfPairs?: boolean;
     contains(obj: T): boolean;
     remove(obj: T): boolean;
@@ -74,16 +75,17 @@ interface Array<T> {
     exceptNulls(): Array<T>;
     insert(index: number, item: T): any;
     toArray(): Array<T>;
-    where(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
-    removeAll<R>(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): void;
-    select<R>(selector: (value: T, index: number, array: T[]) => R, thisArg?: any): R[];
+    where(callbackfn: (value: T, index?: number, array?: T[]) => boolean, thisArg?: any): T[];
+    removeAll<R>(callbackfn: (value: T, index?: number, array?: T[]) => boolean, thisArg?: any): void;
+    select<R>(selector: (value: T, index?: number, array?: T[]) => R, thisArg?: any): R[];
     select<R>(selector: string, thisArg?: any): R[];
     selectMany<R>(callbackfn: (value: T, index: number, array: T[]) => R[], thisArg?: any): R[];
-    orderBy<R>(selector: (value: T, index: number, array: T[]) => R, desc?: boolean, comparer?: Comparer): any;
-    orderByDescending<R>(selector: (value: T, index: number, array: T[]) => R, desc?: boolean): any;
-    sortBy<R>(selector: (value: T, index: number, array: T[]) => R, desc?: boolean, comparer?: Comparer): any;
-    sortByDescending<R>(selector: (value: T, index: number, array: T[]) => R): any;
-    groupBy<K>(callbackfn: (value: T, index: number, array: T[]) => K, thisArg?: any): Grouping<K, T>[];
+    orderBy<R>(selector: (value: T, index?: number, array?: T[]) => R, desc?: boolean, comparer?: Comparer): T[];
+    orderBy<R>(selectors: Array<(value: T, index?: number, array?: T[]) => any>): T[];
+    orderByDescending<R>(selector: (value: T, index?: number, array?: T[]) => R, desc?: boolean): T[];
+    sortBy<R>(selector: (value: T, index?: number, array?: T[]) => R, desc?: boolean, comparer?: Comparer): T[];
+    sortByDescending<R>(selector: (value: T, index?: number, array?: T[]) => R): any;
+    groupBy<K>(callbackfn: (value: T, index?: number, array?: T[]) => K, thisArg?: any): Grouping<K, T>[];
     addRange(items: T[]): any;
     distinct(): T[];
     forEachJoin(action: any, actionBetweenItems: any): any;
@@ -233,10 +235,10 @@ interface StringConstructor {
 }
 interface String {
     every(callbackfn: (value: string, index: number, array: string) => boolean, thisArg?: any): boolean;
-    endsWith(s: any): any;
-    startsWith(s: any): any;
-    forEach(action: any): any;
-    contains(s: any): any;
+    endsWith(s: string): boolean;
+    startsWith(s: string): boolean;
+    forEach(action: (item: string, index?: number) => void): any;
+    contains(s: string): boolean;
     replaceAll(token: string, newToken: string, ignoreCase?: boolean): string;
     replaceMany(finds: string, replacer: Function): any;
     truncateEnd(finalLength: number): any;
@@ -248,14 +250,14 @@ interface String {
     padLeft(totalWidth: number, paddingChar?: string): any;
     toLambda(): any;
     toSelector(): any;
-    substringBetween(start: string, end: string, fromIndex?: number): any;
-    all(predicate: any): any;
+    substringBetween(start: string, end: string, fromIndex?: number): string;
+    all(predicate: (item: string, index?: number) => boolean): boolean;
     every(): any;
-    isInt(): any;
-    isFloat(): any;
-    last(predicate: any): any;
-    splitAt(index: any): any;
-    lines(): any;
+    isInt(): boolean;
+    isFloat(): boolean;
+    last(predicate?: (item: string, index?: number) => boolean): string;
+    splitAt(index: number): string[];
+    lines(): string[];
 }
 interface NumberConstructor {
     generate(min: any, max: any, step: any): any;
