@@ -30,14 +30,14 @@ interface ArrayConstructor {
     selectTwice(list1, list2, func);
     generate(length, generator);
     wrapIfNeeded(obj);
-    toArray<T>(arrayLike):T[];
-    generateNumbers(from:number, until:number):number[];
+    toArray<T>(arrayLike): T[];
+    generateNumbers(from: number, until: number): number[];
     slice();
     concat();
     fromIterator(iterator);
 }
 interface Array<T> {
-    takeWhile(pred):T[];
+    takeWhile(pred): T[];
     isArrayOfPairs?: boolean;
     contains(obj: T): boolean;
     remove(obj: T): boolean;
@@ -55,11 +55,11 @@ interface Array<T> {
     select<R>(selector: string, thisArg?: any): R[];
     selectMany<R>(callbackfn: (value: T, index: number, array: T[]) => R[], thisArg?: any): R[];
 
-    orderBy<R>(selector: (value: T, index?: number, array?: T[]) => R, desc?: boolean, comparer?: Comparer):T[];
-    orderBy<R>(selectors: Array<(value: T, index?: number, array?: T[]) => any>):T[];
-    orderByDescending<R>(selector: (value: T, index?: number, array?: T[]) => R, desc?: boolean):T[];
-    sortBy<R>(selector: (value: T, index?: number, array?: T[]) => R, desc?: boolean, comparer?: Comparer):T[];
-    sortByDescending<R>(selector: (value: T, index?: number, array?: T[]) => R);
+    orderBy<R>(selector: SelectorFunc<T, R>, desc?: boolean, valueComparer?: ComparerFunc<R>): T[];
+    orderBy(selectors: SelectorFunc<T, any>[]): T[];
+    orderByDescending<R>(selector: SelectorFunc<T, R>, desc?: boolean): T[];
+    sortBy<R>(selector: SelectorFunc<T, R>, desc?: boolean, comparer?: ComparerFunc<R>): T[];
+    sortByDescending<R>(selector: SelectorFunc<T, R>);
 
     groupBy<K>(callbackfn: (value: T, index?: number, array?: T[]) => K, thisArg?: any): Grouping<K, T>[];
     //groupBy(keySelector, itemSelector);
@@ -128,14 +128,14 @@ interface Array<T> {
 
 
 interface DateConstructor {
-    fromUnix(value:number):Date;
-    today():Date;
-    current():Date;
-    create(y?, m?, d?, h?, mm?, s?, ms?):Date;
+    fromUnix(value: number): Date;
+    today(): Date;
+    current(): Date;
+    create(y?, m?, d?, h?, mm?, s?, ms?): Date;
     _parsePart(ctx, part, setter?);
-    tryParseExact(s:string, formats:string[] | string):Date;
-    _tryParseExact(s:string, format:string):Date;
-    tryParseJsonDate(s:string):Date;
+    tryParseExact(s: string, formats: string[] | string): Date;
+    _tryParseExact(s: string, format: string): Date;
+    tryParseJsonDate(s: string): Date;
     roundUsing(mathOp, date, part, precision);
     _dowNames;
     _dowNamesAbbr;
@@ -208,7 +208,7 @@ interface Function {
     callNew(varargs);
     getName();
     addTo(target);
-    comparers: Comparer[];
+    comparers: ComparerFunc<any>[];
 }
 interface StringConstructor {
     isInt(s);
@@ -216,10 +216,10 @@ interface StringConstructor {
 }
 interface String {
     every(callbackfn: (value: string, index: number, array: string) => boolean, thisArg?: any): boolean;
-    endsWith(s:string):boolean;
-    startsWith(s:string):boolean;
-    forEach(action:(item: string, index?: number) => void);
-    contains(s:string):boolean;
+    endsWith(s: string): boolean;
+    startsWith(s: string): boolean;
+    forEach(action: (item: string, index?: number) => void);
+    contains(s: string): boolean;
     replaceAll(token: string, newToken: string, ignoreCase?: boolean): string;
     replaceMany(finds: string, replacer: Function);
     truncateEnd(finalLength: number);
@@ -234,8 +234,8 @@ interface String {
     substringBetween(start: string, end: string, fromIndex?: number): string;
     all(predicate: (item: string, index?: number) => boolean): boolean;
     every();
-    isInt():boolean;
-    isFloat():boolean;
+    isInt(): boolean;
+    isFloat(): boolean;
     last(predicate?: (item: string, index?: number) => boolean): string;
     splitAt(index: number): string[];
     lines(): string[];
@@ -260,9 +260,6 @@ interface Math {
     randomInt(min, max);
 }
 interface ComparerConstructor {
-}
-interface Comparer {
-    compare(x, y);
 }
 interface TimerConstructor {
 }
@@ -297,6 +294,8 @@ interface Error {
     innerError?: Error;
     causedBy?(e: Error);
 }
+
+
 
 
 //interface QConstructor {

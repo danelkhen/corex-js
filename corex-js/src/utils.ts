@@ -63,17 +63,6 @@ class ArrayEnumerator<T>{
     }
 }
 
-class Comparer {
-
-    compare(x, y) {
-        if (x > y)
-            return 1;
-        if (x < y)
-            return -1;
-        return 0;
-    }
-    static _default = new Comparer();
-}
 
 
 class Timer {
@@ -197,39 +186,11 @@ class ValueOfEqualityComparer {
         return Object.getHashKey(x);
     }
 }
-function combineCompareFuncs(compareFuncs) {
-    return function (a, b) {
-        var count = compareFuncs.length;
-        for (var i = 0; i < count; i++) {
-            var compare = compareFuncs[i];
-            var x = compare(a, b);
-            if (x != 0)
-                return x;
-        }
-        return 0;
-    };
-}
 
-function createCompareFuncFromSelector(selector, desc) {
-    desc = desc ? -1 : 1;
-    var compare = Comparer._default.compare;
-    var type = typeof (selector);
-    if (type == "string" || type == "number") {
-        return function (x, y) {
-            return compare(x[selector], y[selector]) * desc;
-        };
-    }
-    return function (x, y) {
-        return compare(selector(x), selector(y)) * desc;
-    };
-}
 
-function toStringOrEmpty(val) {
-    return val == null ? "" : val.toString();
-}
 
-if (typeof (window) != "undefined")
-    Function.addTo(window, [toStringOrEmpty, createCompareFuncFromSelector, combineCompareFuncs]);
+//if (typeof (window) != "undefined")
+//    Function.addTo(window, [toStringOrEmpty, createCompareFuncFromSelector, combineCompareFuncs]);
 
 
 class Dictionary<K, T> {
@@ -268,46 +229,72 @@ class Dictionary<K, T> {
 };
 
 
-class ComparerHelper {
-    static combine(comparers: any[]) {
-        var func = function MultiComparer(x, y) {
-            for (var i = 0; i < comparers.length; i++) {
-                var comparer = comparers[i];
-                var diff = comparer(x, y);
-                if (diff != 0)
-                    return diff;
-            }
-            return 0;
-        };
-        func.comparers = comparers;
-        return func;
+class MultiComparer<T> implements Comparer<T>{
+    constructor(comparers?: Comparer<T>[], comparerFuncs?: ComparerFunc<T>[]) {
+        this.comparers = comparers;
+        this.comparerFuncs = comparerFuncs;
+        if (this.comparerFuncs == null && this.comparers != null) {
+            this.comparerFuncs = this.comparers.map(t => t.compare.bind(t));
+        }
     }
-    static _default(x, y) {
+
+    comparers: Comparer<T>[];
+    comparerFuncs: ComparerFunc<T>[];
+    compare(x: T, y: T): number {
+        if (this.comparerFuncs == null)
+            return 0;
+        for (let comparerFunc of this.comparerFuncs) {
+            let diff = comparerFunc(x, y);
+            if (diff != 0)
+                return diff;
+        }
+        return 0;
+    }
+}
+
+class DefaultComparer<T> implements Comparer<T> {
+
+    compare(x, y) {
         if (x > y)
             return 1;
         if (x < y)
             return -1;
         return 0;
     }
-    //createCombined( [ "name", ["size", true], ["custom", false, customComparer] ] )
-    static createCombined(list) {
+}
+
+class ComparerHelper {
+    static combine<T>(comparers: Comparer<T>[]): MultiComparer<T> {
+        return new MultiComparer(comparers);
+    }
+    static combineFuncs<T>(comparerFuncs: ComparerFunc<T>[]): ComparerFunc<T> {
+        let mc = new MultiComparer(null, comparerFuncs);
+        return mc.compare.bind(mc);
+    }
+    static _default = new DefaultComparer<any>();
+
+    static createCombined<T>(list: SelectorComparer<T, any>[]): ComparerFunc<T> {
         var comparers = list.select(function (item) {
             if (item instanceof Array)
                 return ComparerHelper.create.apply(this, item);
             return ComparerHelper.create(item);
         });
-        var combined = ComparerHelper.combine(comparers);
+        var combined = ComparerHelper.combineFuncs(comparers);
         return combined;
     }
-    static create(selector, desc?, comparer?) {
+
+    static create<T, R>(cfg: SelectorComparer<T, R>): ComparerFunc<T> { //selector: SelectorFunc<T, R>, desc?: boolean, comparer?: ComparerFunc<T>): ComparerFunc<T> {
+        let selector = cfg.selector;
+        let desc = cfg.descending;
+        let valueComparer = cfg.valueComparerFunc;
         var selectorFunc = Q.createSelectorFunction(selector);
-        if (comparer == null)
-            comparer = ComparerHelper._default;
+        if (valueComparer == null)
+            valueComparer = ComparerHelper._default.compare;
         if (desc) {
             var func = function DescendingComparer(x, y) {
                 var x1 = selectorFunc(x);
                 var y1 = selectorFunc(y);
-                var diff = comparer(x1, y1);
+                var diff = valueComparer(x1, y1);
                 diff *= -1;
                 return diff;
             };
@@ -316,9 +303,30 @@ class ComparerHelper {
         var func = function AscendingComparer(x, y) {
             var x1 = selectorFunc(x);
             var y1 = selectorFunc(y);
-            var diff = comparer(x1, y1);
+            var diff = valueComparer(x1, y1);
             return diff;
         };
         return func;
     }
+
 }
+
+interface SelectorComparer<T, R> {
+    selector: SelectorFunc<T, R>;
+    descending?: boolean;
+    valueComparerFunc?: ComparerFunc<R>;
+}
+
+interface SelectorFunc<T, R> {
+    (obj: T, index: number): R;
+}
+interface Comparer<T> {
+    compare: ComparerFunc<T>;
+}
+interface ComparerFunc<T> {
+    (x: T, y: T): number;
+}
+//namespace Comparer {
+//    export let _default = new DefaultComparer<any>();
+//}
+

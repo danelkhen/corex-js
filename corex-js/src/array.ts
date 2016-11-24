@@ -3,7 +3,7 @@
 
 Array.prototype.takeWhile = function (pred) {
     var took = [];
-    this.first(t=> {
+    this.first(t => {
         var take = pred(t);
         if (take)
             took.push(t);
@@ -252,7 +252,7 @@ Array.prototype.sortBy = function (selector, desc, comparer) {
     if (arguments.length == 1 && selector instanceof Array)
         compareFunc = ComparerHelper.createCombined(selector);
     else
-        compareFunc = ComparerHelper.create(selector, desc, comparer);
+        compareFunc = ComparerHelper.create({ selector, descending: desc, valueComparerFunc: comparer });
     this.sort(compareFunc);
     return this;
 }
